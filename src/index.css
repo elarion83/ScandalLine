@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom utilities for enhanced card interactions */
+@layer utilities {
+  /* Custom scale value for subtle hover effect */
+  .scale-102 {
+    transform: scale(1.02);
+  }
+  
+  /* Enhanced shadow for hovered cards */
+  .shadow-2xl {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  }
+  
+  /* Smooth transitions for all interactive elements */
+  .transition-all {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+  }
+}
+
+/* Focus styles for better accessibility */
+@layer base {
+  *:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+}
+
+/* Timeline Grid Animation */
+@keyframes gridMove {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 50px 50px;
+  }
+}
+
+.timeline-grid-bg {
+  background-image: 
+    linear-gradient(to right, rgba(156, 163, 175, 0.15) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(156, 163, 175, 0.15) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: gridMove 20s linear infinite;
+}
+
+.dark .timeline-grid-bg {
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+}
+
+/* Tour highlight styles */
+.tour-highlight {
+  position: relative;
+  z-index: 51 !important;
+}
+
+/* Pulse effect for buttons */
+[data-tour="filters"].tour-highlight,
+[data-tour="stats"].tour-highlight {
+  animation: button-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Regular highlight for other elements */
+.tour-highlight:not([data-tour="filters"]):not([data-tour="stats"])::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 2px solid #3B82F6;
+  border-radius: 8px;
+  animation: border-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes button-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+  }
+}
+
+@keyframes border-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
