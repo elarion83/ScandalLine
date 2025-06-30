@@ -40,7 +40,7 @@ const StatsPanel: React.FC<StatsPanelProps> = ({ stats, scandals, onClose }) => 
       className="w-80 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 flex flex-col h-full"
     >
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-gray-100 dark:bg-gray-800">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Statistiques</h2>
         <button
           onClick={onClose}
@@ -51,7 +51,7 @@ const StatsPanel: React.FC<StatsPanelProps> = ({ stats, scandals, onClose }) => 
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-6">
+      <div className="flex-1 overflow-y-auto p-4 space-y-6 bg-white dark:bg-gray-800">
         {/* Key Metrics */}
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
@@ -68,7 +68,7 @@ const StatsPanel: React.FC<StatsPanelProps> = ({ stats, scandals, onClose }) => 
           <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
             <div className="flex items-center gap-2 mb-2">
               <DollarSign className="w-4 h-4 text-red-600 dark:text-red-400" />
-              <span className="text-xs text-red-600 dark:text-red-400 font-medium">Détourné</span>
+              <span className="text-xs text-red-600 dark:text-red-400 font-medium">Concernés</span>
             </div>
             <div className="text-lg font-bold text-red-700 dark:text-red-300">
               {formatLargeNumber(stats.totalMoney)}
@@ -103,7 +103,7 @@ const StatsPanel: React.FC<StatsPanelProps> = ({ stats, scandals, onClose }) => 
         <div>
           <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3 flex items-center gap-2">
             <Calendar className="w-4 h-4" />
-            Par catégorie
+            Par type
           </h3>
           <div className="space-y-3">
             {Object.entries(statsByMainCategory)

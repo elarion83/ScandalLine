@@ -154,7 +154,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
       className="w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col h-full"
     >
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-gray-100 dark:bg-gray-800">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Filtres</h2>
         <button
           onClick={onClose}
@@ -165,7 +165,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-6">
+      <div className="flex-1 overflow-y-auto p-4 space-y-6 bg-white dark:bg-gray-800">
         {/* Date Range */}
         <div>
           <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Période</h3>
@@ -176,7 +176,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
                 type="number"
                 value={filters.dateRange.start}
                 onChange={(e) => handleDateRangeChange('start', parseInt(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
                 min="2000"
                 max="2025"
               />
@@ -187,7 +187,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
                 type="number"
                 value={filters.dateRange.end}
                 onChange={(e) => handleDateRangeChange('end', parseInt(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
                 min="2000"
                 max="2025"
               />
@@ -293,27 +293,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
 
         {/* Personalities */}
         <div>
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-medium text-gray-900 dark:text-white">Personnalités</h3>
-            {Object.keys(filterCounts.personalities).length > ITEMS_PER_SECTION && (
-              <button
-                onClick={() => toggleSection('personalities')}
-                className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center gap-1"
-              >
-                {expandedSections.personalities ? (
-                  <>
-                    Voir moins
-                    <ChevronUp className="w-3 h-3" />
-                  </>
-                ) : (
-                  <>
-                    Voir plus
-                    <ChevronDown className="w-3 h-3" />
-                  </>
-                )}
-              </button>
-            )}
-          </div>
+          <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Personnalités</h3>
           <div className="space-y-2">
             {Object.entries(filterCounts.personalities)
               .sort(([,a], [,b]) => b - a)
@@ -337,12 +317,30 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
                   </span>
                 </label>
               ))}
+            {Object.keys(filterCounts.personalities).length > ITEMS_PER_SECTION && (
+              <button
+                onClick={() => toggleSection('personalities')}
+                className="w-full mt-2 flex items-center justify-center gap-1 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors py-2"
+              >
+                {expandedSections.personalities ? (
+                  <>
+                    Voir moins
+                    <ChevronUp className="w-4 h-4" />
+                  </>
+                ) : (
+                  <>
+                    Voir {Object.keys(filterCounts.personalities).length - ITEMS_PER_SECTION} de plus
+                    <ChevronDown className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </div>
       </div>
 
       {/* Clear Filters Button - Fixed at bottom */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+      <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
         <button
           onClick={clearFilters}
           className="w-full py-2 px-4 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium transition-colors"
