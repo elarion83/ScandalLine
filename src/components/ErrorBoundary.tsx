@@ -38,16 +38,6 @@ class ErrorBoundary extends Component<Props, State> {
               
               <div className="text-left space-y-3 mb-6">
                 <div className="flex items-start gap-3">
-                  <span className="text-blue-500 text-lg">🔒</span>
-                  <div>
-                    <p className="font-medium text-gray-900 dark:text-white">Adblock activé</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Désactivez temporairement votre bloqueur de publicités
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-3">
                   <span className="text-blue-500 text-lg">🌐</span>
                   <div>
                     <p className="font-medium text-gray-900 dark:text-white">Problème de connexion</p>

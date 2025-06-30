@@ -457,7 +457,7 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
             }}
           >
             <div 
-              className={`relative bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-all duration-300 timeline-grid-bg ${
+              className={`relative bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-all duration-300 timeline-grid-bg timeline-container ${
                 state.isTransitioning ? 'scale-95 opacity-70' : 'scale-100 opacity-100'
               } ${shouldUseAdaptiveLayout ? 'h-full flex items-center justify-center' : ''}`}
               style={{ 

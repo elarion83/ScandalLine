@@ -22,6 +22,15 @@
   }
 }
 
+/* Hover effect for scandal cards */
+.scandal-card {
+  transition: opacity 0.3s ease;
+}
+
+.timeline-container:has(.scandal-card:hover) .scandal-card:not(:hover) {
+  opacity: 0.5;
+}
+
 /* Focus styles for better accessibility */
 @layer base {
   *:focus-visible {

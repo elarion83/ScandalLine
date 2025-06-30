@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Calendar, Users, DollarSign, Scale, Tag, Building2, BadgeCheck, Timer, AlertTriangle } from 'lucide-react';
 import { Scandal } from '../types/scandal';
 import { formatCurrency, cleanScandalName, formatLargeNumber, formatDate, getCategoryColors, getCategoryLabel, getMainCategory } from '../utils/scandalUtils';
@@ -11,6 +11,8 @@ interface ScandalCardProps {
   isSelected: boolean;
   position: { x: number; y: number };
   timelineY: number;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
 const ScandalCard: React.FC<ScandalCardProps> = ({ 
@@ -18,7 +20,9 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
   onClick, 
   isSelected, 
   position,
-  timelineY 
+  timelineY,
+  className,
+  style
 }) => {
   const year = new Date(scandal.startDate).getFullYear();
   const connectionHeight = position.y - timelineY - 4;
@@ -200,12 +204,12 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
     return 'default';
   };
   
+  const ref = useRef<HTMLDivElement>(null);
+
   return (
     <div
-      data-tour="timeline"
-      className={`absolute transition-all duration-300 ${
-        isSelected ? 'z-50' : `z-${getZIndex()}`
-      }`}
+      ref={ref}
+      className={`scandal-card absolute ${isSelected ? 'z-50' : `z-${getZIndex()}`}`}
       style={{
         left: position.x,
         top: position.y,
