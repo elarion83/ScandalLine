@@ -57,27 +57,27 @@ export const shareUtils = {
   // Generate title based on context for sharing
   generateShareTitle(contextualFilter?: ContextualFilter | null): string {
     if (!contextualFilter) {
-      return 'ScandalLine : La bibliothèque aux scandales';
+      return 'ScandalList : La bibliothèque aux scandales';
     }
 
     switch (contextualFilter.type) {
       case 'personality':
-        return `ScandalLine de ${contextualFilter.value}`;
+        return `ScandalList de ${contextualFilter.value}`;
       case 'party':
-        return `ScandalLine du ${contextualFilter.value}`;
+        return `ScandalList du ${contextualFilter.value}`;
       case 'status':
         const statusText = contextualFilter.value === 'convicted' ? 'condamnées' :
                           contextualFilter.value === 'acquitted' ? 'acquittées' :
                           contextualFilter.value === 'ongoing' ? 'en cours' : 'jugées';
-        return `ScandalLine des affaires ${statusText}`;
+        return `ScandalList des affaires ${statusText}`;
       case 'scandalType':
         const typeText = contextualFilter.value === 'political' ? 'politiques' :
                         contextualFilter.value === 'financial' ? 'financiers' :
                         contextualFilter.value === 'corruption' ? 'de corruption' :
                         String(contextualFilter.value);
-        return `ScandalLine des scandales ${typeText}`;
+        return `ScandalList des scandales ${typeText}`;
       default:
-        return 'ScandalLine : La bibliothèque aux scandales';
+        return 'ScandalList : La bibliothèque aux scandales';
     }
   },
 

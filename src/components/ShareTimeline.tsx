@@ -139,17 +139,6 @@ const ShareTimeline: React.FC<ShareTimelineProps> = ({ scandals, contextualFilte
 
             {/* Share options */}
             <div className="space-y-3">
-              {/* Native share (mobile) or copy */}
-              <button
-                onClick={shareNative}
-                className="w-full flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 rounded-lg transition-colors"
-              >
-                <Share2 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                <span className="text-blue-700 dark:text-blue-300 font-medium">
-                  {'share' in navigator ? 'Partager' : 'Copier le lien'}
-                </span>
-              </button>
-
               {/* Copy link */}
               <button
                 onClick={() => handleCopy(shareUtils.generateShareUrl(contextualFilter))}
@@ -160,7 +149,17 @@ const ShareTimeline: React.FC<ShareTimelineProps> = ({ scandals, contextualFilte
                   {copied ? '✓ Copié !' : 'Copier le lien'}
                 </span>
               </button>
-
+              
+              {/* Copy full text */}
+              <button
+                onClick={() => handleCopy(getFullShareText())}
+                className="w-full flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors"
+              >
+                <Copy className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <span className="text-gray-700 dark:text-gray-300 font-medium">
+                  Copier le texte complet
+                </span>
+              </button>
               {/* Social media */}
               <div className="flex gap-2">
                 <button
@@ -180,16 +179,7 @@ const ShareTimeline: React.FC<ShareTimelineProps> = ({ scandals, contextualFilte
                 </button>
               </div>
 
-              {/* Copy full text */}
-              <button
-                onClick={() => handleCopy(getFullShareText())}
-                className="w-full flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors"
-              >
-                <Copy className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                <span className="text-gray-700 dark:text-gray-300 font-medium">
-                  Copier le texte complet
-                </span>
-              </button>
+              
             </div>
 
             {/* Info note */}

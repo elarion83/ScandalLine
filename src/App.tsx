@@ -24,7 +24,7 @@ function App() {
   return (
     <TimelineProvider>
       <div className="h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
-        <Timeline scandals={allScandals} />
+            <Timeline scandals={allScandals} />
         {showOnboarding && <OnboardingTour onComplete={handleOnboardingComplete} />}
         
         {/* Help button */}

@@ -425,14 +425,14 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
       <div className="flex flex-1 overflow-hidden">
         {/* Filters Panel */}
         <AnimatePresence>
-          {state.showFilters && (
-            <FilterPanel
-              filters={state.filters}
-              onFiltersChange={(filters) => dispatch({ type: 'SET_FILTERS', payload: filters })}
-              scandals={contextuallyFilteredScandals}
-              onClose={() => dispatch({ type: 'TOGGLE_FILTERS' })}
-            />
-          )}
+        {state.showFilters && (
+          <FilterPanel
+            filters={state.filters}
+            onFiltersChange={(filters) => dispatch({ type: 'SET_FILTERS', payload: filters })}
+            scandals={contextuallyFilteredScandals}
+            onClose={() => dispatch({ type: 'TOGGLE_FILTERS' })}
+          />
+        )}
         </AnimatePresence>
 
         {/* Main Timeline */}
@@ -466,6 +466,7 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
                 paddingTop: shouldUseAdaptiveLayout ? '0' : '60px',
                 paddingBottom: shouldUseAdaptiveLayout ? '0' : '100px'
               }}
+              data-tour="timeline"
             >
               {/* Timeline Axis - only for scrollable timelines */}
               {!shouldUseAdaptiveLayout && (
@@ -518,13 +519,13 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
 
         {/* Stats Panel */}
         <AnimatePresence>
-          {state.showStats && (
-            <StatsPanel 
-              stats={stats}
-              scandals={filteredScandals}
-              onClose={() => dispatch({ type: 'TOGGLE_STATS' })}
-            />
-          )}
+        {state.showStats && (
+          <StatsPanel
+            stats={stats}
+            scandals={filteredScandals}
+            onClose={() => dispatch({ type: 'TOGGLE_STATS' })}
+          />
+        )}
         </AnimatePresence>
       </div>
 

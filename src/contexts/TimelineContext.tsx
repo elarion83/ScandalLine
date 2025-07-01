@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
 import { FilterOptions, ContextualFilter } from '../types/scandal';
+import { shareUtils } from '../utils/shareUtils';
 
 export interface TimelineState {
   zoomLevel: number;
@@ -31,7 +32,7 @@ const initialState: TimelineState = {
   scrollPosition: 0,
   selectedScandalId: null,
   showFilters: false,
-  showStats: true,
+  showStats: false,
   filters: {
     types: [],
     dateRange: { start: 2000, end: 2025 },
@@ -78,7 +79,14 @@ const TimelineContext = createContext<{
 } | null>(null);
 
 export const TimelineProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [state, dispatch] = useReducer(timelineReducer, initialState);
+  // Parse URL filter and merge with initial state
+  const urlFilter = shareUtils.parseUrlFilter();
+  const mergedInitialState = {
+    ...initialState,
+    contextualFilter: urlFilter
+  };
+
+  const [state, dispatch] = useReducer(timelineReducer, mergedInitialState);
 
   return (
     <TimelineContext.Provider value={{ state, dispatch }}>

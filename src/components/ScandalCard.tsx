@@ -205,7 +205,7 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
   };
   
   const ref = useRef<HTMLDivElement>(null);
-
+  
   return (
     <div
       ref={ref}
@@ -323,7 +323,7 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
                 <div className="bg-white dark:bg-gray-700 p-3 rounded-xl shadow-sm">
                   <div className="flex items-center gap-2 mb-2">
                     <DollarSign className="w-4 h-4 text-red-500 dark:text-red-400" />
-                    <span className="text-xs text-gray-600 dark:text-gray-300 font-semibold">Détourné</span>
+                    <span className="text-xs text-gray-600 dark:text-gray-300 font-semibold">Concernés</span>
                   </div>
                   <div className="text-sm font-bold text-red-600 dark:text-red-400">
                     <AnimatedNumber 

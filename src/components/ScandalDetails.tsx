@@ -58,14 +58,10 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
     >
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
         {/* Header Sticky */}
-        <div className={`sticky top-0 z-10 ${getCategoryColors(scandal.type).gradient} text-white p-6 border-b border-gray-200/50 dark:border-gray-700/50`}>
+        <div className={`sticky top-0 z-10 ${getCategoryColors(scandal.type).gradient} text-white p-4 border-b border-gray-200/50 dark:border-gray-700/50`}>
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-3">
-                <span className="flex items-center gap-1.5 px-2 py-1 text-sm font-medium bg-white/20 rounded-md">
-                  <Calendar className="w-3 h-3" />
-                  {formatDate(scandal.startDate)}
-                </span>
                 {scandal.region && (
                   <span className="flex items-center gap-1.5 px-2 py-1 text-sm font-medium bg-white/20 rounded-md">
                     <MapPin className="w-3 h-3" />
@@ -74,7 +70,7 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
                 )}
               </div>
 
-              <h2 className="text-2xl font-bold text-white mb-3">
+              <h2 className="text-2xl font-bold text-white mb-3 mt-0">
                 {cleanScandalName(scandal.name)}
               </h2>
 
