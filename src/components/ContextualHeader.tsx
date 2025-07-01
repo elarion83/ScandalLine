@@ -3,7 +3,6 @@ import { ArrowLeft, Users, Building, Scale, FileText } from 'lucide-react';
 import { ContextualFilter } from '../types/scandal';
 import { getContextualTitle, getContextualDescription } from '../utils/contextualFilters';
 import ShareTimeline from './ShareTimeline';
-import { useTimeline } from '../contexts/TimelineContext';
 
 interface ContextualHeaderProps {
   contextualFilter: ContextualFilter;
@@ -22,13 +21,8 @@ const ContextualHeader: React.FC<ContextualHeaderProps> = ({
   filteredCount,
   totalMoney,
   filteredScandals,
-  onBack,
-  shouldUseAdaptiveLayout,
-  startYear,
-  endYear,
-  containerRef
+  onBack
 }) => {
-  const { state } = useTimeline();
 
   const getIcon = () => {
     switch (contextualFilter.type) {

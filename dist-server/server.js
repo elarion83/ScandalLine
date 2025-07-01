@@ -15,12 +15,12 @@ app.get('/timeline/:personName', function (req, res) {
     // Find the scandal data for this person
     var scandalData = scandals.find(function (s) { return s.name.toLowerCase() === personName.toLowerCase(); });
     // Default meta tags
-    var title = "ScandalLine - La timeline des scandales";
+    var title = "Skandalz - La timeline des scandales";
     var description = "Découvrez la chronologie interactive des scandales politiques et médiatiques.";
     var image = "https://scandalline.fr/default-image.jpg";
     // If we found specific scandal data, use it for meta tags
     if (scandalData) {
-        title = "".concat(scandalData.name, " - ScandalLine");
+        title = "".concat(scandalData.name, " - Skandalz");
         description = "D\u00E9couvrez la chronologie des scandales impliquant ".concat(scandalData.name);
         image = scandalData.image || image;
     }

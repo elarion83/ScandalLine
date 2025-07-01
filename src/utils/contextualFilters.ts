@@ -37,7 +37,7 @@ export const filterTimelineBy = (
 export const getContextualTitle = (contextualFilter: ContextualFilter): string => {
   switch (contextualFilter.type) {
     case 'personality':
-      return `ScandalList de ${contextualFilter.label}`;
+      return `Skandalz de ${contextualFilter.label}`;
     case 'party':
       return `Affaires liées au ${contextualFilter.label}`;
     case 'status':

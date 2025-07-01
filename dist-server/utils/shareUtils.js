@@ -65,26 +65,26 @@ export const shareUtils = {
     // Generate title based on context for sharing
     generateShareTitle(contextualFilter) {
         if (!contextualFilter) {
-            return 'ScandalList : La bibliothèque aux scandales';
+            return 'Skandalz : La bibliothèque aux scandales';
         }
         switch (contextualFilter.type) {
             case 'personality':
-                return `ScandalList de ${contextualFilter.value}`;
+                return `Skandalz de ${contextualFilter.value}`;
             case 'party':
-                return `ScandalList du ${contextualFilter.value}`;
+                return `Skandalz du ${contextualFilter.value}`;
             case 'status':
                 const statusText = contextualFilter.value === 'convicted' ? 'condamnées' :
                     contextualFilter.value === 'acquitted' ? 'acquittées' :
                         contextualFilter.value === 'ongoing' ? 'en cours' : 'jugées';
-                return `ScandalList des affaires ${statusText}`;
+                return `Skandalz des affaires ${statusText}`;
             case 'scandalType':
                 const typeText = contextualFilter.value === 'political' ? 'politiques' :
                     contextualFilter.value === 'financial' ? 'financiers' :
                         contextualFilter.value === 'corruption' ? 'de corruption' :
                             String(contextualFilter.value);
-                return `ScandalList des scandales ${typeText}`;
+                return `Skandalz des affaires ${typeText}`;
             default:
-                return 'ScandalList : La bibliothèque aux scandales';
+                return 'Skandalz : La bibliothèque aux scandales';
         }
     },
     // Share via Web Share API with fallback

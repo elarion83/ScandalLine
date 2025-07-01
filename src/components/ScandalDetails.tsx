@@ -8,7 +8,7 @@ import { formatLargeNumber, formatDate, cleanScandalName, getCategoryColors, get
 import { ClickablePerson, ClickableParty, ClickableStatus, ClickableType } from './ClickableElements';
 import { ScandalModalSection } from './modals/ScandalModalSection';
 import { ScandalTimeline } from './modals/ScandalTimeline';
-import { ShareMenu } from './modals/ShareMenu';
+//import { ShareMenu } from './modals/ShareMenu';
 import { AnimatedNumber } from './AnimatedNumber';
 
 interface ScandalDetailsProps {
@@ -88,7 +88,7 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
             </div>
 
             <div className="flex items-center gap-2">
-              <ShareMenu scandal={scandal} />
+              {/*<ShareMenu scandal={scandal} />*/}
             <button
               onClick={onClose}
                 className="p-2 rounded-lg hover:bg-white/20 transition-colors"

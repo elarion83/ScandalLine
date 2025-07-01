@@ -28,7 +28,7 @@ export var filterTimelineBy = function (scandals, contextualFilter) {
 export var getContextualTitle = function (contextualFilter) {
     switch (contextualFilter.type) {
         case 'personality':
-            return "ScandalList de ".concat(contextualFilter.label);
+            return "Skandalz de ".concat(contextualFilter.label);
         case 'party':
             return "Affaires li\u00E9es au ".concat(contextualFilter.label);
         case 'status':

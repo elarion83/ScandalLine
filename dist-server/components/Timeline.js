@@ -358,15 +358,13 @@ const Timeline = ({ scandals }) => {
             <div className="flex items-center gap-4">
               <div>
                 <h1 className="text-xl font-bold">
-                  ScandalList : La bibliothèque aux scandales
+                  Skandalz : La bibliothèque aux scandales
                 </h1>
                 <span className="text-sm text-gray-300">
                   Affaires et controverses du paysage politique français
                 </span>
               </div>
             </div>
-
-            <ShareTimeline scandals={filteredScandals} data-tour="share"/>
           </div>
         </div>) : (<ContextualHeader contextualFilter={state.contextualFilter} filteredCount={filteredScandals.length} totalMoney={stats.totalMoney} filteredScandals={filteredScandals} onBack={handleBackToMain} shouldUseAdaptiveLayout={shouldUseAdaptiveLayout} startYear={startYear} endYear={endYear} containerRef={containerRef}/>)}
 
@@ -385,7 +383,7 @@ const Timeline = ({ scandals }) => {
       </div>
 
       <div className="flex flex-1 overflow-hidden relative">
-          <div className={`timeline-controls ${showOnboarding ? 'tour-highlight' : ''} ${state.showFilters ? 'filters-open' : ''} ${state.showStats ? 'stats-open' : ''}`} style={{ zIndex: 999 }}>
+          <div className={`timeline-controls ${showOnboarding ? 'tour-highlight' : ''} ${state.showFilters ? 'filters-open' : ''} ${state.showStats ? 'stats-open' : ''}`} style={{ zIndex: 9999 }}>
                 <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg px-0.5">
                 <button onClick={handleZoomOut} className="p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" title="Dézoomer" disabled={state.zoomLevel <= 5}>
                   <ZoomOut className="w-4 h-4 text-gray-700 dark:text-gray-300"/>

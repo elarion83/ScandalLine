@@ -77,11 +77,11 @@ const ShareTimeline = ({ scandals, contextualFilter }) => {
         return `${title}\n\n${description}\n\n${url}`;
     };
     return (<div className="relative">
-      {/* Share button */}
+      {/* Share button 
       <button onClick={() => setIsOpen(!isOpen)} className="flex items-center gap-2 px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm font-medium" title="Partager cette timeline">
         <Share2 className="w-4 h-4"/>
         <span className="hidden sm:inline">Partager</span>
-      </button>
+      </button>*/}
 
       {/* Share modal */}
       {isOpen && (<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">

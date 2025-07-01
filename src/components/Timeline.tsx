@@ -181,7 +181,6 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
   // Handle back to main timeline
   const handleBackToMain = useCallback(() => {
     dispatch({ type: 'SET_TRANSITIONING', payload: true });
-    window.location.href = '/';
     setTimeout(() => {
       // Reset contextual filter
       dispatch({ type: 'SET_CONTEXTUAL_FILTER', payload: null });
@@ -208,6 +207,7 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
         containerRef.current.scrollLeft = 0;
         dispatch({ type: 'SET_SCROLL_POSITION', payload: 0 });
       }
+      window.location.replace('/');
     }, 150);
   }, [dispatch, scandals, state.filters]);
 
@@ -441,15 +441,13 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
             <div className="flex items-center gap-4">
               <div>
                 <h1 className="text-xl font-bold">
-                  ScandalList : La bibliothèque aux scandales
+                  Skandalz : La bibliothèque aux scandales
                 </h1>
                 <span className="text-sm text-gray-300">
                   Affaires et controverses du paysage politique français
                 </span>
               </div>
             </div>
-
-            <ShareTimeline scandals={filteredScandals} data-tour="share" />
           </div>
         </div>
       ) : (
