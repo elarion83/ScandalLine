@@ -3,24 +3,33 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// Debug des imports
-console.log('Début du chargement des modules...');
-
-try {
-  const { allScandals } = await import('./dist-server/data/index.js');
-  console.log('allScandals chargé avec succès');
-  
-  const { perso_Photos } = await import('./dist-server/data/perso_photos.js');
-  console.log('perso_Photos chargé avec succès:', typeof perso_Photos);
-} catch (error) {
-  console.error('Erreur lors du chargement des modules:', error);
-}
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Debug des photos
-console.log('Photos chargées:', perso_Photos);
+// Fonction pour trouver l'URL d'une photo
+const findPhotoUrl = (slug, photos) => {
+  try {
+    // Debug de la recherche
+    console.log('Recherche photo pour:', slug);
+    console.log('Type de photos:', typeof photos);
+    console.log('photos est un tableau:', Array.isArray(photos));
+    
+    // Structure attendue : photos[0][slug].url
+    if (Array.isArray(photos) && photos[0] && typeof photos[0] === 'object') {
+      const photo = photos[0][slug];
+      if (photo && photo.url) {
+        console.log('Photo trouvée:', photo.url);
+        return photo.url;
+      }
+    }
+
+    console.log('Photo non trouvée. Structure des photos:', JSON.stringify(photos, null, 2));
+    return '';
+  } catch (error) {
+    console.error('Erreur lors de la recherche de photo:', error);
+    return '';
+  }
+};
 
 // Fonction pour obtenir le domaine complet
 const getDomain = (req) => {
@@ -67,31 +76,6 @@ const getCurrentPosition = (scandals, name) => {
   return ''; // Retourner une chaîne vide si aucun poste trouvé
 };
 
-// Fonction pour trouver l'URL d'une photo
-const findPhotoUrl = (slug) => {
-  try {
-    // Debug de la recherche
-    console.log('Recherche photo pour:', slug);
-    console.log('Type de perso_Photos:', typeof perso_Photos);
-    console.log('perso_Photos est un tableau:', Array.isArray(perso_Photos));
-    
-    // Structure attendue : perso_Photos[0][slug].url
-    if (Array.isArray(perso_Photos) && perso_Photos[0] && typeof perso_Photos[0] === 'object') {
-      const photo = perso_Photos[0][slug];
-      if (photo && photo.url) {
-        console.log('Photo trouvée:', photo.url);
-        return photo.url;
-      }
-    }
-
-    console.log('Photo non trouvée. Structure des photos:', JSON.stringify(perso_Photos, null, 2));
-    return '';
-  } catch (error) {
-    console.error('Erreur lors de la recherche de photo:', error);
-    return '';
-  }
-};
-
 // Map des types MIME
 const MIME_TYPES = {
   '.html': 'text/html',
@@ -110,155 +94,193 @@ const MIME_TYPES = {
 };
 
 // Handler principal pour les requêtes
-const handler = async (req, res) => {
-  const url = new URL(req.url, `http://${req.headers.host}`);
-  const pathname = url.pathname;
+const createHandler = async () => {
+  console.log('Initialisation du handler...');
+  
+  // Charger les données une seule fois
+  const { allScandals } = await import('./dist-server/data/index.js');
+  console.log('allScandals chargé avec succès');
+  
+  const { perso_Photos } = await import('./dist-server/data/perso_photos.js');
+  console.log('perso_Photos chargé avec succès:', typeof perso_Photos);
 
-  // Servir index.html pour la racine
-  if (pathname === '/') {
-    const indexHtml = fs.readFileSync(path.join(__dirname, 'dist', 'index.html'), 'utf-8');
-    res.writeHead(200, { 'Content-Type': 'text/html' });
-    res.end(indexHtml);
-    return;
-  }
-
-  // Servir les fichiers statiques
-  if (pathname.startsWith('/assets/')) {
-    const filePath = path.join(__dirname, 'dist', pathname);
+  // Retourner le handler configuré avec les données
+  return async (req, res) => {
     try {
-      const content = fs.readFileSync(filePath);
-      const ext = path.extname(filePath);
-      const contentType = MIME_TYPES[ext] || 'application/octet-stream';
-      
-      res.writeHead(200, { 'Content-Type': contentType });
-      res.end(content);
-      return;
-    } catch (err) {
-      console.error('Error serving static file:', err);
-      res.writeHead(404);
-      res.end('Not found');
-      return;
-    }
-  }
+      const url = new URL(req.url, `http://${req.headers.host}`);
+      const pathname = url.pathname;
 
-  // Route pour les timelines de personnalités
-  const match = pathname.match(/^\/timeline\/(.+)$/);
-  if (match) {
-    const slug = match[1];
-    const name = slugToName(slug);
-
-    // Filtrer les scandales pour cette personnalité
-    const personalityScandals = allScandals.filter(scandal => 
-      scandal.personalities && scandal.personalities.includes(name)
-    );
-
-    // Si aucun scandale trouvé, rediriger vers la page d'accueil
-    if (personalityScandals.length === 0) {
-      res.writeHead(302, { Location: '/' });
-      res.end();
-      return;
-    }
-
-    // Calculer les statistiques
-    const totalAmount = personalityScandals.reduce((sum, scandal) => 
-      sum + (scandal.moneyAmount || 0), 0
-    );
-    const totalFines = personalityScandals.reduce((sum, scandal) => {
-      // Si la personne a une amende spécifique dans sanctions
-      const personalSanction = scandal.sanctions?.find(s => s.person === name);
-      if (personalSanction?.fine) {
-        return sum + personalSanction.fine;
+      // Servir index.html pour la racine
+      if (pathname === '/') {
+        const indexHtml = fs.readFileSync(path.join(__dirname, 'dist', 'index.html'), 'utf-8');
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        res.end(indexHtml);
+        return;
       }
-      // Sinon, utiliser l'amende générale du scandale
-      return sum + (scandal.fine || 0);
-    }, 0);
 
-    const dateRange = {
-      start: Math.min(...personalityScandals.map(s => new Date(s.startDate).getFullYear())),
-      end: Math.max(...personalityScandals.map(s => new Date(s.startDate).getFullYear()))
-    };
+      // Servir les fichiers statiques
+      if (pathname.startsWith('/assets/')) {
+        const filePath = path.join(__dirname, 'dist', pathname);
+        try {
+          const content = fs.readFileSync(filePath);
+          const ext = path.extname(filePath);
+          const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+          
+          res.writeHead(200, { 'Content-Type': contentType });
+          res.end(content);
+          return;
+        } catch (err) {
+          console.error('Error serving static file:', err);
+          res.writeHead(404);
+          res.end('Not found');
+          return;
+        }
+      }
 
-    // Obtenir le poste actuel
-    const currentPosition = getCurrentPosition(personalityScandals, name);
-    const title = currentPosition ? `${name} - ${currentPosition}` : name;
+      // Route pour les timelines de personnalités
+      const match = pathname.match(/^\/timeline\/(.+)$/);
+      if (match) {
+        const slug = match[1];
+        const name = slugToName(slug);
 
-    const indexHtml = fs.readFileSync(path.join(__dirname, 'dist', 'index.html'), 'utf-8');
+        // Filtrer les scandales pour cette personnalité
+        const personalityScandals = allScandals.filter(scandal => 
+          scandal.personalities && scandal.personalities.includes(name)
+        );
 
-    // Construire la description
-    let description = `${personalityScandals.length} scandales entre ${dateRange.start} et ${dateRange.end}`;
-    if (totalAmount > 0) {
-      description += `. Montant total concerné : ${formatEuros(totalAmount)}`;
+        // Si aucun scandale trouvé, rediriger vers la page d'accueil
+        if (personalityScandals.length === 0) {
+          res.writeHead(302, { Location: '/' });
+          res.end();
+          return;
+        }
+
+        // Calculer les statistiques
+        const totalAmount = personalityScandals.reduce((sum, scandal) => 
+          sum + (scandal.moneyAmount || 0), 0
+        );
+        const totalFines = personalityScandals.reduce((sum, scandal) => {
+          // Si la personne a une amende spécifique dans sanctions
+          const personalSanction = scandal.sanctions?.find(s => s.person === name);
+          if (personalSanction?.fine) {
+            return sum + personalSanction.fine;
+          }
+          // Sinon, utiliser l'amende générale du scandale
+          return sum + (scandal.fine || 0);
+        }, 0);
+
+        const dateRange = {
+          start: Math.min(...personalityScandals.map(s => new Date(s.startDate).getFullYear())),
+          end: Math.max(...personalityScandals.map(s => new Date(s.startDate).getFullYear()))
+        };
+
+        // Obtenir le poste actuel
+        const currentPosition = getCurrentPosition(personalityScandals, name);
+        const title = currentPosition ? `${name} - ${currentPosition}` : name;
+
+        const indexHtml = fs.readFileSync(path.join(__dirname, 'dist', 'index.html'), 'utf-8');
+
+        // Construire la description
+        let description = `${personalityScandals.length} scandales entre ${dateRange.start} et ${dateRange.end}`;
+        if (totalAmount > 0) {
+          description += `. Montant total concerné : ${formatEuros(totalAmount)}`;
+        }
+        if (totalFines > 0) {
+          description += `. Amendes : ${formatEuros(totalFines)}`;
+        }
+
+        // Récupérer l'URL de l'image
+        const photoUrl = findPhotoUrl(slug, perso_Photos);
+        const domain = getDomain(req);
+        
+        // Debug de la recherche d'image
+        console.log('Recherche image pour:', slug);
+        console.log('Premier objet photos:', perso_Photos[0]);
+        console.log('URL trouvée:', photoUrl);
+
+        // Injecter les méta tags
+        const html = indexHtml
+          .replace('</head>',
+            `<meta name="description" content="${description}" />
+            <meta property="og:title" content="${title}" />
+            <meta property="og:description" content="${description}" />
+            <meta property="og:type" content="website" />
+            <meta property="og:url" content="${domain}/timeline/${slug}" />
+            <meta property="og:image" content="${photoUrl}" />
+            <meta name="twitter:card" content="summary_large_image" />
+            <meta name="twitter:title" content="${title}" />
+            <meta name="twitter:description" content="${description}" />
+            <meta name="twitter:image" content="${photoUrl}" />
+            </head>`
+          )
+          .replace('</body>',
+            `<script>
+              window.__INITIAL_DATA__ = {
+                type: 'personality',
+                value: "${name}"
+              };
+            </script>
+            </body>`
+          );
+
+        // Headers pour éviter le cache
+        res.writeHead(200, {
+          'Content-Type': 'text/html',
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+          'Surrogate-Control': 'no-store'
+        });
+        res.end(html);
+        return;
+      }
+
+      // Route par défaut : servir index.html
+      try {
+        const indexHtml = fs.readFileSync(path.join(__dirname, 'dist', 'index.html'), 'utf-8');
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        res.end(indexHtml);
+      } catch (err) {
+        console.error('Error serving index.html:', err);
+        res.writeHead(500);
+        res.end('Server Error');
+      }
+    } catch (error) {
+      console.error('Erreur lors du traitement de la requête:', error);
+      res.statusCode = 500;
+      res.end('Server Error');
     }
-    if (totalFines > 0) {
-      description += `. Amendes : ${formatEuros(totalFines)}`;
-    }
-
-    // Récupérer l'URL de l'image
-    const photoUrl = findPhotoUrl(slug);
-    const domain = getDomain(req);
-    
-    // Debug de la recherche d'image
-    console.log('Recherche image pour:', slug);
-    console.log('Premier objet photos:', perso_Photos[0]);
-    console.log('URL trouvée:', photoUrl);
-
-    // Injecter les méta tags
-    const html = indexHtml
-      .replace('</head>',
-        `<meta name="description" content="${description}" />
-        <meta property="og:title" content="${title}" />
-        <meta property="og:description" content="${description}" />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="${domain}/timeline/${slug}" />
-        <meta property="og:image" content="${photoUrl}" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="${title}" />
-        <meta name="twitter:description" content="${description}" />
-        <meta name="twitter:image" content="${photoUrl}" />
-        </head>`
-      )
-      .replace('</body>',
-        `<script>
-          window.__INITIAL_DATA__ = {
-            type: 'personality',
-            value: "${name}"
-          };
-        </script>
-        </body>`
-      );
-
-    // Headers pour éviter le cache
-    res.writeHead(200, {
-      'Content-Type': 'text/html',
-      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0',
-      'Surrogate-Control': 'no-store'
-    });
-    res.end(html);
-    return;
-  }
-
-  // Route par défaut : servir index.html
-  try {
-    const indexHtml = fs.readFileSync(path.join(__dirname, 'dist', 'index.html'), 'utf-8');
-    res.writeHead(200, { 'Content-Type': 'text/html' });
-    res.end(indexHtml);
-  } catch (err) {
-    console.error('Error serving index.html:', err);
-    res.writeHead(500);
-    res.end('Server Error');
-  }
+  };
 };
 
-// Créer le serveur si on n'est pas sur Vercel
+// En développement : créer et démarrer le serveur
 if (process.env.NODE_ENV !== 'production') {
-  const server = http.createServer(handler);
-  const PORT = process.env.PORT || 3000;
-  server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
+  const startServer = async () => {
+    try {
+      const handler = await createHandler();
+      const server = http.createServer(handler);
+      const PORT = process.env.PORT || 3000;
+      
+      server.listen(PORT, () => {
+        console.log(`Serveur démarré sur le port ${PORT}`);
+      });
+    } catch (error) {
+      console.error('Erreur lors du démarrage du serveur:', error);
+      process.exit(1);
+    }
+  };
+
+  startServer();
 }
 
-// Exporter le handler pour Vercel
-export default handler;
+// Pour Vercel : exporter le handler
+export default async function handler(req, res) {
+  try {
+    const requestHandler = await createHandler();
+    return requestHandler(req, res);
+  } catch (error) {
+    console.error('Erreur lors de la création du handler:', error);
+    res.statusCode = 500;
+    res.end('Server Error');
+  }
+}
