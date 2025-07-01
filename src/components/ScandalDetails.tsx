@@ -58,7 +58,7 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
     >
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
         {/* Header Sticky */}
-        <div className={`sticky top-0 z-10 ${getCategoryColors(scandal.type).gradient} text-white p-4 border-b border-gray-200/50 dark:border-gray-700/50`}>
+        <div className={`sticky top-0 z-10 ${getCategoryColors(scandal.type).gradient} texture-overlay text-white p-4 border-b border-gray-200/50 dark:border-gray-700/50`}>
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-3">

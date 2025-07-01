@@ -12,7 +12,7 @@ const TOUR_STEPS: Step[] = [
   {
     target: ['[data-tour="filters"]', '[data-tour="stats"]'],
     title: 'Filtres et Statistiques',
-    description: 'Utilisez les filtres pour affiner votre recherche par type d\'affaire, statut ou parti politique. Le bouton statistiques vous donne une vue d\'ensemble des données avec des graphiques détaillés.',
+    description: 'Utilisez les boutons au bas de votre écran pour affiner votre recherche par type d\'affaire, statut ou parti politique. Le bouton statistiques vous donne une vue d\'ensemble des données avec des graphiques détaillés.',
     position: 'bottom'
   },
   {

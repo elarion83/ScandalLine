@@ -317,7 +317,7 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
         }`} />
 
         {/* Header with gradient background */}
-        <div className="relative overflow-hidden">
+        <div className="relative overflow-hidden texture-overlay">
           <div className={`absolute inset-0 ${getCategoryColors(scandal.type).gradient}`}></div>
           <div className="relative p-4">
             <h3 className="font-bold text-lg text-white leading-tight">

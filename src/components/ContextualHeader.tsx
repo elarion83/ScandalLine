@@ -61,7 +61,7 @@ const ContextualHeader: React.FC<ContextualHeaderProps> = ({
   };
 
   return (
-    <div className="bg-gradient-to-r from-gray-800 to-gray-900 text-white px-6 py-4 border-b border-gray-700">
+    <div className="texture-overlay bg-gradient-to-r from-gray-800 to-gray-900 text-white px-6 py-4 border-b border-gray-700">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button

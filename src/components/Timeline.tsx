@@ -123,13 +123,24 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
       dispatch({ type: 'SET_CONTEXTUAL_FILTER', payload: filter });
       dispatch({ type: 'SET_TRANSITIONING', payload: false });
       
-      // Reset scroll position when switching contexts
-      if (containerRef.current) {
-        containerRef.current.scrollLeft = 0;
-        dispatch({ type: 'SET_SCROLL_POSITION', payload: 0 });
+      // Get filtered scandals and their positions
+      const filteredContextScandals = filterTimelineBy(scandals, filter);
+      const width = calculateTimelineWidth(startYear, endYear, state.zoomLevel);
+      const positions = calculateScandalPositions(filteredContextScandals, startYear, endYear, width);
+      
+      // Get the last scandal's position
+      if (positions.length > 0 && containerRef.current) {
+        const lastPosition = positions[positions.length - 1];
+        const viewportWidth = containerRef.current.clientWidth;
+        
+        // Calculate scroll position to center the last scandal
+        const newScrollPosition = Math.max(0, lastPosition.x - (viewportWidth / 2));
+        
+        containerRef.current.scrollLeft = newScrollPosition;
+        dispatch({ type: 'SET_SCROLL_POSITION', payload: newScrollPosition });
       }
     }, 150);
-  }, [dispatch]);
+  }, [dispatch, scandals, startYear, endYear, state.zoomLevel]);
 
   // Handle back to main timeline
   const handleBackToMain = useCallback(() => {
@@ -159,6 +170,21 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [dispatch]);
+
+  // Initial scroll to last scandal
+  useEffect(() => {
+    if (!initialScrollDoneRef.current && containerRef.current && scandalPositions.length > 0) {
+      const lastPosition = scandalPositions[scandalPositions.length - 1];
+      const viewportWidth = containerRef.current.clientWidth;
+      
+      // Calculate scroll position to center the last scandal
+      const newScrollPosition = Math.max(0, lastPosition.x - (viewportWidth / 2));
+      
+      containerRef.current.scrollLeft = newScrollPosition;
+      dispatch({ type: 'SET_SCROLL_POSITION', payload: newScrollPosition });
+      initialScrollDoneRef.current = true;
+    }
+  }, [scandalPositions, dispatch]);
 
   // Handle zoom with center preservation (disabled for adaptive layout)
   const handleZoomIn = useCallback(() => {
@@ -354,26 +380,25 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
   }, []);
 
   return (
-    <div className="flex flex-col h-full relative">
-      {/* Header with controls */}
+    <div className="flex flex-col h-full">
+      {/* Main Header */}
       {!state.contextualFilter ? (
-        <header className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-          <div>
-            <h1 className="text-xl font-bold text-gray-800 dark:text-gray-200">
-              ScandalList : La bibliothèque aux scandales
-            </h1>
-            <span className="text-sm text-gray-600 dark:text-gray-400">
-              Affaires et controverses du paysage politique français
-            </span>
+        <div className="texture-overlay bg-gradient-to-r from-gray-800 to-gray-900 text-white px-6 py-4 border-b border-gray-700">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div>
+                <h1 className="text-xl font-bold">
+                  ScandalList : La bibliothèque aux scandales
+                </h1>
+                <span className="text-sm text-gray-300">
+                  Affaires et controverses du paysage politique français
+                </span>
+              </div>
+            </div>
+
+            <ShareTimeline scandals={filteredScandals} data-tour="share" />
           </div>
-          
-          {/* Share button */}
-          <ShareTimeline 
-            scandals={filteredScandals}
-            contextualFilter={state.contextualFilter}
-            data-tour="share"
-          />
-        </header>
+        </div>
       ) : (
         <ContextualHeader
           contextualFilter={state.contextualFilter}
@@ -389,22 +414,22 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
       )}
 
       {/* Dynamic Stats Bar - Only show for scrollable timelines */}
-        <DynamicStatsBar 
-          visibleScandals={cumulativeScandals}
-          totalScandals={filteredScandals.length}
-          scrollProgress={scrollProgress}
-          startYear={startYear}
-          endYear={endYear}
-          scrollPosition={state.scrollPosition}
-          viewportWidth={state.viewportWidth}
-          timelineWidth={timelineWidth}
-          onScrollChange={(newPosition) => {
-            if (containerRef.current) {
-              containerRef.current.scrollLeft = newPosition;
-              dispatch({ type: 'SET_SCROLL_POSITION', payload: newPosition });
-            }
-          }}
-        />
+      <DynamicStatsBar 
+        visibleScandals={cumulativeScandals}
+        totalScandals={filteredScandals.length}
+        scrollProgress={scrollProgress}
+        startYear={startYear}
+        endYear={endYear}
+        scrollPosition={state.scrollPosition}
+        viewportWidth={state.viewportWidth}
+        timelineWidth={timelineWidth}
+        onScrollChange={(newPosition) => {
+          if (containerRef.current) {
+            containerRef.current.scrollLeft = newPosition;
+            dispatch({ type: 'SET_SCROLL_POSITION', payload: newPosition });
+          }
+        }}
+      />
 
       {/* Timeline years */}
       <div className="absolute left-2 opacity-50 right-4 flex justify-between font-bold text-sm text-gray-500 dark:text-gray-400" style={{ top: '130px', marginTop: '2px' }}>
@@ -425,7 +450,7 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
                 <button
                   onClick={handleZoomOut}
                     className="p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  title="Dézoomer"
+                    title="Dézoomer"
                     disabled={state.zoomLevel <= 5}
                 >
                   <ZoomOut className="w-4 h-4 text-gray-700 dark:text-gray-300" />
