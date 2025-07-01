@@ -2,11 +2,25 @@ import http from 'http';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { allScandals } from './dist-server/data/index.js';
-import { perso_Photos } from './dist-server/data/perso_photos.js';
+
+// Debug des imports
+console.log('Début du chargement des modules...');
+
+try {
+  const { allScandals } = await import('./dist-server/data/index.js');
+  console.log('allScandals chargé avec succès');
+  
+  const { perso_Photos } = await import('./dist-server/data/perso_photos.js');
+  console.log('perso_Photos chargé avec succès:', typeof perso_Photos);
+} catch (error) {
+  console.error('Erreur lors du chargement des modules:', error);
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Debug des photos
+console.log('Photos chargées:', perso_Photos);
 
 // Fonction pour obtenir le domaine complet
 const getDomain = (req) => {
@@ -51,6 +65,31 @@ const getCurrentPosition = (scandals, name) => {
   }
 
   return ''; // Retourner une chaîne vide si aucun poste trouvé
+};
+
+// Fonction pour trouver l'URL d'une photo
+const findPhotoUrl = (slug) => {
+  try {
+    // Debug de la recherche
+    console.log('Recherche photo pour:', slug);
+    console.log('Type de perso_Photos:', typeof perso_Photos);
+    console.log('perso_Photos est un tableau:', Array.isArray(perso_Photos));
+    
+    // Structure attendue : perso_Photos[0][slug].url
+    if (Array.isArray(perso_Photos) && perso_Photos[0] && typeof perso_Photos[0] === 'object') {
+      const photo = perso_Photos[0][slug];
+      if (photo && photo.url) {
+        console.log('Photo trouvée:', photo.url);
+        return photo.url;
+      }
+    }
+
+    console.log('Photo non trouvée. Structure des photos:', JSON.stringify(perso_Photos, null, 2));
+    return '';
+  } catch (error) {
+    console.error('Erreur lors de la recherche de photo:', error);
+    return '';
+  }
 };
 
 // Map des types MIME
@@ -155,8 +194,13 @@ const handler = async (req, res) => {
     }
 
     // Récupérer l'URL de l'image
-    const photoUrl = perso_Photos[0][slug]?.url || '';
+    const photoUrl = findPhotoUrl(slug);
     const domain = getDomain(req);
+    
+    // Debug de la recherche d'image
+    console.log('Recherche image pour:', slug);
+    console.log('Premier objet photos:', perso_Photos[0]);
+    console.log('URL trouvée:', photoUrl);
 
     // Injecter les méta tags
     const html = indexHtml
@@ -183,7 +227,14 @@ const handler = async (req, res) => {
         </body>`
       );
 
-    res.writeHead(200, { 'Content-Type': 'text/html' });
+    // Headers pour éviter le cache
+    res.writeHead(200, {
+      'Content-Type': 'text/html',
+      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+      'Surrogate-Control': 'no-store'
+    });
     res.end(html);
     return;
   }
