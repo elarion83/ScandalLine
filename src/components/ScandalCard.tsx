@@ -338,7 +338,8 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
               {(scandal.personalities || []).slice(0, 2).map((person, index) => (
                 <span key={person}>
                   <ClickablePerson 
-                    name={person} 
+                    name={person}
+                    data-tour="timeline"
                     className="cursor-pointer hover:text-purple-600 dark:hover:text-purple-400 transition-colors hover:underline decoration-purple-400/50 dark:decoration-purple-600/50"
                   >
                     {person}
@@ -382,6 +383,7 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
                   <div className="text-sm text-gray-800 dark:text-gray-100">
                     <ClickableParty 
                       party={scandal.politicalParty}
+                      data-tour="timeline"
                       className="cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors hover:underline decoration-blue-400/50 dark:decoration-blue-600/50"
                     >
                       {scandal.politicalParty}
@@ -455,6 +457,7 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
           <div className="col-span-2 flex justify-between items-center">
             <ClickableStatus 
               status={scandal.status}
+              data-tour="timeline"
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm cursor-pointer hover:scale-105 transition-transform active:scale-95 ${
                 scandal.status === 'convicted' 
                   ? 'bg-red-100 text-red-700 dark:bg-red-900/60 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800/60' 
@@ -470,6 +473,7 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
             </ClickableStatus>
             <ClickableType
               type={getMainCategory(scandal.type)}
+              data-tour="timeline"
               className="text-xs text-gray-500 dark:text-gray-400 font-medium hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
             >
               {getCategoryLabel(getMainCategory(scandal.type))}

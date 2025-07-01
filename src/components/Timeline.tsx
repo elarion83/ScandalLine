@@ -269,7 +269,7 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
       
       // Empêcher le scroll forcé à droite en mode contextuel
       if (state.contextualFilter) {
-        dispatch({ type: 'SET_SCROLL_POSITION', payload: scrollLeft });
+      dispatch({ type: 'SET_SCROLL_POSITION', payload: scrollLeft });
         return;
       }
       
@@ -308,18 +308,18 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
         containerRef.current.scrollLeft = 0;
         dispatch({ type: 'SET_SCROLL_POSITION', payload: 0 });
       } else {
-        // Calculate scroll position to center the latest scandal
-        const viewportWidth = containerRef.current.clientWidth;
-        const targetScrollLeft = Math.max(0, latestPosition.x - (viewportWidth / 2) + (CARD_WIDTH / 2));
-        
-        // Smooth scroll to position
-        containerRef.current.scrollTo({
-          left: targetScrollLeft,
-          behavior: 'smooth'
-        });
-        
-        // Update scroll position in state
-        dispatch({ type: 'SET_SCROLL_POSITION', payload: targetScrollLeft });
+      // Calculate scroll position to center the latest scandal
+      const viewportWidth = containerRef.current.clientWidth;
+      const targetScrollLeft = Math.max(0, latestPosition.x - (viewportWidth / 2) + (CARD_WIDTH / 2));
+      
+      // Smooth scroll to position
+      containerRef.current.scrollTo({
+        left: targetScrollLeft,
+        behavior: 'smooth'
+      });
+      
+      // Update scroll position in state
+      dispatch({ type: 'SET_SCROLL_POSITION', payload: targetScrollLeft });
       }
       
       // Mark initial scroll as done
@@ -415,38 +415,38 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
       <div className="flex flex-1 overflow-hidden relative">
         {/* Timeline Controls - Hide when only one scandal */}
         {filteredScandals.length > 1 && (
-          <div className={`timeline-controls ${
+          <div className={`timeline-controls ${showOnboarding ? 'tour-highlight' : ''} ${
             state.showFilters ? 'filters-open' : ''
-          } ${state.showStats ? 'stats-open' : ''}`}>
+          } ${state.showStats ? 'stats-open' : ''}`} style={{ zIndex: 99 }}>
             {/* Zoom controls - only show for scrollable timelines */}
             {!shouldUseAdaptiveLayout && (
               <>
                 <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg px-0.5">
-                  <button
-                    onClick={handleZoomOut}
+                <button
+                  onClick={handleZoomOut}
                     className="p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    title="Dézoomer"
+                  title="Dézoomer"
                     disabled={state.zoomLevel <= 5}
-                  >
-                    <ZoomOut className="w-4 h-4 text-gray-700 dark:text-gray-300" />
-                  </button>
-                  
-                  <button
-                    onClick={handleResetZoom}
+                >
+                  <ZoomOut className="w-4 h-4 text-gray-700 dark:text-gray-300" />
+                </button>
+                
+                <button
+                  onClick={handleResetZoom}
                     className="px-2 py-1.5 min-w-[3.5rem] text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors"
-                  >
+                >
                     {Math.round((state.zoomLevel / 15) * 100)}%
-                  </button>
-                  
-                  <button
-                    onClick={handleZoomIn}
+                </button>
+                
+                <button
+                  onClick={handleZoomIn}
                     className="p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    title="Zoomer"
-                    disabled={state.zoomLevel >= 300}
-                  >
-                    <ZoomIn className="w-4 h-4 text-gray-700 dark:text-gray-300" />
-                  </button>
-                </div>
+                  title="Zoomer"
+                  disabled={state.zoomLevel >= 300}
+                >
+                  <ZoomIn className="w-4 h-4 text-gray-700 dark:text-gray-300" />
+                </button>
+              </div>
                 <div className="w-px h-6 bg-gray-200 dark:bg-gray-600 self-center mx-1"></div>
               </>
             )}
@@ -509,7 +509,6 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
           {/* Timeline Container */}
           <div
             ref={containerRef}
-            data-tour="timeline"
             className={`flex-1 h-full transition-all duration-300 overflow-auto ${state.isDragging ? 'cursor-grabbing' : 'cursor-grab'} ${state.isTransitioning ? 'pointer-events-none' : ''}`}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
@@ -528,7 +527,6 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
                 paddingTop: '60px',
                 paddingBottom: '100px'
               }}
-              data-tour="timeline"
             >
               {/* Timeline background with grid */}
               <div 
@@ -561,6 +559,7 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
                   timelineWidth={timelineWidth}
                   zoomLevel={state.zoomLevel}
                   timelineY={TIMELINE_Y}
+                  data-tour="timeline-axis"
                 />
               </div>
 
@@ -579,6 +578,7 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
                 
                 return (
                   <ScandalCard
+                    
                     key={scandal.id}
                     scandal={scandal}
                     position={position}

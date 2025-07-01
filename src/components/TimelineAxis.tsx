@@ -32,17 +32,6 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
         }}
       />
 
-      {/* Timeline glow effect */}
-      <div
-        className="absolute bg-gradient-to-r from-transparent via-gray-300 to-transparent dark:via-gray-700 opacity-30 blur-sm"
-        style={{
-          left: 0,
-          right: 0,
-          top: timelineY - 4,
-          height: '12px',
-          borderRadius: '6px'
-        }}
-      />
 
       {/* Year markers and labels */}
       {yearMarkers.map(({ year, x, isMainMarker }) => (

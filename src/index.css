@@ -138,7 +138,17 @@
 /* Tour highlight styles */
 .tour-highlight {
   position: relative;
-  z-index: 51 !important;
+  z-index: 102 !important;
+  isolation: isolate;
+}
+
+.tour-highlight::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  background: rgba(255, 248, 185, 0.5);
+  border-radius: 12px;
+  z-index: -1;
 }
 
 /* Pulse effect for buttons */
@@ -155,6 +165,18 @@
   border: 2px solid #3B82F6;
   border-radius: 8px;
   animation: border-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  z-index: -1;
+}
+
+@keyframes highlight-pulse {
+  0%, 100% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
 }
 
 @keyframes button-pulse {
