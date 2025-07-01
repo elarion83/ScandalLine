@@ -73,7 +73,7 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
   }, [startYear, endYear, state.filters]);
   
   // Determine if we need adaptive layout
-  const shouldUseAdaptiveLayout = !needsScrolling(filteredScandals);
+  const shouldUseAdaptiveLayout = false;
   
   // Calculate timeline dimensions based on adaptive behavior
   const { timelineWidth, gaps, scandalPositions } = useMemo(() => {
@@ -264,7 +264,12 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
   const handleScroll = useCallback(() => {
     if (containerRef.current && !state.isDragging && !shouldUseAdaptiveLayout) {
       const scrollLeft = containerRef.current.scrollLeft;
-      dispatch({ type: 'SET_SCROLL_POSITION', payload: scrollLeft });
+      
+      // Empêcher le scroll forcé à droite en mode contextuel
+      if (state.contextualFilter) {
+        dispatch({ type: 'SET_SCROLL_POSITION', payload: scrollLeft });
+        return;
+      }
       
       // Clear existing timeout
       if (scrollTimeoutRef.current) {
@@ -276,7 +281,7 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
         dispatch({ type: 'SET_SCROLL_POSITION', payload: scrollLeft });
       }, 16); // ~60fps
     }
-  }, [dispatch, state.isDragging, shouldUseAdaptiveLayout]);
+  }, [dispatch, state.isDragging, shouldUseAdaptiveLayout, state.contextualFilter]);
 
   // Format zoom level for display
   const formatZoomLevel = (zoom: number): string => {
@@ -296,23 +301,29 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
       const sortedPositions = [...scandalPositions].sort((a, b) => b.date.getTime() - a.date.getTime());
       const latestPosition = sortedPositions[0];
       
-      // Calculate scroll position to center the latest scandal
-      const viewportWidth = containerRef.current.clientWidth;
-      const targetScrollLeft = Math.max(0, latestPosition.x - (viewportWidth / 2) + (CARD_WIDTH / 2));
-      
-      // Smooth scroll to position
-      containerRef.current.scrollTo({
-        left: targetScrollLeft,
-        behavior: 'smooth'
-      });
-      
-      // Update scroll position in state
-      dispatch({ type: 'SET_SCROLL_POSITION', payload: targetScrollLeft });
+      // Ne pas scroller automatiquement si on est en mode contextuel
+      if (state.contextualFilter) {
+        containerRef.current.scrollLeft = 0;
+        dispatch({ type: 'SET_SCROLL_POSITION', payload: 0 });
+      } else {
+        // Calculate scroll position to center the latest scandal
+        const viewportWidth = containerRef.current.clientWidth;
+        const targetScrollLeft = Math.max(0, latestPosition.x - (viewportWidth / 2) + (CARD_WIDTH / 2));
+        
+        // Smooth scroll to position
+        containerRef.current.scrollTo({
+          left: targetScrollLeft,
+          behavior: 'smooth'
+        });
+        
+        // Update scroll position in state
+        dispatch({ type: 'SET_SCROLL_POSITION', payload: targetScrollLeft });
+      }
       
       // Mark initial scroll as done
       initialScrollDoneRef.current = true;
     }
-  }, [scandalPositions, shouldUseAdaptiveLayout, dispatch]);
+  }, [scandalPositions, shouldUseAdaptiveLayout, dispatch, state.contextualFilter]);
 
   // Reset initial scroll flag when scandals change significantly
   useEffect(() => {
@@ -457,11 +468,7 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
           <div
             ref={containerRef}
             data-tour="timeline"
-            className={`flex-1 transition-all duration-300 ${
-              shouldUseAdaptiveLayout 
-                ? 'overflow-visible'
-                : `overflow-auto ${state.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`
-            } ${state.isTransitioning ? 'pointer-events-none' : ''}`}
+            className={`flex-1 transition-all duration-300 overflow-auto ${state.isDragging ? 'cursor-grabbing' : 'cursor-grab'} ${state.isTransitioning ? 'pointer-events-none' : ''}`}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}

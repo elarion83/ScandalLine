@@ -91,6 +91,8 @@ const DynamicStatsBar: React.FC<DynamicStatsBarProps> = ({
       ref={containerRef}
       className="relative w-full bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm cursor-grab active:cursor-grabbing [&.dragging_.transition-all]:transition-none"
       onMouseDown={handleMouseDown}
+      style={{
+        overflow: 'hidden'}}
     >
       {/* Progress bar background */}
       <div 

@@ -10,7 +10,7 @@ export const filterTimelineBy = (
     case 'personality':
       return scandals.filter(scandal => 
         scandal.personalities?.some(person => 
-          person.toLowerCase().includes(contextualFilter.value.toString().toLowerCase())
+          person === contextualFilter.value.toString()
         ) ?? false
       );
     

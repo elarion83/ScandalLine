@@ -1,49 +1,91 @@
 import { ContextualFilter } from '../types/scandal';
-import { Personality, SocialMetadata, Scandal } from '../types/scandal';
-import { formatLargeNumber } from './scandalUtils';
 
-// Utility functions for sharing and URL management
-export const shareUtils = {
-  
-  // Generate shareable URL with filters encoded
-  generateShareUrl(contextualFilter?: ContextualFilter | null): string {
-    const baseUrl = window.location.origin + window.location.pathname;
-    
-    if (!contextualFilter) {
-      return baseUrl;
+const baseUrl = 'https://scandalline.fr';
+
+interface ShareUtils {
+  copyToClipboard(text: string): Promise<boolean>;
+  shareNative(title: string, text: string, url: string): Promise<void>;
+  generateShareTitle(contextualFilter: ContextualFilter | null): string;
+  generateShareUrl(contextualFilter: ContextualFilter | null): string;
+  parseUrlFilter(): ContextualFilter | null;
+}
+
+export const shareUtils: ShareUtils = {
+  copyToClipboard: async (text: string): Promise<boolean> => {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+      return false;
     }
-    
+  },
+
+  shareNative: async (title: string, text: string, url: string): Promise<void> => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title,
+          text,
+          url
+        });
+      } catch (err) {
+        if (err instanceof Error && err.name !== 'AbortError') {
+          console.error('Error sharing:', err);
+        }
+      }
+    } else {
+      await shareUtils.copyToClipboard(`${title}\n\n${text}\n\n${url}`);
+    }
+  },
+
+  generateShareTitle: (contextualFilter: ContextualFilter | null): string => {
+    if (!contextualFilter) return 'ScandalList : La bibliothèque aux scandales';
+
+    switch (contextualFilter.type) {
+      case 'personality':
+        return `ScandalList de ${contextualFilter.label}`;
+      case 'party':
+        return `Affaires liées au ${contextualFilter.label}`;
+      case 'status':
+        return `Affaires ${contextualFilter.label}`;
+      case 'scandalType':
+        return `Affaires de type "${contextualFilter.label}"`;
+      default:
+        return 'ScandalList : La bibliothèque aux scandales';
+    }
+  },
+
+  generateShareUrl: (contextualFilter: ContextualFilter | null): string => {
+    if (!contextualFilter) return baseUrl;
+
     const params = new URLSearchParams();
-    params.set('filter', JSON.stringify(contextualFilter));
-    
+    params.set('filter', contextualFilter.type);
+    params.set('value', contextualFilter.value.toString());
+    params.set('label', contextualFilter.label);
+
     return `${baseUrl}?${params.toString()}`;
   },
 
-  // Parse URL parameters to restore contextual filter
-  parseUrlFilter(): ContextualFilter | null {
-    try {
-      const urlParams = new URLSearchParams(window.location.search);
-      const filterParam = urlParams.get('filter');
-      
-      if (!filterParam) {
-        return null;
-      }
-      
-      const parsedFilter = JSON.parse(filterParam);
-      
-      // Validate the filter structure
-      if (parsedFilter && 
-          typeof parsedFilter.type === 'string' && 
-          (parsedFilter.value !== undefined) &&
-          typeof parsedFilter.label === 'string') {
-        return parsedFilter as ContextualFilter;
-      }
-      
-      return null;
-    } catch (error) {
-      console.warn('Error parsing URL filter:', error);
-      return null;
+  parseUrlFilter: (): ContextualFilter | null => {
+    if (typeof window === 'undefined') return null;
+
+    const params = new URLSearchParams(window.location.search);
+    const filterType = params.get('filter');
+    const filterValue = params.get('value');
+    const filterLabel = params.get('label');
+
+    if (!filterType || !filterValue || !filterLabel) return null;
+
+    if (['personality', 'party', 'status', 'scandalType'].includes(filterType)) {
+      return {
+        type: filterType as 'personality' | 'party' | 'status' | 'scandalType',
+        value: filterValue,
+        label: filterLabel
+      };
     }
+
+    return null;
   },
 
   // Update URL without reload
@@ -126,68 +168,4 @@ export const shareUtils = {
       return false;
     }
   }
-};
-
-export function generatePersonalityStats(scandals: Scandal[]) {
-  return {
-    totalScandals: scandals.length,
-    totalMoneyAmount: scandals.reduce((sum, s) => sum + (s.moneyAmount || 0), 0),
-    totalFines: scandals.reduce((sum, s) => sum + (s.fine || 0), 0),
-    totalPrisonYears: scandals.reduce((sum, s) => sum + (s.prisonYears || 0), 0),
-  };
-}
-
-export function generatePersonalityMetadata(
-  personality: Personality,
-  scandals: Scandal[],
-  baseUrl: string
-): SocialMetadata {
-  const stats = generatePersonalityStats(scandals);
-  
-  const description = [
-    `📊 ${stats.totalScandals} affaires recensées`,
-    stats.totalMoneyAmount > 0 ? `💰 ${formatLargeNumber(stats.totalMoneyAmount)}€ concernés` : null,
-    stats.totalFines > 0 ? `🏛️ ${formatLargeNumber(stats.totalFines)}€ d'amendes` : null,
-    stats.totalPrisonYears > 0 ? `⚖️ ${stats.totalPrisonYears} ans de prison` : null,
-  ].filter(Boolean).join(' • ');
-
-  return {
-    title: `ScandalList de ${personality.name}`,
-    description,
-    image: personality.imageUrl,
-    url: `${baseUrl}/personnalite/${encodeURIComponent(personality.id)}`,
-    type: 'timeline'
-  };
-}
-
-export function updateDocumentMetadata(metadata: SocialMetadata) {
-  // Mise à jour du titre
-  document.title = metadata.title;
-
-  // Mise à jour des balises meta
-  const metaTags = {
-    'description': metadata.description,
-    'og:title': metadata.title,
-    'og:description': metadata.description,
-    'og:image': metadata.image,
-    'og:url': metadata.url,
-    'og:type': metadata.type,
-    'twitter:card': 'summary_large_image',
-    'twitter:title': metadata.title,
-    'twitter:description': metadata.description,
-    'twitter:image': metadata.image,
-  };
-
-  Object.entries(metaTags).forEach(([name, content]) => {
-    let element = document.querySelector(`meta[property="${name}"]`) ||
-                  document.querySelector(`meta[name="${name}"]`);
-    
-    if (!element) {
-      element = document.createElement('meta');
-      element.setAttribute(name.startsWith('og:') ? 'property' : 'name', name);
-      document.head.appendChild(element);
-    }
-    
-    element.setAttribute('content', content);
-  });
-} 
+}; 

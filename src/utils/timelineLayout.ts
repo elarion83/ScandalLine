@@ -269,69 +269,61 @@ export const calculateScandalPositions = (
 ): ScandalPosition[] => {
   if (scandals.length === 0) return [];
 
-  // Sort scandals by date to process them chronologically
-  const sortedScandals = [...scandals].sort((a, b) => 
-    new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
-  );
+  // Si nous n'avons qu'un seul scandale, le centrer
+  if (scandals.length === 1) {
+    const scandal = scandals[0];
+    return [{
+      id: scandal.id,
+      x: timelineWidth / 2 - CARD_WIDTH / 2,
+      y: TIMELINE_Y + MIN_VERTICAL_SPACING,
+      width: CARD_WIDTH,
+      height: CARD_HEIGHT,
+      date: new Date(scandal.startDate)
+    }];
+  }
 
   const positions: ScandalPosition[] = [];
-  const tracks: Array<{ 
-    scandals: Array<{ startX: number; endX: number; id: string }>;
-    y: number;
-  }> = [];
+  const tracks: Array<{ endX: number }> = [];
 
-  sortedScandals.forEach(scandal => {
+  // Trier les scandales par date
+  const sortedScandals = [...scandals].sort(
+    (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+  );
+
+  // Calculer la position X pour chaque scandale
+  for (const scandal of sortedScandals) {
     const x = getXPositionForDate(scandal.startDate, startYear, endYear, timelineWidth);
-    const startX = x - CARD_WIDTH / 2;
-    const endX = x + CARD_WIDTH / 2;
     
-    // Find the best track for this scandal
-    let assignedTrack = -1;
-    
-    // Try to find an existing track where this scandal fits
-    for (let i = 0; i < tracks.length; i++) {
-      const track = tracks[i];
-      let canFit = true;
-      
-      // Check collision with all scandals in this track
-      for (const existingScandal of track.scandals) {
-        const horizontalOverlap = !(endX + MIN_HORIZONTAL_SPACING < existingScandal.startX || 
-                                   startX - MIN_HORIZONTAL_SPACING > existingScandal.endX);
-        if (horizontalOverlap) {
-          canFit = false;
-          break;
-        }
-      }
-      
-      if (canFit) {
-        assignedTrack = i;
-        break;
-      }
+    // Trouver une piste disponible
+    let trackIndex = 0;
+    while (
+      trackIndex < tracks.length &&
+      tracks[trackIndex].endX > x - (CARD_WIDTH + MIN_HORIZONTAL_SPACING)
+    ) {
+      trackIndex++;
     }
-    
-    // If no existing track works, create a new one
-    if (assignedTrack === -1) {
-      assignedTrack = tracks.length;
-      tracks.push({
-        scandals: [],
-        y: TIMELINE_Y + 50 + (assignedTrack * TRACK_HEIGHT)
-      });
+
+    // Si aucune piste n'est disponible, en créer une nouvelle
+    if (trackIndex === tracks.length) {
+      tracks.push({ endX: 0 });
     }
-    
-    // Add scandal to the assigned track
-    tracks[assignedTrack].scandals.push({ startX, endX, id: scandal.id });
-    
-    const y = tracks[assignedTrack].y;
-    
+
+    // Calculer la position Y
+    const y = TIMELINE_Y + MIN_VERTICAL_SPACING + (trackIndex * TRACK_HEIGHT);
+
+    // Mettre à jour la fin de la piste
+    tracks[trackIndex].endX = x + CARD_WIDTH;
+
+    // Ajouter la position
     positions.push({
       id: scandal.id,
-      x: startX,
-      y: y,
+      x: Math.max(0, Math.min(timelineWidth - CARD_WIDTH, x - CARD_WIDTH / 2)),
+      y,
       width: CARD_WIDTH,
       height: CARD_HEIGHT,
       date: new Date(scandal.startDate)
     });
-  });
+  }
 
   return positions;
 };

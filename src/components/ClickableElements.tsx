@@ -20,10 +20,17 @@ export const ClickablePerson: React.FC<ClickablePersonProps> = ({
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    dispatch({ 
-      type: 'SET_CONTEXTUAL_FILTER', 
-      payload: createContextualFilter('personality', name, name)
-    });
+    dispatch({ type: 'SET_TRANSITIONING', payload: true });
+    
+    // Simulate loading time
+    setTimeout(() => {
+      dispatch({ 
+        type: 'SET_CONTEXTUAL_FILTER', 
+        payload: createContextualFilter('personality', name, name)
+      });
+      dispatch({ type: 'SET_TRANSITIONING', payload: false });
+    }, 300);
+    
     onFilter?.();
   };
 
@@ -55,10 +62,17 @@ export const ClickableParty: React.FC<ClickablePartyProps> = ({
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    dispatch({ 
-      type: 'SET_CONTEXTUAL_FILTER', 
-      payload: createContextualFilter('party', party, party)
-    });
+    dispatch({ type: 'SET_TRANSITIONING', payload: true });
+    
+    // Simulate loading time
+    setTimeout(() => {
+      dispatch({ 
+        type: 'SET_CONTEXTUAL_FILTER', 
+        payload: createContextualFilter('party', party, party)
+      });
+      dispatch({ type: 'SET_TRANSITIONING', payload: false });
+    }, 300);
+    
     onFilter?.();
   };
 
@@ -100,10 +114,17 @@ export const ClickableStatus: React.FC<ClickableStatusProps> = ({
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    dispatch({ 
-      type: 'SET_CONTEXTUAL_FILTER', 
-      payload: createContextualFilter('status', status, getStatusLabel(status))
-    });
+    dispatch({ type: 'SET_TRANSITIONING', payload: true });
+    
+    // Simulate loading time
+    setTimeout(() => {
+      dispatch({ 
+        type: 'SET_CONTEXTUAL_FILTER', 
+        payload: createContextualFilter('status', status, getStatusLabel(status))
+      });
+      dispatch({ type: 'SET_TRANSITIONING', payload: false });
+    }, 300);
+    
     onFilter?.();
   };
 
@@ -135,10 +156,17 @@ export const ClickableType: React.FC<ClickableTypeProps> = ({
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    dispatch({ 
-      type: 'SET_CONTEXTUAL_FILTER', 
-      payload: createContextualFilter('scandalType', type, getCategoryLabel(type))
-    });
+    dispatch({ type: 'SET_TRANSITIONING', payload: true });
+    
+    // Simulate loading time
+    setTimeout(() => {
+      dispatch({ 
+        type: 'SET_CONTEXTUAL_FILTER', 
+        payload: createContextualFilter('scandalType', type, getCategoryLabel(type))
+      });
+      dispatch({ type: 'SET_TRANSITIONING', payload: false });
+    }, 300);
+    
     onFilter?.();
   };
 
