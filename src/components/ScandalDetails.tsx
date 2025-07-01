@@ -70,11 +70,11 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
                 )}
               </div>
 
-              <h2 className="text-2xl font-bold text-white mb-3 mt-0">
+              <h2 className="text-2xl font-bold ml-5 text-white mb-3 mt-0">
                 {cleanScandalName(scandal.name)}
               </h2>
 
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-wrap items-center ml-5 gap-2">
                 <ClickableType 
                   type={scandal.type}
                   onFilter={onClose}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, TrendingUp, Users, DollarSign, Scale, Calendar } from 'lucide-react';
+import { X, TrendingUp, Users, DollarSign, Scale, Calendar, FileText, Building2, BarChart2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { formatCurrency, formatLargeNumber, getCategoryLabel, getMainCategory, getCategoryColors } from '../utils/scandalUtils';
 
@@ -41,7 +41,10 @@ const StatsPanel: React.FC<StatsPanelProps> = ({ stats, scandals, onClose }) => 
     >
       {/* Header */}
       <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-gray-100 dark:bg-gray-800">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Statistiques</h2>
+        <div className="flex items-center gap-2">
+          <BarChart2 className="w-5 h-5 text-gray-900 dark:text-white" />
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Statistiques</h2>
+        </div>
         <button
           onClick={onClose}
           className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -102,8 +105,8 @@ const StatsPanel: React.FC<StatsPanelProps> = ({ stats, scandals, onClose }) => 
         {/* By Type */}
         <div>
           <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-            <Calendar className="w-4 h-4" />
-            Par type
+            <FileText className="w-4 h-4" />
+            <span>Par type</span>
           </h3>
           <div className="space-y-3">
             {Object.entries(statsByMainCategory)
@@ -138,8 +141,8 @@ const StatsPanel: React.FC<StatsPanelProps> = ({ stats, scandals, onClose }) => 
         {Object.keys(stats.byParty).length > 0 && (
           <div>
             <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-              <Users className="w-4 h-4" />
-              Par parti politique
+              <Building2 className="w-4 h-4" />
+              <span>Par parti politique</span>
             </h3>
             <div className="space-y-3">
               {Object.entries(stats.byParty)
@@ -167,8 +170,8 @@ const StatsPanel: React.FC<StatsPanelProps> = ({ stats, scandals, onClose }) => 
         {/* By Decade */}
         <div>
           <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-            <TrendingUp className="w-4 h-4" />
-            Par décennie
+            <Calendar className="w-4 h-4" />
+            <span>Par décennie</span>
           </h3>
           <div className="space-y-3">
             {Object.entries(stats.byDecade)

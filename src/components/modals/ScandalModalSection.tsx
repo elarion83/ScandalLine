@@ -20,7 +20,7 @@ const ScandalModalSection: React.FC<ScandalModalSectionProps> = ({
         {Icon && <Icon className="w-5 h-5 text-gray-600 dark:text-gray-400" />}
         {title}
       </h3>
-      {children}
+      {children} 
     </section>
   );
 };

@@ -62,9 +62,9 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
                   className="relative px-3  py-4 rounded-2x border border-white/30 dark:border-white/10 pb-0"
                 >
                   <span className="relative z-10 text-grey dark:text-white tracking-wide inline-block"
-                     style={{ filter: 'blur(1px)' ,                    transform: 'rotate(25deg)',
+                     style={{ transform: 'rotate(0deg) translateY(25px)',
 
-                      fontSize: '1em', opacity: 0.3 }}>
+                      fontSize: '1em', opacity: 0.1 }}>
                     {year}
                   </span>
                 </div>
@@ -96,7 +96,7 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
                   {/* Conteneur avec effet glassmorphism plus léger */}
                   <div 
                     className="relative px-2 py-3 rounded-xl bg-white/10 dark:bg-gray-900/10 backdrop-blur-[1px] border border-white/20 dark:border-white/5"
-                    style={{ transform: 'rotate(25deg)' }}
+                    style={{ transform: 'rotate(90deg)' }}
                   >
                     <span className="relative z-10 text-black/60 dark:text-gray-300 tracking-wide inline-block">
                       {year}

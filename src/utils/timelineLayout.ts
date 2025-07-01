@@ -447,9 +447,31 @@ export const calculateCurrentYear = (
   startYear: number,
   endYear: number
 ): number => {
+  // On regarde la position du centre de l'écran
   const centerPosition = scrollPosition + viewportWidth / 2;
-  const yearSpan = endYear - startYear;
-  const yearProgress = centerPosition / timelineWidth;
-  const currentYear = startYear + (yearProgress * yearSpan);
-  return Math.round(Math.max(startYear, Math.min(endYear, currentYear)));
+  
+  // On génère les positions des marqueurs d'années
+  const yearMarkers = generateYearMarkers(startYear, endYear, timelineWidth, 1);
+  
+  // On trouve entre quels marqueurs on se trouve
+  for (let i = 0; i < yearMarkers.length - 1; i++) {
+    const currentMarker = yearMarkers[i];
+    const nextMarker = yearMarkers[i + 1];
+    
+    if (centerPosition >= currentMarker.x && centerPosition < nextMarker.x) {
+      return currentMarker.year;
+    }
+  }
+  
+  // Si on est après le dernier marqueur
+  if (yearMarkers.length > 0 && centerPosition >= yearMarkers[yearMarkers.length - 1].x) {
+    return yearMarkers[yearMarkers.length - 1].year;
+  }
+  
+  // Si on est avant le premier marqueur
+  if (yearMarkers.length > 0 && centerPosition < yearMarkers[0].x) {
+    return yearMarkers[0].year;
+  }
+  
+  return startYear; // Fallback
 };

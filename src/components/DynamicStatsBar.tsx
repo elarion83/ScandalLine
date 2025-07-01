@@ -92,8 +92,9 @@ const DynamicStatsBar: React.FC<DynamicStatsBarProps> = ({
       className="relative w-full bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm cursor-grab active:cursor-grabbing [&.dragging_.transition-all]:transition-none"
       onMouseDown={handleMouseDown}
       style={{
-        overflow: 'hidden'}}
+        overflowX: 'hidden'}}
     >
+      
       {/* Progress bar background */}
       <div 
         className="absolute inset-0 bg-gradient-to-r from-blue-500 via-blue-400 to-blue-500 dark:from-blue-600 dark:via-blue-500 dark:to-blue-600 opacity-20 dark:opacity-30 transition-all duration-300 ease-out"

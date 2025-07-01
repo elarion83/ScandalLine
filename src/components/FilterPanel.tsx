@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { X, ChevronDown, ChevronUp } from 'lucide-react';
+import { X, ChevronDown, ChevronUp, Calendar, FileText, Building2, Users, Filter } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FilterOptions, Scandal } from '../types/scandal';
 import { getMainCategory, getCategoryLabel } from '../utils/scandalUtils';
@@ -92,6 +92,13 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
     };
   }, [scandals, filters]);
 
+  // Vérifie si des filtres sont actifs
+  const hasActiveFilters = useMemo(() => {
+    return filters.types.length > 0 || 
+           filters.parties.length > 0 || 
+           filters.personalities.length > 0;
+  }, [filters]);
+
   const handleTypeToggle = (type: string) => {
     const newTypes = filters.types.includes(type)
       ? filters.types.filter(t => t !== type)
@@ -157,7 +164,10 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
     >
       {/* Header */}
       <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-gray-100 dark:bg-gray-800">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Filtres</h2>
+        <div className="flex items-center gap-2">
+          <Filter className="w-5 h-5 text-gray-900 dark:text-white" />
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Filtres</h2>
+        </div>
         <button
           onClick={onClose}
           className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -168,9 +178,12 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-4 space-y-6 bg-white dark:bg-gray-800">
-        {/* Date Range */}
+        {/* Date Range - Temporarily disabled
         <div>
-          <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Période</h3>
+          <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+            <Calendar className="w-4 h-4" />
+            <span>Période</span>
+          </h3>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Début</label>
@@ -196,10 +209,14 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
             </div>
           </div>
         </div>
+        */}
 
         {/* Types */}
         <div>
-          <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Type d'affaire</h3>
+          <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+            <FileText className="w-4 h-4" />
+            <span>Type d'affaire</span>
+          </h3>
           <div className="space-y-2">
             {Object.entries(filterCounts.types)
               .sort(([typeA, countA], [typeB, countB]) => {
@@ -256,7 +273,10 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
 
         {/* Parties */}
         <div>
-          <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Parti politique</h3>
+          <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+            <Building2 className="w-4 h-4" />
+            <span>Parti politique</span>
+          </h3>
           <div className="space-y-2">
             {Object.entries(filterCounts.parties)
               .sort(([partyA, countA], [partyB, countB]) => {
@@ -311,7 +331,10 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
 
         {/* Personalities */}
         <div>
-          <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Personnalités</h3>
+          <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+            <Users className="w-4 h-4" />
+            <span>Personnalités</span>
+          </h3>
           <div className="space-y-2">
             {Object.entries(filterCounts.personalities)
               .sort(([personA, countA], [personB, countB]) => {
@@ -369,9 +392,22 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
       <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
         <button
           onClick={clearFilters}
-          className="w-full py-2 px-4 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium transition-colors"
+          className={`w-full py-2 px-4 rounded-lg text-sm font-medium transition-all ${
+            hasActiveFilters 
+              ? 'bg-blue-500 hover:bg-blue-600 text-white dark:bg-blue-600 dark:hover:bg-blue-700 shadow-md' 
+              : 'bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300'
+          }`}
         >
-          Réinitialiser les filtres
+          {hasActiveFilters ? (
+            <div className="flex items-center justify-center gap-2">
+              <span>Réinitialiser les filtres</span>
+              <span className="bg-blue-600 dark:bg-blue-700 px-2 py-0.5 rounded-full text-xs">
+                {filters.types.length + filters.parties.length + filters.personalities.length}
+              </span>
+            </div>
+          ) : (
+            'Réinitialiser les filtres'
+          )}
         </button>
       </div>
     </motion.div>

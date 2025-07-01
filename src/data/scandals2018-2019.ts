@@ -269,6 +269,7 @@ export const scandals2018_2019: Scandal[] = [
     positions: ['Députée LREM', 'Président République', 'Président Assemblée', 'Ministre Intérieur'],
     startDate: '2019-05-15',
     type: 'propos-racistes',
+    politicalParty: 'LREM',
     status: 'ongoing',
     sanctions: [],
     sources: [
@@ -289,6 +290,7 @@ export const scandals2018_2019: Scandal[] = [
     personalities: ['Adrien Moretti', 'Emmanuel Macron', 'Richard Ferrand', 'Marlène Schiappa'],
     positions: ['Député LREM', 'Président République', 'Président Assemblée', 'Ministre Égalité'],
     startDate: '2019-08-20',
+    politicalParty: 'LREM',
     type: 'violences-conjugales',
     status: 'ongoing',
     sanctions: [],
@@ -313,6 +315,7 @@ export const scandals2018_2019: Scandal[] = [
     moneyAmount: 63000,
     type: 'abus-fonction',
     status: 'judged',
+    politicalParty: 'LREM',
     sanctions: [
       { person: 'François de Rugy', penalty: 'Démission forcée', fine: 0 }
     ],
