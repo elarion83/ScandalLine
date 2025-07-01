@@ -200,19 +200,27 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
           <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Type d'affaire</h3>
           <div className="space-y-2">
             {Object.entries(filterCounts.types)
-              .sort(([,a], [,b]) => b - a)
+              .sort(([typeA, countA], [typeB, countB]) => {
+                // D'abord on compare si les éléments sont cochés
+                const isCheckedA = filters.types.includes(typeA);
+                const isCheckedB = filters.types.includes(typeB);
+                if (isCheckedA !== isCheckedB) return isCheckedB ? 1 : -1;
+                // Ensuite on trie par nombre d'occurrences
+                return countB - countA;
+              })
               .slice(0, expandedSections.types ? undefined : ITEMS_PER_SECTION)
               .map(([type, count]) => (
                 <label key={type} className="flex items-center justify-between cursor-pointer group hover:bg-gray-50 dark:hover:bg-gray-700/50 p-0 rounded-lg transition-colors">
                   <div className="flex items-center gap-3">
-                    <div className="relative">
+                    <div className="relative flex items-center justify-center">
                       <input
                         type="checkbox"
                         checked={filters.types.includes(type)}
                         onChange={() => handleTypeToggle(type)}
-                        className="peer h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-0 transition-colors"
+                        className="peer sr-only"
                       />
-                      <div className="absolute inset-0 rounded pointer-events-none peer-checked:bg-indigo-100 dark:peer-checked:bg-indigo-900/30 transition-colors" />
+                      <div className="h-5 w-5 rounded border-2 border-gray-300 dark:border-gray-600 peer-checked:border-violet-500 dark:peer-checked:border-violet-400 transition-colors" />
+                      <div className="absolute h-3 w-3 rounded-sm bg-violet-500 dark:bg-violet-400 scale-0 peer-checked:scale-100 transition-transform duration-200 ease-out" />
                     </div>
                     <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">
                       {getCategoryLabel(type)}
@@ -249,19 +257,27 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
           <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Parti politique</h3>
           <div className="space-y-2">
             {Object.entries(filterCounts.parties)
-              .sort(([,a], [,b]) => b - a)
+              .sort(([partyA, countA], [partyB, countB]) => {
+                // D'abord on compare si les éléments sont cochés
+                const isCheckedA = filters.parties.includes(partyA);
+                const isCheckedB = filters.parties.includes(partyB);
+                if (isCheckedA !== isCheckedB) return isCheckedB ? 1 : -1;
+                // Ensuite on trie par nombre d'occurrences
+                return countB - countA;
+              })
               .slice(0, expandedSections.parties ? undefined : ITEMS_PER_SECTION)
               .map(([party, count]) => (
                 <label key={party} className="flex items-center justify-between cursor-pointer group hover:bg-gray-50 dark:hover:bg-gray-700/50 p-0 rounded-lg transition-colors">
                   <div className="flex items-center gap-3">
-                    <div className="relative">
+                    <div className="relative flex items-center justify-center">
                       <input
                         type="checkbox"
                         checked={filters.parties.includes(party)}
                         onChange={() => handlePartyToggle(party)}
-                        className="peer h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-0 transition-colors"
+                        className="peer sr-only"
                       />
-                      <div className="absolute inset-0 rounded pointer-events-none peer-checked:bg-indigo-100 dark:peer-checked:bg-indigo-900/30 transition-colors" />
+                      <div className="h-5 w-5 rounded border-2 border-gray-300 dark:border-gray-600 peer-checked:border-violet-500 dark:peer-checked:border-violet-400 transition-colors" />
+                      <div className="absolute h-3 w-3 rounded-sm bg-violet-500 dark:bg-violet-400 scale-0 peer-checked:scale-100 transition-transform duration-200 ease-out" />
                     </div>
                     <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">{party}</span>
                   </div>
@@ -296,19 +312,27 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
           <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Personnalités</h3>
           <div className="space-y-2">
             {Object.entries(filterCounts.personalities)
-              .sort(([,a], [,b]) => b - a)
+              .sort(([personA, countA], [personB, countB]) => {
+                // D'abord on compare si les éléments sont cochés
+                const isCheckedA = filters.personalities.includes(personA);
+                const isCheckedB = filters.personalities.includes(personB);
+                if (isCheckedA !== isCheckedB) return isCheckedB ? 1 : -1;
+                // Ensuite on trie par nombre d'occurrences
+                return countB - countA;
+              })
               .slice(0, expandedSections.personalities ? undefined : ITEMS_PER_SECTION)
               .map(([person, count]) => (
                 <label key={person} className="flex items-center justify-between cursor-pointer group hover:bg-gray-50 dark:hover:bg-gray-700/50 p-0 rounded-lg transition-colors">
                   <div className="flex items-center gap-3">
-                    <div className="relative">
+                    <div className="relative flex items-center justify-center">
                       <input
                         type="checkbox"
                         checked={filters.personalities.includes(person)}
                         onChange={() => handlePersonalityToggle(person)}
-                        className="peer h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-0 transition-colors"
+                        className="peer sr-only"
                       />
-                      <div className="absolute inset-0 rounded pointer-events-none peer-checked:bg-indigo-100 dark:peer-checked:bg-indigo-900/30 transition-colors" />
+                      <div className="h-5 w-5 rounded border-2 border-gray-300 dark:border-gray-600 peer-checked:border-violet-500 dark:peer-checked:border-violet-400 transition-colors" />
+                      <div className="absolute h-3 w-3 rounded-sm bg-violet-500 dark:bg-violet-400 scale-0 peer-checked:scale-100 transition-transform duration-200 ease-out" />
                     </div>
                     <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">{person}</span>
                   </div>
