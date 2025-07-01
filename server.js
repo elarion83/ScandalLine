@@ -20,6 +20,24 @@ const formatEuros = (number) => {
   }).format(number);
 };
 
+// Fonction pour obtenir le poste le plus récent d'une personnalité
+const getCurrentPosition = (scandals, name) => {
+  // Trier les scandales par date décroissante
+  const sortedScandals = [...scandals].sort((a, b) => 
+    new Date(b.startDate) - new Date(a.startDate)
+  );
+
+  // Trouver le dernier scandale où la personne a un poste
+  for (const scandal of sortedScandals) {
+    const personIndex = scandal.personalities.indexOf(name);
+    if (personIndex !== -1 && scandal.positions && scandal.positions[personIndex]) {
+      return scandal.positions[personIndex];
+    }
+  }
+
+  return ''; // Retourner une chaîne vide si aucun poste trouvé
+};
+
 // Map des types MIME
 const MIME_TYPES = {
   '.html': 'text/html',
@@ -89,29 +107,33 @@ const handler = async (req, res) => {
 
     // Calculer les statistiques
     const totalAmount = personalityScandals.reduce((sum, scandal) => 
-      sum + (scandal.fine || 0), 0
+      sum + (scandal.amount || 0), 0
     );
     const dateRange = {
       start: Math.min(...personalityScandals.map(s => new Date(s.startDate).getFullYear())),
       end: Math.max(...personalityScandals.map(s => new Date(s.startDate).getFullYear()))
     };
 
+    // Obtenir le poste actuel
+    const currentPosition = getCurrentPosition(personalityScandals, name);
+    const title = currentPosition ? `${name} - ${currentPosition}` : name;
+
     const indexHtml = fs.readFileSync(path.join(__dirname, 'dist', 'index.html'), 'utf-8');
 
     // Construire la description
     const description = `${personalityScandals.length} scandales entre ${dateRange.start} et ${dateRange.end}${
-      totalAmount > 0 ? `. Montant total des amendes : ${formatEuros(totalAmount)}` : ''
+      totalAmount > 0 ? `. Montant total concerné : ${formatEuros(totalAmount)}` : ''
     }`;
 
     // Injecter les méta tags
     const html = indexHtml
       .replace('</head>',
-        `<meta property="og:title" content="Timeline des scandales de ${name}" />
+        `<meta property="og:title" content="${title}" />
         <meta property="og:description" content="${description}" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="/timeline/${slug}" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Timeline des scandales de ${name}" />
+        <meta name="twitter:title" content="${title}" />
         <meta name="twitter:description" content="${description}" />
         </head>`
       )
