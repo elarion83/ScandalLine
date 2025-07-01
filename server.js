@@ -8,6 +8,16 @@ import { perso_Photos } from './dist-server/data/perso_photos.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Fonction pour obtenir le domaine complet
+const getDomain = (req) => {
+  // En prod sur Vercel
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  // En local
+  return `http://${req.headers.host}`;
+};
+
 // Fonction pour convertir un slug en nom
 const slugToName = (slug) => {
   return slug
@@ -146,6 +156,7 @@ const handler = async (req, res) => {
 
     // Récupérer l'URL de l'image
     const photoUrl = perso_Photos[0][slug]?.url || '';
+    const domain = getDomain(req);
 
     // Injecter les méta tags
     const html = indexHtml
@@ -154,7 +165,7 @@ const handler = async (req, res) => {
         <meta property="og:title" content="${title}" />
         <meta property="og:description" content="${description}" />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="/timeline/${slug}" />
+        <meta property="og:url" content="${domain}/timeline/${slug}" />
         <meta property="og:image" content="${photoUrl}" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="${title}" />

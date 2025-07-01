@@ -1,5 +1,5 @@
 export const perso_Photos = [
-  {
+    {
     "emmanuel-macron": {
       "nom": "Emmanuel Macron",
       "url": "https://upload.wikimedia.org/wikipedia/commons/4/47/Emmanuel_Macron_-_June_2025_%283x4_cropped%29.jpg"
