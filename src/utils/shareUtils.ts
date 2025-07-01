@@ -16,8 +16,8 @@ export const shareUtils: ShareUtils = {
   async copyToClipboard(text: string): Promise<boolean> {
     try {
       if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(text);
-        return true;
+      await navigator.clipboard.writeText(text);
+      return true;
       } else {
         // Fallback for older browsers or non-secure contexts
         const textArea = document.createElement('textarea');

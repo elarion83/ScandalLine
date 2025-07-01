@@ -107,7 +107,7 @@ const handler = async (req, res) => {
 
     // Calculer les statistiques
     const totalAmount = personalityScandals.reduce((sum, scandal) => 
-      sum + (scandal.amount || 0), 0
+      sum + (scandal.moneyAmount || 0), 0
     );
     const totalFines = personalityScandals.reduce((sum, scandal) => {
       // Si la personne a une amende spécifique dans sanctions
