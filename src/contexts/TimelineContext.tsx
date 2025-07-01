@@ -25,7 +25,8 @@ export type TimelineAction =
   | { type: 'SET_VIEWPORT_WIDTH'; payload: number }
   | { type: 'SET_DRAGGING'; payload: boolean }
   | { type: 'SET_CONTEXTUAL_FILTER'; payload: ContextualFilter | null }
-  | { type: 'SET_TRANSITIONING'; payload: boolean };
+  | { type: 'SET_TRANSITIONING'; payload: boolean }
+  | { type: 'RESET_STATE' };
 
 const initialState: TimelineState = {
   zoomLevel: 15,
@@ -68,6 +69,8 @@ const timelineReducer = (state: TimelineState, action: TimelineAction): Timeline
       return { ...state, contextualFilter: action.payload };
     case 'SET_TRANSITIONING':
       return { ...state, isTransitioning: action.payload };
+    case 'RESET_STATE':
+      return { ...initialState };
     default:
       return state;
   }
@@ -76,20 +79,42 @@ const timelineReducer = (state: TimelineState, action: TimelineAction): Timeline
 const TimelineContext = createContext<{
   state: TimelineState;
   dispatch: React.Dispatch<TimelineAction>;
+  resetToServerState: () => void;
 } | null>(null);
 
-export const TimelineProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+interface TimelineProviderProps {
+  children: ReactNode;
+  initialContext?: {
+    type: 'personality';
+    value: string;
+  };
+}
+
+export const TimelineProvider: React.FC<TimelineProviderProps> = ({ children, initialContext }) => {
   // Parse URL filter and merge with initial state
   const urlFilter = shareUtils.parseUrlFilter();
-  const mergedInitialState = {
+  const contextualFilter = initialContext ? {
+    type: initialContext.type,
+    value: initialContext.value,
+    label: initialContext.value
+  } : urlFilter;
+
+  const serverInitialState = {
     ...initialState,
-    contextualFilter: urlFilter
+    contextualFilter
   };
 
-  const [state, dispatch] = useReducer(timelineReducer, mergedInitialState);
+  const [state, dispatch] = useReducer(timelineReducer, serverInitialState);
+
+  const resetToServerState = () => {
+    dispatch({ type: 'RESET_STATE' });
+    if (contextualFilter) {
+      dispatch({ type: 'SET_CONTEXTUAL_FILTER', payload: contextualFilter });
+    }
+  };
 
   return (
-    <TimelineContext.Provider value={{ state, dispatch }}>
+    <TimelineContext.Provider value={{ state, dispatch, resetToServerState }}>
       {children}
     </TimelineContext.Provider>
   );

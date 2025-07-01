@@ -2,6 +2,7 @@ import React from 'react';
 import { useTimeline } from '../contexts/TimelineContext';
 import { createContextualFilter } from '../utils/contextualFilters';
 import { getCategoryLabel } from '../utils/scandalUtils';
+import { nameToSlug } from '../utils/shareUtils';
 
 interface ClickablePersonProps {
   name: string;
@@ -21,6 +22,11 @@ export const ClickablePerson: React.FC<ClickablePersonProps> = ({
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     dispatch({ type: 'SET_TRANSITIONING', payload: true });
+    
+    // Mettre à jour l'URL avec le slug
+    const slug = nameToSlug(name);
+    const newUrl = `/timeline/${slug}`;
+    window.history.pushState({}, '', newUrl);
     
     // Simulate loading time
     setTimeout(() => {
