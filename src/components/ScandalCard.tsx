@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Calendar, Users, DollarSign, Scale, Tag, Building2, BadgeCheck, Timer, AlertTriangle } from 'lucide-react';
 import { Scandal } from '../types/scandal';
 import { formatCurrency, cleanScandalName, formatLargeNumber, formatDate, getCategoryColors, getCategoryLabel, getMainCategory } from '../utils/scandalUtils';
@@ -30,6 +30,7 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
   // State to track hover and focus states for dynamic z-index management
   const [isHovered, setIsHovered] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   // Check if there are any sanctions
   const hasSanctions = (scandal.moneyAmount ?? 0) > 0 || 
@@ -206,10 +207,35 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
   
   const ref = useRef<HTMLDivElement>(null);
   
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(entry.target);
+        }
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '50px'
+      }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => {
+      if (ref.current) {
+        observer.unobserve(ref.current);
+      }
+    };
+  }, []);
+
   return (
     <div
       ref={ref}
-      className={`scandal-card absolute ${isSelected ? 'z-50' : `z-${getZIndex()}`}`}
+      className={`scandal-card absolute ${isSelected ? 'z-50' : `z-${getZIndex()}`} ${isVisible ? 'visible' : ''}`}
       style={{
         left: position.x,
         top: position.y,

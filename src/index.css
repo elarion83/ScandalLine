@@ -2,6 +2,67 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Styles des barres de défilement */
+@layer base {
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(217, 70, 239, 0.6) rgba(229, 231, 235, 0.2);
+  }
+
+  /* Chrome, Edge, Safari */
+  *::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: rgba(229, 231, 235, 0.2);
+    border-radius: 8px;
+    backdrop-filter: blur(8px);
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: linear-gradient(45deg, 
+      rgba(217, 70, 239, 0.6),
+      rgba(139, 92, 246, 0.6)
+    );
+    border-radius: 8px;
+    border: 3px solid rgba(229, 231, 235, 0.1);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(45deg, 
+      rgba(217, 70, 239, 0.8),
+      rgba(139, 92, 246, 0.8)
+    );
+  }
+
+  *::-webkit-scrollbar-corner {
+    background: rgba(229, 231, 235, 0.2);
+    backdrop-filter: blur(8px);
+  }
+
+  /* Dark mode */
+  .dark * {
+    scrollbar-color: rgba(217, 70, 239, 0.6) rgba(31, 41, 55, 0.2);
+  }
+
+  .dark *::-webkit-scrollbar-track {
+    background: rgba(31, 41, 55, 0.2);
+  }
+
+  .dark *::-webkit-scrollbar-thumb {
+    border-color: rgba(31, 41, 55, 0.1);
+  }
+
+  .dark *::-webkit-scrollbar-corner {
+    background: rgba(31, 41, 55, 0.2);
+  }
+}
+
 /* Custom utilities for enhanced card interactions */
 @layer utilities {
   /* Custom scale value for subtle hover effect */
@@ -22,11 +83,21 @@
   }
 }
 
-/* Hover effect for scandal cards */
+/* Animation de fade-in pour les cartes */
 .scandal-card {
-  transition: opacity 0.3s ease;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity;
 }
 
+.scandal-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Hover effect pour les cartes */
 .timeline-container:has(.scandal-card:hover) .scandal-card:not(:hover) {
   opacity: 0.5;
 }
