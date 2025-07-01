@@ -324,9 +324,14 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
       {/* Header with controls */}
       {!state.contextualFilter ? (
         <header className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-          <h1 className="text-xl font-bold text-gray-800 dark:text-gray-200">
-            Timeline des scandales politiques
-          </h1>
+          <div>
+            <h1 className="text-xl font-bold text-gray-800 dark:text-gray-200">
+              ScandalList : La bibliothèque aux scandales
+            </h1>
+            <span className="text-sm text-gray-600 dark:text-gray-400">
+              Affaires et controverses du paysage politique français
+            </span>
+          </div>
           
           {/* Share button */}
           <ShareTimeline 
@@ -360,71 +365,79 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
           scrollPosition={state.scrollPosition}
           viewportWidth={state.viewportWidth}
           timelineWidth={timelineWidth}
+          onScrollChange={(newPosition) => {
+            if (containerRef.current) {
+              containerRef.current.scrollLeft = newPosition;
+              dispatch({ type: 'SET_SCROLL_POSITION', payload: newPosition });
+            }
+          }}
         />
       )}
 
       <div className="flex flex-1 overflow-hidden relative">
-        {/* Timeline Controls */}
-        <div className={`timeline-controls ${
-          state.showFilters ? 'filters-open' : ''
-        } ${state.showStats ? 'stats-open' : ''}`}>
-          {/* Zoom controls - only show for scrollable timelines */}
-          {!shouldUseAdaptiveLayout && (
-            <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
-              <button
-                onClick={handleZoomOut}
-                className="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Dézoomer"
-                disabled={state.zoomLevel <= 1.5}
-              >
-                <ZoomOut className="w-4 h-4 text-gray-700 dark:text-gray-300" />
-              </button>
-              
-              <button
-                onClick={handleResetZoom}
-                className="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 min-w-[4rem] text-center hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors"
-                title="Réinitialiser le zoom (100%)"
-              >
-                {formatZoomLevel(state.zoomLevel)}
-              </button>
-              
-              <button
-                onClick={handleZoomIn}
-                className="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Zoomer"
-                disabled={state.zoomLevel >= 300}
-              >
-                <ZoomIn className="w-4 h-4 text-gray-700 dark:text-gray-300" />
-              </button>
-            </div>
-          )}
-          
-          <button
-            onClick={() => dispatch({ type: 'TOGGLE_FILTERS' })}
-            data-tour="filters"
-            className={`p-2 rounded-lg transition-colors ${
-              state.showFilters 
-                ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' 
-                : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300'
-            }`}
-            title="Filtres"
-          >
-            <Filter className="w-5 h-5" />
-          </button>
-          
-          <button
-            onClick={() => dispatch({ type: 'TOGGLE_STATS' })}
-            data-tour="stats"
-            className={`p-2 rounded-lg transition-colors ${
-              state.showStats 
-                ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' 
-                : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300'
-            }`}
-            title="Statistiques"
-          >
-            <BarChart3 className="w-5 h-5" />
-          </button>
-        </div>
+        {/* Timeline Controls - Hide when only one scandal */}
+        {filteredScandals.length > 1 && (
+          <div className={`timeline-controls ${
+            state.showFilters ? 'filters-open' : ''
+          } ${state.showStats ? 'stats-open' : ''}`}>
+            {/* Zoom controls - only show for scrollable timelines */}
+            {!shouldUseAdaptiveLayout && (
+              <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                <button
+                  onClick={handleZoomOut}
+                  className="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Dézoomer"
+                  disabled={state.zoomLevel <= 1.5}
+                >
+                  <ZoomOut className="w-4 h-4 text-gray-700 dark:text-gray-300" />
+                </button>
+                
+                <button
+                  onClick={handleResetZoom}
+                  className="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 min-w-[4rem] text-center hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors"
+                  title="Réinitialiser le zoom (100%)"
+                >
+                  {formatZoomLevel(state.zoomLevel)}
+                </button>
+                
+                <button
+                  onClick={handleZoomIn}
+                  className="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Zoomer"
+                  disabled={state.zoomLevel >= 300}
+                >
+                  <ZoomIn className="w-4 h-4 text-gray-700 dark:text-gray-300" />
+                </button>
+              </div>
+            )}
+            
+            <button
+              onClick={() => dispatch({ type: 'TOGGLE_FILTERS' })}
+              data-tour="filters"
+              className={`p-2 rounded-lg transition-colors ${
+                state.showFilters 
+                  ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' 
+                  : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300'
+              }`}
+              title="Filtres"
+            >
+              <Filter className="w-5 h-5" />
+            </button>
+            
+            <button
+              onClick={() => dispatch({ type: 'TOGGLE_STATS' })}
+              data-tour="stats"
+              className={`p-2 rounded-lg transition-colors ${
+                state.showStats 
+                  ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' 
+                  : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300'
+              }`}
+              title="Statistiques"
+            >
+              <BarChart3 className="w-5 h-5" />
+            </button>
+          </div>
+        )}
 
         {/* Filters Panel */}
         <AnimatePresence>
@@ -446,7 +459,7 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
             data-tour="timeline"
             className={`flex-1 transition-all duration-300 ${
               shouldUseAdaptiveLayout 
-                ? 'overflow-hidden' // No scroll for adaptive layout
+                ? 'overflow-visible'
                 : `overflow-auto ${state.isDragging ? 'cursor-grabbing' : 'cursor-grab'}`
             } ${state.isTransitioning ? 'pointer-events-none' : ''}`}
             onMouseDown={handleMouseDown}
@@ -458,12 +471,12 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
             <div 
               className={`relative bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-all duration-300 timeline-grid-bg timeline-container ${
                 state.isTransitioning ? 'scale-95 opacity-70' : 'scale-100 opacity-100'
-              } ${shouldUseAdaptiveLayout ? 'h-full flex items-center justify-center' : ''}`}
+              }`}
               style={{ 
                 width: timelineWidth, 
-                minHeight: shouldUseAdaptiveLayout ? '100%' : '700px',
-                paddingTop: shouldUseAdaptiveLayout ? '0' : '60px',
-                paddingBottom: shouldUseAdaptiveLayout ? '0' : '100px'
+                minHeight: '700px',
+                paddingTop: '60px',
+                paddingBottom: '100px'
               }}
               data-tour="timeline"
             >
@@ -500,11 +513,11 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
                 />
               </div>
 
-              {/* Timeline Gaps - only for adaptive layout with gaps */}
-              {shouldUseAdaptiveLayout && gaps.length > 0 && (
+              {/* Timeline Gaps */}
+              {gaps.length > 0 && (
                 <TimelineGaps
                   gaps={gaps}
-                  timelineY={shouldUseAdaptiveLayout ? 300 : TIMELINE_Y}
+                  timelineY={TIMELINE_Y}
                 />
               )}
 
@@ -518,7 +531,7 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
                     key={scandal.id}
                     scandal={scandal}
                     position={position}
-                    timelineY={shouldUseAdaptiveLayout ? 300 : TIMELINE_Y}
+                    timelineY={TIMELINE_Y}
                     onClick={() => dispatch({ type: 'SELECT_SCANDAL', payload: scandal.id })}
                     isSelected={state.selectedScandalId === scandal.id}
                   />

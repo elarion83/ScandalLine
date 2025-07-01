@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { TrendingUp, DollarSign, Scale, Award, Calendar } from 'lucide-react';
 import { Scandal } from '../types/scandal';
 import { formatCurrency, formatLargeNumber } from '../utils/scandalUtils';
@@ -12,6 +12,7 @@ interface DynamicStatsBarProps {
   scrollPosition: number;
   viewportWidth: number;
   timelineWidth: number;
+  onScrollChange?: (newPosition: number) => void;
 }
 
 const DynamicStatsBar: React.FC<DynamicStatsBarProps> = ({ 
@@ -22,8 +23,12 @@ const DynamicStatsBar: React.FC<DynamicStatsBarProps> = ({
   endYear,
   scrollPosition,
   viewportWidth,
-  timelineWidth
+  timelineWidth,
+  onScrollChange
 }) => {
+  const isDraggingRef = useRef(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
   // Calculate the current year being viewed based on scroll position
   const calculateCurrentYear = (): number => {
     const centerPosition = scrollPosition + viewportWidth / 2;
@@ -49,20 +54,80 @@ const DynamicStatsBar: React.FC<DynamicStatsBarProps> = ({
     }, {} as Record<string, number>)
   };
 
-  return (
-    <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-3">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          {/* Current year indicator */}
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1">
-              <Calendar className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-              <span className="text-sm font-bold text-gray-700 dark:text-gray-300 min-w-[2.5rem]">
-                {currentYear}
-            </span>
-            </div>
-          </div>
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!containerRef.current || !onScrollChange) return;
+    
+    isDraggingRef.current = true;
+    containerRef.current.classList.add('dragging');
+    
+    const rect = containerRef.current.getBoundingClientRect();
+    const clickPositionRatio = (e.clientX - rect.left) / rect.width;
+    const newScrollPosition = (clickPositionRatio * timelineWidth) - (viewportWidth / 2);
+    onScrollChange(Math.max(0, Math.min(timelineWidth - viewportWidth, newScrollPosition)));
 
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!containerRef.current || !isDraggingRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const positionRatio = (e.clientX - rect.left) / rect.width;
+      const newScrollPosition = (positionRatio * timelineWidth) - (viewportWidth / 2);
+      onScrollChange(Math.max(0, Math.min(timelineWidth - viewportWidth, newScrollPosition)));
+    };
+
+    const handleMouseUp = () => {
+      isDraggingRef.current = false;
+      if (containerRef.current) {
+        containerRef.current.classList.remove('dragging');
+      }
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
+
+  return (
+    <div 
+      ref={containerRef}
+      className="relative w-full bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm cursor-grab active:cursor-grabbing [&.dragging_.transition-all]:transition-none"
+      onMouseDown={handleMouseDown}
+    >
+      {/* Progress bar background */}
+      <div 
+        className="absolute inset-0 bg-gradient-to-r from-blue-500 via-blue-400 to-blue-500 dark:from-blue-600 dark:via-blue-500 dark:to-blue-600 opacity-20 dark:opacity-30 transition-all duration-300 ease-out"
+        style={{ 
+          width: `${scrollProgress * 100}%`,
+          transitionProperty: isDraggingRef.current ? 'none' : 'all'
+        }}
+      />
+      
+      {/* Progress bar shine effect */}
+      <div 
+        className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20 dark:opacity-10 transition-all duration-300 ease-out animate-pulse"
+        style={{ 
+          width: `${scrollProgress * 100}%`,
+          transitionProperty: isDraggingRef.current ? 'none' : 'all'
+        }}
+      />
+
+      {/* Current year at progress bar end */}
+      <div 
+        className="absolute top-0 bottom-0 flex items-center transition-all duration-300 ease-out"
+        style={{ 
+          left: `${scrollProgress * 100}%`,
+          transform: 'translateX(-50%)',
+          transitionProperty: isDraggingRef.current ? 'none' : 'all'
+        }}
+      >
+        <div className="flex items-center gap-1 bg-blue-500/50 dark:bg-blue-600 text-white px-2 py-1 mt-1 rounded-full text-sm font-medium shadow-md">
+          <Calendar className="w-4 h-4" />
+          {currentYear}
+        </div>
+      </div>
+      
+      {/* Stats content */}
+      <div className="relative flex items-center justify-between px-4 py-2">
+        <div className={`flex items-center gap-4 transition-all duration-300 ${scrollProgress < 0.5 ? 'ml-auto' : ''}`}>
           {/* Visible scandals count */}
           <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-lg">
             <TrendingUp className="w-4 h-4 text-blue-600 dark:text-blue-400" />

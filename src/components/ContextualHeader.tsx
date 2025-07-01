@@ -61,26 +61,29 @@ const ContextualHeader: React.FC<ContextualHeaderProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-3">
+    <div className="bg-gradient-to-r from-gray-800 to-gray-900 text-white px-6 py-4 border-b border-gray-700">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button
             onClick={onBack}
-            className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"
+            className="flex items-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors group"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+            <span className="text-sm font-medium">Retour</span>
           </button>
+
+          <div className="w-px h-8 bg-white/20" />
 
           <div className="flex items-center gap-3">
             <div className={`p-2 rounded-lg ${getColorClasses()}`}>
               {getIcon()}
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h1 className="text-xl font-bold">
                 {getContextualTitle(contextualFilter)}
-              </h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {getContextualDescription(contextualFilter, filteredCount, totalMoney)}
+              </h1>
+              <p className="text-sm text-gray-300">
+                {getContextualDescription(contextualFilter, filteredCount)} • {totalMoney.toLocaleString('fr-FR')}€ concernés
               </p>
             </div>
           </div>

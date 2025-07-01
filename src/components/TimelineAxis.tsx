@@ -64,7 +64,7 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
                   <span className="relative z-10 text-grey dark:text-white tracking-wide inline-block"
                      style={{ filter: 'blur(1px)' ,                    transform: 'rotate(25deg)',
 
-                      fontSize: '1em', opacity: 0.5 }}>
+                      fontSize: '1em', opacity: 0.3 }}>
                     {year}
                   </span>
                 </div>
