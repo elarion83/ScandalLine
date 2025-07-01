@@ -54,3 +54,32 @@ export interface ContextualFilter {
   value: string | number;
   label: string;
 }
+
+export interface Personality {
+  id: string;
+  name: string;
+  imageUrl: string;
+  position?: string;
+  party?: string;
+  scandals?: string[]; // IDs des scandales liés
+  stats?: {
+    totalScandals: number;
+    totalMoneyAmount: number;
+    totalFines: number;
+    totalPrisonYears: number;
+  };
+}
+
+export interface SocialMetadata {
+  title: string;
+  description: string;
+  image: string;
+  url: string;
+  type: 'profile' | 'timeline';
+}
+
+export interface PersonalityTimeline {
+  personality: Personality;
+  scandals: Scandal[];
+  metadata: SocialMetadata;
+}

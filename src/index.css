@@ -175,3 +175,58 @@
     opacity: .5;
   }
 }
+
+/* Styles pour l'encoche des contrôles */
+.timeline-controls {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(243, 244, 246, 0.95);
+  backdrop-filter: blur(8px);
+  border-radius: 0 0 20px 20px;
+  padding: 6px 12px;
+  display: flex;
+  gap: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-top: none;
+  z-index: 40;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.6;
+}
+
+.timeline-controls:hover,
+.timeline-controls:focus-within,
+.timeline-controls.filters-open,
+.timeline-controls.stats-open {
+  opacity: 1;
+  padding: 8px 16px;
+  gap: 8px;
+}
+
+.dark .timeline-controls {
+  background: rgba(17, 24, 39, 0.95);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.timeline-controls button {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: scale(0.9);
+}
+
+.timeline-controls:hover button,
+.timeline-controls:focus-within button,
+.timeline-controls.filters-open button,
+.timeline-controls.stats-open button {
+  transform: scale(1);
+}
+
+.timeline-controls button:hover {
+  transform: translateY(1px) scale(1);
+}
+
+.timeline-controls button:active {
+  transform: translateY(2px) scale(1);
+}

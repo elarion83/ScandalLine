@@ -31,6 +31,7 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
   const [isHovered, setIsHovered] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [intersectionRatio, setIntersectionRatio] = useState(0);
 
   // Check if there are any sanctions
   const hasSanctions = (scandal.moneyAmount ?? 0) > 0 || 
@@ -210,14 +211,17 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
+        // Mettre à jour le ratio d'intersection
+        setIntersectionRatio(entry.intersectionRatio);
+        
+        // Une fois que la carte est entrée dans le viewport, elle reste "visible"
         if (entry.isIntersecting) {
           setIsVisible(true);
-          observer.unobserve(entry.target);
         }
       },
       {
-        threshold: 0.1,
-        rootMargin: '50px'
+        threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+        rootMargin: '100px -100px'
       }
     );
 
@@ -239,8 +243,9 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
       style={{
         left: position.x,
         top: position.y,
-        zIndex: getZIndex()
-      }}
+        zIndex: getZIndex(),
+        '--intersection-ratio': intersectionRatio
+      } as React.CSSProperties}
     >
       {/* Date label */}
       <div 

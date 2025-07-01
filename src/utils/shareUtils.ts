@@ -1,4 +1,6 @@
 import { ContextualFilter } from '../types/scandal';
+import { Personality, SocialMetadata, Scandal } from '../types/scandal';
+import { formatLargeNumber } from './scandalUtils';
 
 // Utility functions for sharing and URL management
 export const shareUtils = {
@@ -124,4 +126,68 @@ export const shareUtils = {
       return false;
     }
   }
-}; 
+};
+
+export function generatePersonalityStats(scandals: Scandal[]) {
+  return {
+    totalScandals: scandals.length,
+    totalMoneyAmount: scandals.reduce((sum, s) => sum + (s.moneyAmount || 0), 0),
+    totalFines: scandals.reduce((sum, s) => sum + (s.fine || 0), 0),
+    totalPrisonYears: scandals.reduce((sum, s) => sum + (s.prisonYears || 0), 0),
+  };
+}
+
+export function generatePersonalityMetadata(
+  personality: Personality,
+  scandals: Scandal[],
+  baseUrl: string
+): SocialMetadata {
+  const stats = generatePersonalityStats(scandals);
+  
+  const description = [
+    `📊 ${stats.totalScandals} affaires recensées`,
+    stats.totalMoneyAmount > 0 ? `💰 ${formatLargeNumber(stats.totalMoneyAmount)}€ concernés` : null,
+    stats.totalFines > 0 ? `🏛️ ${formatLargeNumber(stats.totalFines)}€ d'amendes` : null,
+    stats.totalPrisonYears > 0 ? `⚖️ ${stats.totalPrisonYears} ans de prison` : null,
+  ].filter(Boolean).join(' • ');
+
+  return {
+    title: `ScandalList de ${personality.name}`,
+    description,
+    image: personality.imageUrl,
+    url: `${baseUrl}/personnalite/${encodeURIComponent(personality.id)}`,
+    type: 'timeline'
+  };
+}
+
+export function updateDocumentMetadata(metadata: SocialMetadata) {
+  // Mise à jour du titre
+  document.title = metadata.title;
+
+  // Mise à jour des balises meta
+  const metaTags = {
+    'description': metadata.description,
+    'og:title': metadata.title,
+    'og:description': metadata.description,
+    'og:image': metadata.image,
+    'og:url': metadata.url,
+    'og:type': metadata.type,
+    'twitter:card': 'summary_large_image',
+    'twitter:title': metadata.title,
+    'twitter:description': metadata.description,
+    'twitter:image': metadata.image,
+  };
+
+  Object.entries(metaTags).forEach(([name, content]) => {
+    let element = document.querySelector(`meta[property="${name}"]`) ||
+                  document.querySelector(`meta[name="${name}"]`);
+    
+    if (!element) {
+      element = document.createElement('meta');
+      element.setAttribute(name.startsWith('og:') ? 'property' : 'name', name);
+      document.head.appendChild(element);
+    }
+    
+    element.setAttribute('content', content);
+  });
+} 

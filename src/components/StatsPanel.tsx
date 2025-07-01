@@ -1,7 +1,7 @@
 import React from 'react';
 import { X, TrendingUp, Users, DollarSign, Scale, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { formatCurrency, formatLargeNumber, getCategoryLabel, getMainCategory } from '../utils/scandalUtils';
+import { formatCurrency, formatLargeNumber, getCategoryLabel, getMainCategory, getCategoryColors } from '../utils/scandalUtils';
 
 interface StatsData {
   total: number;
@@ -108,24 +108,29 @@ const StatsPanel: React.FC<StatsPanelProps> = ({ stats, scandals, onClose }) => 
           <div className="space-y-3">
             {Object.entries(statsByMainCategory)
               .sort(([,a], [,b]) => b - a)
-              .map(([category, count]) => (
-              <div key={category}>
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-sm text-gray-700 dark:text-gray-300">
-                    {getCategoryLabel(category)}
-                  </span>
-                  <span className="text-sm font-medium text-gray-900 dark:text-white">
-                    {count}
-                  </span>
-                </div>
-                <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-blue-500 transition-all duration-300"
-                    style={{ width: `${(count / maxByType) * 100}%` }}
-                  />
-                </div>
-              </div>
-            ))}
+              .map(([category, count]) => {
+                const colors = getCategoryColors(category);
+                const gradientClass = colors.gradient.replace('bg-gradient-to-br', 'bg-gradient-to-r');
+                
+                return (
+                  <div key={category}>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-sm text-gray-700 dark:text-gray-300">
+                        {getCategoryLabel(category)}
+                      </span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">
+                        {count}
+                      </span>
+                    </div>
+                    <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full transition-all duration-300 ${gradientClass}`}
+                        style={{ width: `${(count / maxByType) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
           </div>
         </div>
 

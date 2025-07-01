@@ -122,33 +122,31 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {scandal.status && (
-                    <div className="bg-gray-50 dark:bg-gray-900/20 p-4 rounded-xl border border-gray-100 dark:border-gray-800/30">
+                    <div className={`p-4 rounded-xl border ${
+                      scandal.status === 'convicted' ? 'bg-red-50 dark:bg-red-900/20 border-red-100 dark:border-red-800/30' :
+                      scandal.status === 'acquitted' ? 'bg-green-50 dark:bg-green-900/20 border-green-100 dark:border-green-800/30' :
+                      'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-100 dark:border-yellow-800/30'
+                    }`}>
                       <div className="flex items-center gap-2 mb-2">
-                        {scandal.status === 'convicted' ? <AlertTriangle className="w-4 h-4 text-gray-500 dark:text-gray-400" /> :
-                         scandal.status === 'acquitted' ? <BadgeCheck className="w-4 h-4 text-gray-500 dark:text-gray-400" /> :
-                         <Timer className="w-4 h-4 text-gray-500 dark:text-gray-400" />}
-                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                        {scandal.status === 'convicted' ? <AlertTriangle className="w-4 h-4 text-red-500 dark:text-red-400" /> :
+                         scandal.status === 'acquitted' ? <BadgeCheck className="w-4 h-4 text-green-500 dark:text-green-400" /> :
+                         <Timer className="w-4 h-4 text-yellow-500 dark:text-yellow-400" />}
+                        <span className={`text-sm ${
+                          scandal.status === 'convicted' ? 'text-red-600 dark:text-red-400' :
+                          scandal.status === 'acquitted' ? 'text-green-600 dark:text-green-400' :
+                          'text-yellow-600 dark:text-yellow-400'
+                        }`}>
                           Statut
                         </span>
                       </div>
-                      <div className="text-xl font-bold text-gray-700 dark:text-gray-300">
+                      <div className={`text-xl font-bold ${
+                        scandal.status === 'convicted' ? 'text-red-700 dark:text-red-300' :
+                        scandal.status === 'acquitted' ? 'text-green-700 dark:text-green-300' :
+                        'text-yellow-700 dark:text-yellow-300'
+                      }`}>
                         {scandal.status === 'convicted' ? 'Condamné' : 
                          scandal.status === 'acquitted' ? 'Acquitté' : 
                          scandal.status === 'ongoing' ? 'En cours' : 'Jugé'}
-                      </div>
-                    </div>
-                  )}
-
-                  {scandal.politicalParty && (
-                    <div className="bg-gray-50 dark:bg-gray-900/20 p-4 rounded-xl border border-gray-100 dark:border-gray-800/30">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Building2 className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                        <span className="text-sm text-gray-600 dark:text-gray-400">
-                          Parti politique
-                        </span>
-                      </div>
-                      <div className="text-xl font-bold text-gray-700 dark:text-gray-300">
-                        {scandal.politicalParty}
                       </div>
                     </div>
                   )}
