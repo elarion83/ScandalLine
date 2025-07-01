@@ -181,7 +181,7 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
   // Handle back to main timeline
   const handleBackToMain = useCallback(() => {
     dispatch({ type: 'SET_TRANSITIONING', payload: true });
-    
+    window.location.href = '/';
     setTimeout(() => {
       // Reset contextual filter
       dispatch({ type: 'SET_CONTEXTUAL_FILTER', payload: null });
