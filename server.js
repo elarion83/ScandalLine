@@ -1,8 +1,12 @@
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
-const { allScandals } = require('./dist-server/data');
-const politiciansPhotos = require('./dist-server/data/politiciens_photos.json');
+import http from 'http';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { allScandals } from './dist-server/data/index.js';
+import { perso_Photos } from './dist-server/data/perso_photos.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Fonction pour convertir un slug en nom
 const slugToName = (slug) => {
@@ -141,7 +145,7 @@ const handler = async (req, res) => {
     }
 
     // Récupérer l'URL de l'image
-    const photoUrl = politiciansPhotos[slug]?.url || '';
+    const photoUrl = perso_Photos[0][slug]?.url || '';
 
     // Injecter les méta tags
     const html = indexHtml
@@ -195,4 +199,4 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // Exporter le handler pour Vercel
-module.exports = handler;
+export default handler;

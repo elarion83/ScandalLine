@@ -1,17 +1,17 @@
 // Import all scandal files
-import { scandals2000_2001 } from './scandals2000-2001';
-import { scandals2002_2003 } from './scandals2002-2003';
-import { scandals2004_2005 } from './scandals2004-2005';
-import { scandals2006_2007 } from './scandals2006-2007';
-import { scandals2008_2009 } from './scandals2008-2009';
-import { scandals2010_2011 } from './scandals2010-2011';
-import { scandals2012_2013 } from './scandals2012-2013';
-import { scandals2014_2015 } from './scandals2014-2015';
-import { scandals2016_2017 } from './scandals2016-2017';
-import { scandals2018_2019 } from './scandals2018-2019';
-import { scandals2020_2021 } from './scandals2020-2021';
-import { scandals2022_2023 } from './scandals2022-2023';
-import { scandals2024_2025 } from './scandals2024-2025';
+import { scandals2000_2001 } from './scandals2000-2001.js';
+import { scandals2002_2003 } from './scandals2002-2003.js';
+import { scandals2004_2005 } from './scandals2004-2005.js';
+import { scandals2006_2007 } from './scandals2006-2007.js';
+import { scandals2008_2009 } from './scandals2008-2009.js';
+import { scandals2010_2011 } from './scandals2010-2011.js';
+import { scandals2012_2013 } from './scandals2012-2013.js';
+import { scandals2014_2015 } from './scandals2014-2015.js';
+import { scandals2016_2017 } from './scandals2016-2017.js';
+import { scandals2018_2019 } from './scandals2018-2019.js';
+import { scandals2020_2021 } from './scandals2020-2021.js';
+import { scandals2022_2023 } from './scandals2022-2023.js';
+import { scandals2024_2025 } from './scandals2024-2025.js';
 // Combine all scandals into one array
 export const allScandals = [
     ...scandals2000_2001,
