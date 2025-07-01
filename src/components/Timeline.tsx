@@ -28,8 +28,6 @@ import DynamicStatsBar from './DynamicStatsBar';
 import ContextualHeader from './ContextualHeader';
 import ShareTimeline from './ShareTimeline';
 import OnboardingTour from './modals/OnboardingTour';
-import { shareUtils } from '../utils/shareUtils';
-import { getContextualDescription } from '../utils/contextualFilters';
 
 interface TimelineProps {
   scandals: Scandal[];
@@ -159,10 +157,6 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
           dateRange: { start, end }
         } 
       });
-
-      // Update meta tags
-      const description = getContextualDescription(filter, filteredContextScandals.length);
-      shareUtils.updateMetaTags(filter.label, description);
       
       dispatch({ type: 'SET_TRANSITIONING', payload: false });
       
@@ -186,7 +180,6 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
 
   // Handle back to main timeline
   const handleBackToMain = useCallback(() => {
-    window.location.replace('/');
     dispatch({ type: 'SET_TRANSITIONING', payload: true });
     
     setTimeout(() => {

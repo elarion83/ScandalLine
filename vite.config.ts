@@ -9,10 +9,9 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/timeline': {
+      '^/timeline/[^.]+$': {
         target: 'http://localhost:3000',
-        changeOrigin: true,
-        rewrite: (path) => path
+        changeOrigin: true
       }
     }
   }

@@ -7,8 +7,7 @@
     "build": "tsc && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "npm run build && node server.js",
-    "vercel-build": "npm run build"
+    "start": "npm run build && node server.js"
   },
   "dependencies": {
     "@types/react-transition-group": "^4.4.12",

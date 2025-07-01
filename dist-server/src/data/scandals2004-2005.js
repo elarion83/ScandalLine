@@ -1,4 +1,4 @@
-export const scandals2004_2005 = [
+export var scandals2004_2005 = [
     {
         id: 'oil-for-food-pasqua-2004-01',
         name: 'Programme Pétrole contre nourriture - Charles Pasqua',

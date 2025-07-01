@@ -25,8 +25,7 @@ export type TimelineAction =
   | { type: 'SET_VIEWPORT_WIDTH'; payload: number }
   | { type: 'SET_DRAGGING'; payload: boolean }
   | { type: 'SET_CONTEXTUAL_FILTER'; payload: ContextualFilter | null }
-  | { type: 'SET_TRANSITIONING'; payload: boolean }
-  | { type: 'RESET_STATE' };
+  | { type: 'SET_TRANSITIONING'; payload: boolean };
 
 const initialState: TimelineState = {
   zoomLevel: 15,
@@ -69,8 +68,6 @@ const timelineReducer = (state: TimelineState, action: TimelineAction): Timeline
       return { ...state, contextualFilter: action.payload };
     case 'SET_TRANSITIONING':
       return { ...state, isTransitioning: action.payload };
-    case 'RESET_STATE':
-      return { ...initialState };
     default:
       return state;
   }
@@ -79,7 +76,6 @@ const timelineReducer = (state: TimelineState, action: TimelineAction): Timeline
 const TimelineContext = createContext<{
   state: TimelineState;
   dispatch: React.Dispatch<TimelineAction>;
-  resetToServerState: () => void;
 } | null>(null);
 
 interface TimelineProviderProps {
@@ -99,22 +95,15 @@ export const TimelineProvider: React.FC<TimelineProviderProps> = ({ children, in
     label: initialContext.value
   } : urlFilter;
 
-  const serverInitialState = {
+  const mergedInitialState = {
     ...initialState,
     contextualFilter
   };
 
-  const [state, dispatch] = useReducer(timelineReducer, serverInitialState);
-
-  const resetToServerState = () => {
-    dispatch({ type: 'RESET_STATE' });
-    if (contextualFilter) {
-      dispatch({ type: 'SET_CONTEXTUAL_FILTER', payload: contextualFilter });
-    }
-  };
+  const [state, dispatch] = useReducer(timelineReducer, mergedInitialState);
 
   return (
-    <TimelineContext.Provider value={{ state, dispatch, resetToServerState }}>
+    <TimelineContext.Provider value={{ state, dispatch }}>
       {children}
     </TimelineContext.Provider>
   );

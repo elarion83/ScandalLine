@@ -1,84 +1,118 @@
-import express from 'express';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { getAllScandals } from './src/data/index.js';
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Fonction pour convertir un slug en nom
+const slugToName = (slug) => {
+  return slug
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+// Map des types MIME
+const MIME_TYPES = {
+  '.html': 'text/html',
+  '.js': 'application/javascript',
+  '.css': 'text/css',
+  '.json': 'application/json',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.gif': 'image/gif',
+  '.svg': 'image/svg+xml',
+  '.ico': 'image/x-icon',
+  '.woff': 'font/woff',
+  '.woff2': 'font/woff2',
+  '.ttf': 'font/ttf',
+  '.eot': 'application/vnd.ms-fontobject'
+};
 
-// Serve static files
-app.use(express.static(path.join(__dirname, 'dist')));
+// Handler principal pour les requêtes
+const handler = async (req, res) => {
+  const url = new URL(req.url, `http://${req.headers.host}`);
+  const pathname = url.pathname;
 
-// Timeline route with named parameter
-app.get('/timeline/:personName', (req, res) => {
-  const scandals = getAllScandals();
-  const personName = req.params.personName;
-  
-  // Find the scandal data for this person
-  const scandalData = scandals.find(s => s.name.toLowerCase() === personName.toLowerCase());
-  
-  // Default meta tags
-  let title = "ScandalLine - La timeline des scandales";
-  let description = "Découvrez la chronologie interactive des scandales politiques et médiatiques.";
-  let image = "https://scandalline.fr/default-image.jpg";
-  
-  // If we found specific scandal data, use it for meta tags
-  if (scandalData) {
-    title = `${scandalData.name} - ScandalLine`;
-    description = `Découvrez la chronologie des scandales impliquant ${scandalData.name}`;
-    image = scandalData.image || image;
+  // Servir index.html pour la racine
+  if (pathname === '/') {
+    const indexHtml = fs.readFileSync(path.join(__dirname, 'dist', 'index.html'), 'utf-8');
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(indexHtml);
+    return;
   }
 
-  // Send index.html with injected meta tags
-  res.send(`
-    <!DOCTYPE html>
-    <html lang="fr">
-      <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        
-        <!-- Primary Meta Tags -->
-        <title>${title}</title>
-        <meta name="title" content="${title}">
-        <meta name="description" content="${description}">
+  // Servir les fichiers statiques
+  if (pathname.startsWith('/assets/')) {
+    const filePath = path.join(__dirname, 'dist', pathname);
+    try {
+      const content = fs.readFileSync(filePath);
+      const ext = path.extname(filePath);
+      const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+      
+      res.writeHead(200, { 'Content-Type': contentType });
+      res.end(content);
+      return;
+    } catch (err) {
+      console.error('Error serving static file:', err);
+      res.writeHead(404);
+      res.end('Not found');
+      return;
+    }
+  }
 
-        <!-- Open Graph / Facebook -->
-        <meta property="og:type" content="website">
-        <meta property="og:url" content="https://scandalline.fr/timeline/${personName}">
-        <meta property="og:title" content="${title}">
-        <meta property="og:description" content="${description}">
-        <meta property="og:image" content="${image}">
+  // Route pour les timelines de personnalités
+  const match = pathname.match(/^\/timeline\/(.+)$/);
+  if (match) {
+    const slug = match[1];
+    const name = slugToName(slug);
+    const indexHtml = fs.readFileSync(path.join(__dirname, 'dist', 'index.html'), 'utf-8');
 
-        <!-- Twitter -->
-        <meta property="twitter:card" content="summary_large_image">
-        <meta property="twitter:url" content="https://scandalline.fr/timeline/${personName}">
-        <meta property="twitter:title" content="${title}">
-        <meta property="twitter:description" content="${description}">
-        <meta property="twitter:image" content="${image}">
+    // Injecter les méta tags
+    const html = indexHtml
+      .replace('</head>',
+        `<meta property="og:title" content="Timeline des scandales de ${name}" />
+        <meta property="og:description" content="Découvrez les scandales impliquant ${name}" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="/timeline/${slug}" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Timeline des scandales de ${name}" />
+        <meta name="twitter:description" content="Découvrez les scandales impliquant ${name}" />
+        </head>`
+      )
+      .replace('</body>',
+        `<script>
+          window.__INITIAL_DATA__ = {
+            type: 'personality',
+            value: "${name}"
+          };
+        </script>
+        </body>`
+      );
 
-        <!-- Vite assets -->
-        <script type="module" crossorigin src="/assets/index.js"></script>
-        <link rel="stylesheet" href="/assets/index.css">
-      </head>
-      <body>
-        <div id="root"></div>
-      </body>
-    </html>
-  `);
-});
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(html);
+    return;
+  }
 
-// Catch all other routes
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-});
+  // Route par défaut : servir index.html
+  try {
+    const indexHtml = fs.readFileSync(path.join(__dirname, 'dist', 'index.html'), 'utf-8');
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(indexHtml);
+  } catch (err) {
+    console.error('Error serving index.html:', err);
+    res.writeHead(500);
+    res.end('Server Error');
+  }
+};
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// Créer le serveur si on n'est pas sur Vercel
+if (process.env.NODE_ENV !== 'production') {
+  const server = http.createServer(handler);
+  const PORT = process.env.PORT || 3000;
+  server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
 
-// Export for Vercel
-export default app;
+// Exporter le handler pour Vercel
+module.exports = handler;

@@ -1,10 +1,6 @@
 import { ContextualFilter } from '../types/scandal';
 
-// Get base URL from current location
-const getBaseUrl = () => {
-  if (typeof window === 'undefined') return '';
-  return `${window.location.protocol}//${window.location.host}`;
-};
+const baseUrl = 'https://scandalline.fr';
 
 interface ShareUtils {
   copyToClipboard(text: string): Promise<boolean>;
@@ -12,8 +8,7 @@ interface ShareUtils {
   generateShareTitle(contextualFilter: ContextualFilter | null): string;
   generateShareUrl(contextualFilter: ContextualFilter | null): string;
   parseUrlFilter(): ContextualFilter | null;
-  updateUrl(contextualFilter: ContextualFilter | null): void;
-  updateMetaTags(name: string, description: string): void;
+  updateUrl(contextualFilter?: ContextualFilter | null): void;
 }
 
 export const shareUtils: ShareUtils = {
@@ -45,7 +40,6 @@ export const shareUtils: ShareUtils = {
   },
 
   generateShareUrl: (contextualFilter: ContextualFilter | null): string => {
-    const baseUrl = getBaseUrl();
     if (!contextualFilter) return baseUrl;
 
     const params = new URLSearchParams();
@@ -78,7 +72,7 @@ export const shareUtils: ShareUtils = {
   },
 
   // Update URL without reload
-  updateUrl(contextualFilter: ContextualFilter | null): void {
+  updateUrl(contextualFilter?: ContextualFilter | null): void {
     const newUrl = this.generateShareUrl(contextualFilter);
     
     // Only update if URL has changed
@@ -129,35 +123,7 @@ export const shareUtils: ShareUtils = {
       console.error('Error sharing:', error);
       return false;
     }
-  },
-
-  updateMetaTags(name: string, description: string): void {
-    // Update title
-    document.title = `Timeline des scandales de ${name} | ScandalLine`;
-
-    // Update meta tags
-    const updateMetaTag = (selector: string, content: string) => {
-      let element = document.querySelector(selector);
-      if (!element) {
-        element = document.createElement('meta');
-        element.setAttribute('name', selector.replace('meta[name="', '').replace('"]', ''));
-        document.head.appendChild(element);
-      }
-      element.setAttribute('content', content);
-    };
-
-    // Update OpenGraph tags
-    updateMetaTag('meta[property="og:title"]', `Timeline des scandales de ${name} | ScandalLine`);
-    updateMetaTag('meta[property="og:description"]', description);
-    updateMetaTag('meta[property="og:url"]', window.location.href);
-
-    // Update Twitter tags
-    updateMetaTag('meta[name="twitter:title"]', `Timeline des scandales de ${name} | ScandalLine`);
-    updateMetaTag('meta[name="twitter:description"]', description);
-
-    // Update regular meta description
-    updateMetaTag('meta[name="description"]', description);
-  },
+  }
 };
 
 /**

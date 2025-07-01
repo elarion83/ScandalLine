@@ -4,9 +4,21 @@
     {
       "src": "server.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "buildCommand": "npm run build",
+        "outputDirectory": "dist"
+      }
     }
   ],
   "routes": [
+    {
+      "src": "/assets/(.*)",
+      "dest": "/dist/assets/$1"
+    },
     {
       "src": "/(.*)",
       "dest": "/server.js"
