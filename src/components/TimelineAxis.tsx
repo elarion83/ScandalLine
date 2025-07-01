@@ -57,24 +57,14 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
               }}
             >
               <div className="relative">
-                {/* Motif quadrillé */}
-                <div 
-                  className="absolute inset-0 opacity-10"
-                  style={{
-                    backgroundImage: `
-                      linear-gradient(to right, rgb(139, 92, 246) 1px, transparent 1px),
-                      linear-gradient(to bottom, rgb(139, 92, 246) 1px, transparent 1px)
-                    `,
-                    backgroundSize: '8px 8px'
-                  }}
-                />
-                
                 {/* Conteneur avec effet glassmorphism */}
                 <div 
-                  className="relative px-3 py-4 rounded-2xl bg-white/20 dark:bg-gray-900/20 backdrop-blur-[2px] border border-white/30 dark:border-white/10"
-                  style={{ transform: 'rotate(25deg)' }}
+                  className="relative px-3  py-4 rounded-2x border border-white/30 dark:border-white/10 pb-0"
                 >
-                  <span className="relative z-10 text-black dark:text-white tracking-wide inline-block">
+                  <span className="relative z-10 text-grey dark:text-white tracking-wide inline-block"
+                     style={{ filter: 'blur(1px)' ,                    transform: 'rotate(25deg)',
+
+                      fontSize: '1em', opacity: 0.5 }}>
                     {year}
                   </span>
                 </div>

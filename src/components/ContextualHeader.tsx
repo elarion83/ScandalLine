@@ -1,10 +1,9 @@
 import React from 'react';
-import { ArrowLeft, Users, Building, Scale, FileText, ZoomIn, ZoomOut, Filter, BarChart3, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Users, Building, Scale, FileText } from 'lucide-react';
 import { ContextualFilter } from '../types/scandal';
 import { getContextualTitle, getContextualDescription } from '../utils/contextualFilters';
 import ShareTimeline from './ShareTimeline';
 import { useTimeline } from '../contexts/TimelineContext';
-import { calculateTimelineWidth } from '../utils/timelineLayout';
 
 interface ContextualHeaderProps {
   contextualFilter: ContextualFilter;
@@ -29,88 +28,7 @@ const ContextualHeader: React.FC<ContextualHeaderProps> = ({
   endYear,
   containerRef
 }) => {
-  const { state, dispatch } = useTimeline();
-
-  // Format zoom level for display
-  const formatZoomLevel = (zoom: number): string => {
-    // Normalize zoom level: 15 = 100%, 1 = 6.67%, 30 = 200%
-    const normalizedZoom = (zoom / 15) * 100;
-    return `${Math.round(normalizedZoom)}%`;
-  };
-
-  // Zoom handlers (copied from Timeline.tsx)
-  const handleZoomIn = React.useCallback(() => {
-    if (state.zoomLevel >= 300 || shouldUseAdaptiveLayout) return;
-    
-    const container = containerRef.current;
-    if (!container) return;
-
-    const currentCenter = state.scrollPosition + state.viewportWidth / 2;
-    const timelineWidth = calculateTimelineWidth(startYear, endYear, state.zoomLevel);
-    const currentCenterRatio = currentCenter / timelineWidth;
-    
-    const zoomFactor = state.zoomLevel < 15 ? 1.5 : state.zoomLevel < 75 ? 1.4 : 1.3;
-    const newZoomLevel = Math.min(300, state.zoomLevel * zoomFactor);
-    dispatch({ type: 'SET_ZOOM', payload: newZoomLevel });
-    
-    setTimeout(() => {
-      if (container) {
-        const newTimelineWidth = calculateTimelineWidth(startYear, endYear, newZoomLevel);
-        const newCenter = currentCenterRatio * newTimelineWidth;
-        const newScrollLeft = newCenter - state.viewportWidth / 2;
-        container.scrollLeft = Math.max(0, newScrollLeft);
-        dispatch({ type: 'SET_SCROLL_POSITION', payload: container.scrollLeft });
-      }
-    }, 0);
-  }, [dispatch, state.zoomLevel, state.scrollPosition, state.viewportWidth, startYear, endYear, shouldUseAdaptiveLayout, containerRef]);
-
-  const handleZoomOut = React.useCallback(() => {
-    if (state.zoomLevel <= 1.5 || shouldUseAdaptiveLayout) return;
-    
-    const container = containerRef.current;
-    if (!container) return;
-
-    const currentCenter = state.scrollPosition + state.viewportWidth / 2;
-    const timelineWidth = calculateTimelineWidth(startYear, endYear, state.zoomLevel);
-    const currentCenterRatio = currentCenter / timelineWidth;
-    
-    const zoomFactor = state.zoomLevel > 75 ? 1.3 : state.zoomLevel > 15 ? 1.4 : 1.5;
-    const newZoomLevel = Math.max(1.5, state.zoomLevel / zoomFactor);
-    dispatch({ type: 'SET_ZOOM', payload: newZoomLevel });
-    
-    setTimeout(() => {
-      if (container) {
-        const newTimelineWidth = calculateTimelineWidth(startYear, endYear, newZoomLevel);
-        const newCenter = currentCenterRatio * newTimelineWidth;
-        const newScrollLeft = newCenter - state.viewportWidth / 2;
-        container.scrollLeft = Math.max(0, newScrollLeft);
-        dispatch({ type: 'SET_SCROLL_POSITION', payload: container.scrollLeft });
-      }
-    }, 0);
-  }, [dispatch, state.zoomLevel, state.scrollPosition, state.viewportWidth, startYear, endYear, shouldUseAdaptiveLayout, containerRef]);
-
-  const handleResetZoom = React.useCallback(() => {
-    if (shouldUseAdaptiveLayout) return;
-    
-    const container = containerRef.current;
-    if (!container) return;
-
-    const currentCenter = state.scrollPosition + state.viewportWidth / 2;
-    const timelineWidth = calculateTimelineWidth(startYear, endYear, state.zoomLevel);
-    const currentCenterRatio = currentCenter / timelineWidth;
-    
-    dispatch({ type: 'SET_ZOOM', payload: 15 });
-    
-    setTimeout(() => {
-      if (container) {
-        const newTimelineWidth = calculateTimelineWidth(startYear, endYear, 15);
-        const newCenter = currentCenterRatio * newTimelineWidth;
-        const newScrollLeft = newCenter - state.viewportWidth / 2;
-        container.scrollLeft = Math.max(0, newScrollLeft);
-        dispatch({ type: 'SET_SCROLL_POSITION', payload: container.scrollLeft });
-      }
-    }, 0);
-  }, [dispatch, state.scrollPosition, state.viewportWidth, startYear, endYear, shouldUseAdaptiveLayout, containerRef]);
+  const { state } = useTimeline();
 
   const getIcon = () => {
     switch (contextualFilter.type) {
@@ -143,102 +61,32 @@ const ContextualHeader: React.FC<ContextualHeaderProps> = ({
   };
 
   return (
-    <div className="bg-gradient-to-r from-gray-800 to-gray-900 text-white px-6 py-4 border-b border-gray-700">
+    <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-3">
       <div className="flex items-center justify-between">
-        {/* Left section - Back button and context info */}
-      <div className="flex items-center gap-4">
-        {/* Back button */}
-        <button
-          onClick={onBack}
-          className="flex items-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors group"
-        >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-            <span className="text-sm font-medium">Retour</span>
-        </button>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={onBack}
+            className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
 
-        {/* Separator */}
-        <div className="w-px h-8 bg-white/20" />
-
-        {/* Context info */}
-        <div className="flex items-center gap-3">
-          <div className={`p-2 rounded-lg ${getColorClasses()}`}>
-            {getIcon()}
-          </div>
-          
-          <div>
-            <h1 className="text-xl font-bold">
-              {getContextualTitle(contextualFilter)}
-            </h1>
-            <p className="text-sm text-gray-300">
-              {getContextualDescription(contextualFilter, filteredCount)} • {totalMoney.toLocaleString('fr-FR')}€ concernés
-            </p>
-          </div>
-          </div>
-        </div>
-
-        {/* Right section - Control buttons */}
-        <div className="flex items-center gap-3">
-          {/* Share button */}
-          <ShareTimeline 
-            scandals={filteredScandals}
-            contextualFilter={contextualFilter}
-          />
-          
-          {/* Zoom controls - only show for scrollable timelines */}
-          {!shouldUseAdaptiveLayout && (
-            <div className="flex items-center gap-1 bg-white/10 rounded-lg p-1">
-              <button
-                onClick={handleZoomOut}
-                className="p-2 rounded-md hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Dézoomer"
-                disabled={state.zoomLevel <= 1.5}
-              >
-                <ZoomOut className="w-4 h-4 text-white" />
-              </button>
-              
-              <button
-                onClick={handleResetZoom}
-                className="px-3 py-2 text-sm text-gray-300 min-w-[4rem] text-center hover:bg-white/20 rounded-md transition-colors"
-                title="Réinitialiser le zoom (100%)"
-              >
-                {formatZoomLevel(state.zoomLevel)}
-              </button>
-              
-              <button
-                onClick={handleZoomIn}
-                className="p-2 rounded-md hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Zoomer"
-                disabled={state.zoomLevel >= 300}
-              >
-                <ZoomIn className="w-4 h-4 text-white" />
-              </button>
+          <div className="flex items-center gap-3">
+            <div className={`p-2 rounded-lg ${getColorClasses()}`}>
+              {getIcon()}
             </div>
-          )}
-          
-          <button
-            onClick={() => dispatch({ type: 'TOGGLE_FILTERS' })}
-            className={`p-2 rounded-lg transition-colors ${
-              state.showFilters 
-                ? 'bg-blue-500 text-white' 
-                : 'bg-white/10 hover:bg-white/20 text-white'
-            }`}
-            title="Filtres"
-          >
-            <Filter className="w-5 h-5" />
-          </button>
-          
-          <button
-            onClick={() => dispatch({ type: 'TOGGLE_STATS' })}
-            className={`p-2 rounded-lg transition-colors ${
-              state.showStats 
-                ? 'bg-green-500 text-white' 
-                : 'bg-white/10 hover:bg-white/20 text-white'
-            }`}
-            title="Statistiques"
-          >
-            <BarChart3 className="w-5 h-5" />
-          </button>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {getContextualTitle(contextualFilter)}
+              </h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {getContextualDescription(contextualFilter, filteredCount, totalMoney)}
+              </p>
+            </div>
+          </div>
         </div>
+
+        <ShareTimeline scandals={filteredScandals} contextualFilter={contextualFilter} />
       </div>
     </div>
   );

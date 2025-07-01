@@ -14,7 +14,8 @@ import {
   needsScrolling,
   calculateOptimizedTimelineWidth,
   calculateOptimizedScandalPositions,
-  calculateDynamicDateRange
+  calculateDynamicDateRange,
+  calculateCurrentYear
 } from '../utils/timelineLayout';
 import { useTimeline } from '../contexts/TimelineContext';
 import ScandalCard from './ScandalCard';
@@ -427,18 +428,18 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
 
         {/* Filters Panel */}
         <AnimatePresence>
-        {state.showFilters && (
-          <FilterPanel
-            filters={state.filters}
-            onFiltersChange={(filters) => dispatch({ type: 'SET_FILTERS', payload: filters })}
-            scandals={contextuallyFilteredScandals}
-            onClose={() => dispatch({ type: 'TOGGLE_FILTERS' })}
-          />
-        )}
+          {state.showFilters && (
+            <FilterPanel
+              filters={state.filters}
+              onFiltersChange={(filters) => dispatch({ type: 'SET_FILTERS', payload: filters })}
+              scandals={contextuallyFilteredScandals}
+              onClose={() => dispatch({ type: 'TOGGLE_FILTERS' })}
+            />
+          )}
         </AnimatePresence>
 
         {/* Main Timeline */}
-        <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex-1 flex flex-col min-w-0 relative">
           {/* Timeline Container */}
           <div
             ref={containerRef}
@@ -466,8 +467,30 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
               }}
               data-tour="timeline"
             >
-              {/* Timeline Axis - only for scrollable timelines */}
-              {!shouldUseAdaptiveLayout && (
+              {/* Timeline background with grid */}
+              <div 
+                className="absolute inset-0"
+                style={{ width: timelineWidth }}
+              >
+                {/* Current year background */}
+                <div 
+                  className="absolute inset-0 flex items-center justify-center pointer-events-none select-none"
+                  style={{
+                    left: state.scrollPosition,
+                    width: state.viewportWidth
+                  }}
+                >
+                  <span className="text-[20rem] font-bold text-gray-100 dark:text-gray-800/50 opacity-70">
+                    {calculateCurrentYear(
+                      state.scrollPosition,
+                      state.viewportWidth,
+                      timelineWidth,
+                      startYear,
+                      endYear
+                    )}
+                  </span>
+                </div>
+
                 <TimelineAxis
                   startYear={startYear}
                   endYear={endYear}
@@ -475,7 +498,7 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
                   zoomLevel={state.zoomLevel}
                   timelineY={TIMELINE_Y}
                 />
-              )}
+              </div>
 
               {/* Timeline Gaps - only for adaptive layout with gaps */}
               {shouldUseAdaptiveLayout && gaps.length > 0 && (

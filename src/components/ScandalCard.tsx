@@ -4,6 +4,7 @@ import { Scandal } from '../types/scandal';
 import { formatCurrency, cleanScandalName, formatLargeNumber, formatDate, getCategoryColors, getCategoryLabel, getMainCategory } from '../utils/scandalUtils';
 import { ClickablePerson, ClickableParty, ClickableStatus, ClickableType } from './ClickableElements';
 import { AnimatedNumber } from './AnimatedNumber';
+import { useTimeline } from '../contexts/TimelineContext';
 
 interface ScandalCardProps {
   scandal: Scandal;
@@ -24,6 +25,7 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
   className,
   style
 }) => {
+  const { state } = useTimeline();
   const year = new Date(scandal.startDate).getFullYear();
   const connectionHeight = position.y - timelineY - 4;
   
@@ -32,6 +34,9 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
   const [isFocused, setIsFocused] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [intersectionRatio, setIntersectionRatio] = useState(0);
+
+  // Check if content should be collapsed (zoom < 67%)
+  const isContentCollapsed = (state.zoomLevel / 15) * 100 < 67;
 
   // Check if there are any sanctions
   const hasSanctions = (scandal.moneyAmount ?? 0) > 0 || 
@@ -294,6 +299,7 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
             : `border-gray-200/80 dark:border-gray-700/80 ${getCategoryColors(scandal.type).darkBorder}`
           }
           ${(isHovered || isFocused) && !isSelected ? 'shadow-2xl -translate-y-1 scale-102' : ''}
+          ${isContentCollapsed ? 'scandal-card-collapsed' : ''}
           relative
         `}
         onClick={onClick}
@@ -323,10 +329,10 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
         {/* Content Grid */}
         <div className="p-4 grid grid-cols-2 gap-3 bg-gray-50/50 dark:bg-gray-800/50">
           {/* Personalities */}
-          <div className="col-span-2 bg-white dark:bg-gray-700 p-3 rounded-xl shadow-sm">
+          <div className="col-span-2  bg-white dark:bg-gray-700 p-3 rounded-xl shadow-sm">
             <div className="flex items-center gap-2 mb-2">
               <Users className="w-4 h-4 text-purple-500 dark:text-purple-400" />
-              <span className="text-xs text-gray-600 dark:text-gray-300 font-semibold">Impliqués</span>
+              <span className="text-xs text-gray-600 dark:text-gray-300  font-semibold">Impliqués</span>
             </div>
             <div className="text-sm text-gray-800 dark:text-gray-100">
               {(scandal.personalities || []).slice(0, 2).map((person, index) => (
@@ -348,7 +354,7 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
 
           {/* Stats or Description */}
           {hasSanctions ? (
-            <div className="col-span-2 grid grid-cols-2 gap-3">
+            <div className="col-span-2 statOrDesc grid grid-cols-2 gap-3">
               {/* Money Amount */}
               {(scandal.moneyAmount ?? 0) > 0 && (
                 <div className="bg-white dark:bg-gray-700 p-3 rounded-xl shadow-sm">
@@ -434,7 +440,7 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
             </div>
           ) : (
             // Description
-            <div className="col-span-2 bg-white dark:bg-gray-700 p-3 rounded-xl shadow-sm">
+            <div className="col-span-2 statOrDesc bg-white dark:bg-gray-700 p-3 rounded-xl shadow-sm">
               <div className="flex items-center gap-2 mb-2">
                 <Tag className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                 <span className="text-xs text-gray-600 dark:text-gray-300 font-semibold">Description</span>

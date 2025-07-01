@@ -201,7 +201,7 @@
 .timeline-controls.filters-open,
 .timeline-controls.stats-open {
   opacity: 1;
-  padding: 8px 16px;
+  padding: 0px 16px;
   gap: 8px;
 }
 
@@ -229,4 +229,8 @@
 
 .timeline-controls button:active {
   transform: translateY(2px) scale(1);
+}
+
+.scandal-card-collapsed .statOrDesc {
+  display:none;
 }

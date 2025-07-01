@@ -150,16 +150,6 @@ const ShareTimeline: React.FC<ShareTimelineProps> = ({ scandals, contextualFilte
                 </span>
               </button>
               
-              {/* Copy full text */}
-              <button
-                onClick={() => handleCopy(getFullShareText())}
-                className="w-full flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors"
-              >
-                <Copy className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                <span className="text-gray-700 dark:text-gray-300 font-medium">
-                  Copier le texte complet
-                </span>
-              </button>
               {/* Social media */}
               <div className="flex gap-2">
                 <button

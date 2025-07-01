@@ -446,3 +446,18 @@ export const calculateDynamicDateRange = (scandals: Scandal[]): { start: number;
     end: lastYear + 1
   };
 };
+
+// Calculate the current year being viewed based on scroll position
+export const calculateCurrentYear = (
+  scrollPosition: number,
+  viewportWidth: number,
+  timelineWidth: number,
+  startYear: number,
+  endYear: number
+): number => {
+  const centerPosition = scrollPosition + viewportWidth / 2;
+  const yearSpan = endYear - startYear;
+  const yearProgress = centerPosition / timelineWidth;
+  const currentYear = startYear + (yearProgress * yearSpan);
+  return Math.round(Math.max(startYear, Math.min(endYear, currentYear)));
+};
