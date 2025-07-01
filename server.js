@@ -109,6 +109,16 @@ const handler = async (req, res) => {
     const totalAmount = personalityScandals.reduce((sum, scandal) => 
       sum + (scandal.amount || 0), 0
     );
+    const totalFines = personalityScandals.reduce((sum, scandal) => {
+      // Si la personne a une amende spécifique dans sanctions
+      const personalSanction = scandal.sanctions?.find(s => s.person === name);
+      if (personalSanction?.fine) {
+        return sum + personalSanction.fine;
+      }
+      // Sinon, utiliser l'amende générale du scandale
+      return sum + (scandal.fine || 0);
+    }, 0);
+
     const dateRange = {
       start: Math.min(...personalityScandals.map(s => new Date(s.startDate).getFullYear())),
       end: Math.max(...personalityScandals.map(s => new Date(s.startDate).getFullYear()))
@@ -121,9 +131,13 @@ const handler = async (req, res) => {
     const indexHtml = fs.readFileSync(path.join(__dirname, 'dist', 'index.html'), 'utf-8');
 
     // Construire la description
-    const description = `${personalityScandals.length} scandales entre ${dateRange.start} et ${dateRange.end}${
-      totalAmount > 0 ? `. Montant total concerné : ${formatEuros(totalAmount)}` : ''
-    }`;
+    let description = `${personalityScandals.length} scandales entre ${dateRange.start} et ${dateRange.end}`;
+    if (totalAmount > 0) {
+      description += `. Montant total concerné : ${formatEuros(totalAmount)}`;
+    }
+    if (totalFines > 0) {
+      description += `. Amendes : ${formatEuros(totalFines)}`;
+    }
 
     // Injecter les méta tags
     const html = indexHtml
