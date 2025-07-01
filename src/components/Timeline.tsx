@@ -186,6 +186,7 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
 
   // Handle back to main timeline
   const handleBackToMain = useCallback(() => {
+    window.location.replace('/');
     dispatch({ type: 'SET_TRANSITIONING', payload: true });
     
     setTimeout(() => {
