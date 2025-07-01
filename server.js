@@ -2,6 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { allScandals } = require('./dist-server/data');
+const politiciansPhotos = require('./dist-server/data/politiciens_photos.json');
 
 // Fonction pour convertir un slug en nom
 const slugToName = (slug) => {
@@ -139,16 +140,22 @@ const handler = async (req, res) => {
       description += `. Amendes : ${formatEuros(totalFines)}`;
     }
 
+    // Récupérer l'URL de l'image
+    const photoUrl = politiciansPhotos[slug]?.url || '';
+
     // Injecter les méta tags
     const html = indexHtml
       .replace('</head>',
-        `<meta property="og:title" content="${title}" />
+        `<meta name="description" content="${description}" />
+        <meta property="og:title" content="${title}" />
         <meta property="og:description" content="${description}" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="/timeline/${slug}" />
+        <meta property="og:image" content="${photoUrl}" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="${title}" />
         <meta name="twitter:description" content="${description}" />
+        <meta name="twitter:image" content="${photoUrl}" />
         </head>`
       )
       .replace('</body>',
