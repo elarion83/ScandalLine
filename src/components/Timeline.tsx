@@ -54,7 +54,13 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
 
   // Update filters with new date range
   useEffect(() => {
-    if (startYear !== state.filters.dateRange.start || endYear !== state.filters.dateRange.end) {
+    // Ne pas mettre à jour les dates si les filtres ont changé à cause d'une case à cocher
+    const hasOnlyCheckboxChanges = 
+      state.filters.types.length > 0 || 
+      state.filters.parties.length > 0 || 
+      state.filters.personalities.length > 0;
+
+    if (!hasOnlyCheckboxChanges && (startYear !== state.filters.dateRange.start || endYear !== state.filters.dateRange.end)) {
       dispatch({ 
         type: 'SET_FILTERS', 
         payload: { 
@@ -333,7 +339,7 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
         <header className="bg-white dark:bg-gray-800 shadow-sm px-6 py-4 flex items-center justify-between flex-shrink-0">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              ScandalLine : La bibliothèque aux scandales
+             ScandalList : La bibliothèque aux scandales
             </h1>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Affaires et controverses du paysage politique français 

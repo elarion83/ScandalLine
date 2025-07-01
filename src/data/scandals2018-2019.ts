@@ -12,6 +12,7 @@ export const scandals2018_2019: Scandal[] = [
     convictionDate: '2021-11-19',
     prisonYears: 3,
     type: 'abus-fonction',
+    politicalParty: 'LREM',
     status: 'convicted',
     sanctions: [
       { person: 'Alexandre Benalla', penalty: '3 ans prison avec sursis', fine: 0 },
@@ -38,6 +39,7 @@ export const scandals2018_2019: Scandal[] = [
     judgmentDate: '2020-03-12',
     moneyAmount: 63000,
     type: 'abus-fonction',
+    politicalParty: 'LREM',
     status: 'judged',
     sanctions: [
       { person: 'François de Rugy', penalty: 'Démission forcée', fine: 0 }
@@ -64,6 +66,7 @@ export const scandals2018_2019: Scandal[] = [
     status: 'acquitted',
     moneyAmount: 120000,
     type: 'conflit-interets',
+    politicalParty: 'LREM',
     sanctions: [
       { person: 'Richard Ferrand', penalty: 'Relaxe', fine: 0 }
     ],
@@ -87,6 +90,7 @@ export const scandals2018_2019: Scandal[] = [
     startDate: '2018-11-25',
     moneyAmount: 2000000,
     type: 'conflit-interets',
+    politicalParty: 'LREM',
     status: 'ongoing',
     sanctions: [],
     sources: [
@@ -109,6 +113,7 @@ export const scandals2018_2019: Scandal[] = [
     startDate: '2018-08-30',
     moneyAmount: 400000,
     type: 'enrichissement-suspect',
+    politicalParty: 'LREM',
     status: 'ongoing',
     sanctions: [],
     sources: [
@@ -130,6 +135,7 @@ export const scandals2018_2019: Scandal[] = [
     positions: ['Candidat maire Paris', 'Artiste activiste', 'Philosophe', 'Président République'],
     startDate: '2018-12-15',
     type: 'chantage-politique',
+    politicalParty: 'LREM',
     status: 'ongoing',
     sanctions: [],
     sources: [
@@ -152,6 +158,7 @@ export const scandals2018_2019: Scandal[] = [
     startDate: '2018-10-20',
     judgmentDate: '2021-07-03',
     type: 'mensonge-etat',
+    politicalParty: 'LREM',
     status: 'ongoing',
     sanctions: [],
     sources: [
@@ -173,6 +180,7 @@ export const scandals2018_2019: Scandal[] = [
     positions: ['Ministre Intérieur', 'Plaignante', 'Président République', 'Ministre Égalité'],
     startDate: '2018-06-25',
     type: 'agression-sexuelle',
+    politicalParty: 'LREM',
     status: 'ongoing',
     sanctions: [],
     sources: [
@@ -194,6 +202,7 @@ export const scandals2018_2019: Scandal[] = [
     positions: ['Garde des Sceaux', 'Président République', 'Procureur général', 'Ex-procureure PNF'],
     startDate: '2018-04-15',
     type: 'conflit-interets',
+    politicalParty: 'LREM',
     status: 'ongoing',
     sanctions: [],
     sources: [
@@ -216,6 +225,7 @@ export const scandals2018_2019: Scandal[] = [
     startDate: '2018-03-20',
     moneyAmount: 200000000,
     type: 'favoritisme',
+    politicalParty: 'LREM',
     status: 'ongoing',
     sanctions: [],
     sources: [
@@ -237,6 +247,7 @@ export const scandals2018_2019: Scandal[] = [
     positions: ['Ministre Éducation', 'Président République', 'Premier ministre', 'Ministre Santé'],
     startDate: '2019-12-28',
     type: 'hypocrisie-politique',
+    politicalParty: 'LREM',
     status: 'ongoing',
     sanctions: [],
     sources: [

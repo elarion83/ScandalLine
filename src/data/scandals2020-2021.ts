@@ -40,6 +40,7 @@ export const scandals2020_2021: Scandal[] = [
     positions: ['Ministre Santé', 'Président République', 'Premier ministre', 'Directeur général Santé'],
     startDate: '2020-03-15',
     type: 'mensonge-etat',
+    politicalParty: 'LREM',
     status: 'ongoing',
     sanctions: [],
     sources: [
@@ -61,6 +62,7 @@ export const scandals2020_2021: Scandal[] = [
     positions: ['Premier ministre', 'Président République', 'Ministre Santé', 'Chef cuisinier'],
     startDate: '2020-11-20',
     type: 'hypocrisie-politique',
+    politicalParty: 'LREM',
     status: 'ongoing',
     sanctions: [],
     sources: [
@@ -82,6 +84,7 @@ export const scandals2020_2021: Scandal[] = [
     positions: ['Ministre Culture', 'Président République', 'Premier ministre', 'Comédienne'],
     startDate: '2020-12-15',
     type: 'hypocrisie-politique',
+    politicalParty: 'LREM',
     status: 'ongoing',
     sanctions: [],
     sources: [
@@ -104,6 +107,7 @@ export const scandals2020_2021: Scandal[] = [
     startDate: '2020-09-10',
     moneyAmount: 50000000,
     type: 'conflit-interets',
+    politicalParty: 'LREM',
     status: 'ongoing',
     sanctions: [],
     sources: [
@@ -125,6 +129,7 @@ export const scandals2020_2021: Scandal[] = [
     positions: ['Premier ministre', 'Président République', 'Ministre Santé', 'Ex-ministre Santé'],
     startDate: '2020-04-05',
     type: 'mensonge-etat',
+    politicalParty: 'LREM',
     status: 'ongoing',
     sanctions: [],
     sources: [
@@ -146,6 +151,7 @@ export const scandals2020_2021: Scandal[] = [
     positions: ['Ministre Égalité', 'Président République', 'Secrétaire État Enfance', 'Premier ministre'],
     startDate: '2020-08-25',
     type: 'scandale-moral',
+    politicalParty: 'LREM',
     status: 'ongoing',
     sanctions: [],
     sources: [
@@ -167,6 +173,7 @@ export const scandals2020_2021: Scandal[] = [
     positions: ['Ex-chargé mission Élysée', 'Président République', 'Secrétaire général Élysée', 'Ambassadeur'],
     startDate: '2021-01-20',
     type: 'abus-fonction',
+    politicalParty: 'LREM',
     status: 'ongoing',
     sanctions: [],
     sources: [
@@ -189,6 +196,7 @@ export const scandals2020_2021: Scandal[] = [
     startDate: '2021-03-15',
     moneyAmount: 50000000,
     type: 'corruption-lobbying',
+    politicalParty: 'LREM',
     status: 'ongoing',
     sanctions: [],
     sources: [
@@ -240,6 +248,7 @@ export const scandals2020_2021: Scandal[] = [
     convictionDate: '2021-11-19',
     prisonYears: 3,
     type: 'abus-fonction',
+    politicalParty: 'LREM',
     status: 'convicted',
     sanctions: [
       { person: 'Alexandre Benalla', penalty: '3 ans prison avec sursis', fine: 0 },

@@ -27,28 +27,30 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
 
   // Calculate counts for each filter option based on current filters
   const filterCounts = useMemo(() => {
-    const scandalTypes = Array.from(new Set(scandals.map(s => getMainCategory(s.type))));
+    const scandalTypes = Array.from(new Set(scandals.map(s => {
+      const mainCategory = getMainCategory(s.type);
+      return mainCategory || 'non-categorise';
+    })));
     const parties = Array.from(new Set(scandals.filter(s => s.politicalParty).map(s => s.politicalParty!)));
     const personalities = Array.from(new Set(scandals.flatMap(s => s.personalities || [])));
     
     // For each filter option, calculate how many scandals would match if only that filter was applied
     const getCountForFilter = (filterType: string, filterValue: string) => {
       return scandals.filter(scandal => {
-        // Apply all current filters except the one we're counting
-        const tempFilters = { ...filters };
+        // Créer un nouveau filtre qui ne contient que le filtre qu'on veut compter
+        const tempFilters = {
+          types: filterType === 'type' ? [filterValue] : [],
+          parties: filterType === 'party' ? [filterValue] : [],
+          personalities: filterType === 'personality' ? [filterValue] : [],
+          dateRange: filters.dateRange
+        };
         
-        // Apply the specific filter we're counting
-        if (filterType === 'type') {
-          tempFilters.types = [filterValue];
-        } else if (filterType === 'party') {
-          tempFilters.parties = [filterValue];
-        } else if (filterType === 'personality') {
-          tempFilters.personalities = [filterValue];
-        }
-        
-        // Check if scandal matches the temp filters
-        if (tempFilters.types.length > 0 && !tempFilters.types.includes(getMainCategory(scandal.type))) {
-          return false;
+        // Utiliser la même logique que filterScandals
+        if (tempFilters.types.length > 0) {
+          const mainCategory = getMainCategory(scandal.type);
+          if (!mainCategory || !tempFilters.types.includes(mainCategory)) {
+            return false;
+          }
         }
         
         const scandalYear = new Date(scandal.startDate).getFullYear();
@@ -56,8 +58,8 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
           return false;
         }
         
-        if (tempFilters.parties.length > 0 && scandal.politicalParty) {
-          if (!tempFilters.parties.includes(scandal.politicalParty)) {
+        if (tempFilters.parties.length > 0) {
+          if (!scandal.politicalParty || !tempFilters.parties.includes(scandal.politicalParty)) {
             return false;
           }
         }

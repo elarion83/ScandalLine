@@ -77,16 +77,16 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
       case 'fraude-financiere':
         return {
           selected: {
-            line: 'w-2 bg-gradient-to-b from-red-400 to-red-600 shadow-lg shadow-red-200/50 dark:shadow-red-900/50',
-            dot: 'w-7 h-7 bg-gradient-to-br from-red-400 to-red-600 border-2 border-white dark:border-gray-800 shadow-lg shadow-red-200/50 dark:shadow-red-900/50 ring-4 ring-red-200/30 dark:ring-red-900/30'
+            line: 'w-2 bg-gradient-to-b from-fuchsia-400 to-fuchsia-600 shadow-lg shadow-fuchsia-200/50 dark:shadow-fuchsia-900/50',
+            dot: 'w-7 h-7 bg-gradient-to-br from-fuchsia-400 to-fuchsia-600 border-2 border-white dark:border-gray-800 shadow-lg shadow-fuchsia-200/50 dark:shadow-fuchsia-900/50 ring-4 ring-fuchsia-200/30 dark:ring-fuchsia-900/30'
           },
           hover: {
-            line: 'w-2 bg-gradient-to-b from-red-300 to-red-500 shadow-md shadow-red-200/30 dark:shadow-red-900/30',
-            dot: 'w-6 h-6 bg-gradient-to-br from-red-300 to-red-500 border-2 border-white dark:border-gray-800 shadow-md shadow-red-200/30 dark:shadow-red-900/30 ring-2 ring-red-200/20 dark:ring-red-900/20'
+            line: 'w-2 bg-gradient-to-b from-fuchsia-300 to-fuchsia-500 shadow-md shadow-fuchsia-200/30 dark:shadow-fuchsia-900/30',
+            dot: 'w-6 h-6 bg-gradient-to-br from-fuchsia-300 to-fuchsia-500 border-2 border-white dark:border-gray-800 shadow-md shadow-fuchsia-200/30 dark:shadow-fuchsia-900/30 ring-2 ring-fuchsia-200/20 dark:ring-fuchsia-900/20'
           },
           default: {
-            line: 'w-1.5 bg-gradient-to-b from-red-200 to-red-400 dark:from-red-600 dark:to-red-800',
-            dot: 'w-5 h-5 bg-gradient-to-br from-red-200 to-red-400 dark:from-red-600 dark:to-red-800 border-2 border-white dark:border-gray-800'
+            line: 'w-1.5 bg-gradient-to-b from-fuchsia-200 to-fuchsia-400 dark:from-fuchsia-600 dark:to-fuchsia-800',
+            dot: 'w-5 h-5 bg-gradient-to-br from-fuchsia-200 to-fuchsia-400 dark:from-fuchsia-600 dark:to-fuchsia-800 border-2 border-white dark:border-gray-800'
           }
         };
       case 'manipulation-marche':
@@ -330,6 +330,25 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
                       value={scandal.moneyAmount ?? 0} 
                       formatFn={formatLargeNumber} 
                     />
+                  </div>
+                </div>
+              )}
+
+              {/* Parti politique si on n'a que la somme concernée */}
+              {scandal.politicalParty && (scandal.moneyAmount ?? 0) > 0 && 
+               !(scandal.fine ?? 0) && !(scandal.prisonYears ?? 0) && !(scandal.ineligibilityYears ?? 0) && (
+                <div className="bg-white dark:bg-gray-700 p-3 rounded-xl shadow-sm">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Building2 className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+                    <span className="text-xs text-gray-600 dark:text-gray-300 font-semibold">Parti</span>
+                  </div>
+                  <div className="text-sm text-gray-800 dark:text-gray-100">
+                    <ClickableParty 
+                      party={scandal.politicalParty}
+                      className="cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors hover:underline decoration-blue-400/50 dark:decoration-blue-600/50"
+                    >
+                      {scandal.politicalParty}
+                    </ClickableParty>
                   </div>
                 </div>
               )}

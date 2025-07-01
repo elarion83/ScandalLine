@@ -16,7 +16,7 @@ export const filterTimelineBy = (
     
     case 'party':
       return scandals.filter(scandal => 
-        scandal.politicalParty === contextualFilter.value
+        scandal.politicalParty && scandal.politicalParty === contextualFilter.value
       );
     
     case 'status':
@@ -37,7 +37,7 @@ export const filterTimelineBy = (
 export const getContextualTitle = (contextualFilter: ContextualFilter): string => {
   switch (contextualFilter.type) {
     case 'personality':
-      return `ScandalLine de ${contextualFilter.label}`;
+      return `ScandalList de ${contextualFilter.label}`;
     case 'party':
       return `Affaires liées au ${contextualFilter.label}`;
     case 'status':

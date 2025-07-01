@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTimeline } from '../contexts/TimelineContext';
 import { createContextualFilter } from '../utils/contextualFilters';
+import { getCategoryLabel } from '../utils/scandalUtils';
 
 interface ClickablePersonProps {
   name: string;
@@ -132,21 +133,11 @@ export const ClickableType: React.FC<ClickableTypeProps> = ({
 }) => {
   const { dispatch } = useTimeline();
 
-  const getTypeLabel = (t: string): string => {
-    const labels = {
-      'political': 'Politiques',
-      'financial': 'Financiers',
-      'corruption': 'Corruption',
-      'media': 'Médiatiques'
-    };
-    return labels[t as keyof typeof labels] || t;
-  };
-
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     dispatch({ 
       type: 'SET_CONTEXTUAL_FILTER', 
-      payload: createContextualFilter('scandalType', type, getTypeLabel(type))
+      payload: createContextualFilter('scandalType', type, getCategoryLabel(type))
     });
     onFilter?.();
   };
@@ -155,7 +146,7 @@ export const ClickableType: React.FC<ClickableTypeProps> = ({
     <button
       onClick={handleClick}
       className={`${className} hover:underline hover:text-slate-600 dark:hover:text-slate-400 transition-colors cursor-pointer`}
-      title={`Voir tous les scandales ${getTypeLabel(type).toLowerCase()}`}
+      title={`Voir tous les scandales de type ${getCategoryLabel(type).toLowerCase()}`}
     >
       {children}
     </button>

@@ -41,6 +41,7 @@ export const scandals2024_2025: Scandal[] = [
     startDate: '2024-03-15',
     moneyAmount: 5000000,
     type: 'evasion-fiscale',
+    politicalParty: 'LREM',
     status: 'ongoing',
     sanctions: [],
     sources: [
@@ -63,6 +64,7 @@ export const scandals2024_2025: Scandal[] = [
     startDate: '2024-01-20',
     moneyAmount: 1200000,
     type: 'conflit-interets',
+    politicalParty: 'LREM',
     status: 'ongoing',
     sanctions: [],
     sources: [
@@ -107,6 +109,7 @@ export const scandals2024_2025: Scandal[] = [
     positions: ['Ministre Intérieur', 'Président République', 'Directeur IGPN', 'Préfet police Paris'],
     startDate: '2024-07-15',
     type: 'entrave-justice',
+    politicalParty: 'LREM',
     status: 'ongoing',
     sanctions: [],
     sources: [
@@ -128,6 +131,7 @@ export const scandals2024_2025: Scandal[] = [
     positions: ['Ministre Sports', 'Président République', 'Premier ministre', 'Ministre Culture'],
     startDate: '2024-02-25',
     type: 'fraude-academique',
+    politicalParty: 'LREM',
     status: 'ongoing',
     sanctions: [],
     sources: [
@@ -219,6 +223,7 @@ export const scandals2024_2025: Scandal[] = [
     startDate: '2024-12-05',
     moneyAmount: 300000,
     type: 'conflit-interets',
+    politicalParty: 'LREM',
     status: 'ongoing',
     sanctions: [],
     sources: [
@@ -241,6 +246,7 @@ export const scandals2024_2025: Scandal[] = [
     startDate: '2025-01-15',
     moneyAmount: 200000,
     type: 'pantouflage',
+    politicalParty: 'LREM',
     status: 'ongoing',
     sanctions: [],
     sources: [

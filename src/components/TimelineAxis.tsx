@@ -22,7 +22,7 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
     <div className="absolute inset-0 pointer-events-none">
       {/* Main timeline line */}
       <div
-        className="absolute bg-gradient-to-r from-violet-400 via-fuchsia-500 to-violet-400 shadow-lg shadow-fuchsia-200/20 dark:shadow-fuchsia-900/20"
+        className="absolute bg-gradient-to-r from-gray-300 via-gray-400 to-gray-300 dark:from-gray-600 dark:via-gray-500 dark:to-gray-600 shadow-lg shadow-gray-200/20 dark:shadow-gray-900/20"
         style={{
           left: 0,
           right: 0,
@@ -34,7 +34,7 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
 
       {/* Timeline glow effect */}
       <div
-        className="absolute bg-gradient-to-r from-transparent via-fuchsia-300 to-transparent dark:via-fuchsia-800 opacity-30 blur-sm"
+        className="absolute bg-gradient-to-r from-transparent via-gray-300 to-transparent dark:via-gray-700 opacity-30 blur-sm"
         style={{
           left: 0,
           right: 0,
@@ -70,8 +70,11 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
                 />
                 
                 {/* Conteneur avec effet glassmorphism */}
-                <div className="relative px-3 py-4 rounded-2xl bg-white/20 dark:bg-gray-900/20 backdrop-blur-[2px] border border-white/30 dark:border-white/10">
-                  <span className="relative z-10 text-gray-800 dark:text-white tracking-wide">
+                <div 
+                  className="relative px-3 py-4 rounded-2xl bg-white/20 dark:bg-gray-900/20 backdrop-blur-[2px] border border-white/30 dark:border-white/10"
+                  style={{ transform: 'rotate(25deg)' }}
+                >
+                  <span className="relative z-10 text-black dark:text-white tracking-wide inline-block">
                     {year}
                   </span>
                 </div>
@@ -101,8 +104,11 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
                   />
                   
                   {/* Conteneur avec effet glassmorphism plus léger */}
-                  <div className="relative px-2 py-3 rounded-xl bg-white/10 dark:bg-gray-900/10 backdrop-blur-[1px] border border-white/20 dark:border-white/5">
-                    <span className="relative z-10 text-gray-600 dark:text-gray-300 tracking-wide">
+                  <div 
+                    className="relative px-2 py-3 rounded-xl bg-white/10 dark:bg-gray-900/10 backdrop-blur-[1px] border border-white/20 dark:border-white/5"
+                    style={{ transform: 'rotate(25deg)' }}
+                  >
+                    <span className="relative z-10 text-black/60 dark:text-gray-300 tracking-wide inline-block">
                       {year}
                     </span>
                   </div>

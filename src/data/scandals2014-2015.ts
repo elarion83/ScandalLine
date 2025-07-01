@@ -237,7 +237,7 @@ export const scandals2014_2015: Scandal[] = [
     "startDate": "2014-11-20",
     "moneyAmount": 2000000,
     "type": "conflit-intérêts",
-    "politicalParty": "PS",
+    "politicalParty": "LREM",
     "status": "ongoing",
     "region": "National",
     "sources": [

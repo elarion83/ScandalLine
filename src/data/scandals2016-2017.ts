@@ -182,6 +182,7 @@ export const scandals2016_2017: Scandal[] = [
     startDate: '2016-10-24',
     moneyAmount: 36000000,
     type: 'corruption-internationale',
+    politicalParty: 'LREM',
     status: 'ongoing',
     sanctions: [],
     sources: [

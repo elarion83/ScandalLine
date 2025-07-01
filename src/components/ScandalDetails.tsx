@@ -75,38 +75,13 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
               </h2>
 
               <div className="flex flex-wrap items-center gap-2">
-                <ClickableStatus 
-                  status={scandal.status}
-                  onFilter={onClose}
-                  className="flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium shadow-sm bg-white/20"
-                >
-                  {scandal.status === 'convicted' ? <AlertTriangle className="w-3 h-3" /> :
-                   scandal.status === 'acquitted' ? <BadgeCheck className="w-3 h-3" /> :
-                   <Timer className="w-3 h-3" />}
-                  {scandal.status === 'convicted' ? 'Condamné' : 
-                   scandal.status === 'acquitted' ? 'Acquitté' : 
-                   scandal.status === 'ongoing' ? 'En cours' : 'Jugé'}
-                </ClickableStatus>
-                {scandal.politicalParty && (
-                  <ClickableParty 
-                    party={scandal.politicalParty}
-                    onFilter={onClose}
-                    className="flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium shadow-sm bg-white/20"
-                  >
-                    <Building2 className="w-3 h-3" />
-                    {scandal.politicalParty}
-                  </ClickableParty>
-                )}
                 <ClickableType 
                   type={scandal.type}
                   onFilter={onClose}
                   className="flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium shadow-sm bg-white/20"
                 >
                   <Tag className="w-3 h-3" />
-                  {scandal.type === 'political' ? 'Politique' :
-                   scandal.type === 'financial' ? 'Financier' :
-                   scandal.type === 'corruption' ? 'Corruption' :
-                   scandal.type}
+                  {getCategoryLabel(scandal.type)}
                 </ClickableType>
               </div>
             </div>
@@ -139,13 +114,45 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
             </ScandalModalSection>
 
             {/* Section Faits & Sanctions - Affichée uniquement s'il y a des sanctions */}
-            {((scandal.moneyAmount ?? 0) > 0 || (scandal.fine ?? 0) > 0 || (scandal.prisonYears ?? 0) > 0 || (scandal.ineligibilityYears ?? 0) > 0 || (scandal.sanctions?.length ?? 0) > 0) && (
+            {((scandal.moneyAmount ?? 0) > 0 || (scandal.fine ?? 0) > 0 || (scandal.prisonYears ?? 0) > 0 || (scandal.ineligibilityYears ?? 0) > 0 || (scandal.sanctions?.length ?? 0) > 0 || scandal.status || scandal.politicalParty) && (
               <ScandalModalSection 
                 title="Faits & Sanctions" 
                 icon={Scale}
                 className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-100 dark:border-gray-700/50"
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {scandal.status && (
+                    <div className="bg-gray-50 dark:bg-gray-900/20 p-4 rounded-xl border border-gray-100 dark:border-gray-800/30">
+                      <div className="flex items-center gap-2 mb-2">
+                        {scandal.status === 'convicted' ? <AlertTriangle className="w-4 h-4 text-gray-500 dark:text-gray-400" /> :
+                         scandal.status === 'acquitted' ? <BadgeCheck className="w-4 h-4 text-gray-500 dark:text-gray-400" /> :
+                         <Timer className="w-4 h-4 text-gray-500 dark:text-gray-400" />}
+                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                          Statut
+                        </span>
+                      </div>
+                      <div className="text-xl font-bold text-gray-700 dark:text-gray-300">
+                        {scandal.status === 'convicted' ? 'Condamné' : 
+                         scandal.status === 'acquitted' ? 'Acquitté' : 
+                         scandal.status === 'ongoing' ? 'En cours' : 'Jugé'}
+                      </div>
+                    </div>
+                  )}
+
+                  {scandal.politicalParty && (
+                    <div className="bg-gray-50 dark:bg-gray-900/20 p-4 rounded-xl border border-gray-100 dark:border-gray-800/30">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Building2 className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                          Parti politique
+                        </span>
+                      </div>
+                      <div className="text-xl font-bold text-gray-700 dark:text-gray-300">
+                        {scandal.politicalParty}
+                      </div>
+                    </div>
+                  )}
+
                   {(scandal.moneyAmount ?? 0) > 0 && (
                     <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-xl border border-red-100 dark:border-red-800/30">
                       <div className="flex items-center gap-2 mb-2">
@@ -262,15 +269,6 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
                   </div>
             </ScandalModalSection>
 
-            {/* Timeline */}
-            <ScandalModalSection 
-              title="Chronologie" 
-              icon={Calendar}
-              className="bg-white dark:bg-gray-800 p-6 pb-0 rounded-xl border border-gray-100 dark:border-gray-700/50"
-            >
-              <ScandalTimeline events={timelineEvents} />
-            </ScandalModalSection>
-
             {/* Section Institution */}
             {(scandal.politicalParty || scandal.institution) && (
               <ScandalModalSection 
@@ -302,6 +300,15 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
                 </div>
               </ScandalModalSection>
             )}
+
+            {/* Timeline */}
+            <ScandalModalSection 
+              title="Chronologie" 
+              icon={Calendar}
+              className="bg-white dark:bg-gray-800 p-6 pb-0 rounded-xl border border-gray-100 dark:border-gray-700/50"
+            >
+              <ScandalTimeline events={timelineEvents} />
+            </ScandalModalSection>
 
             {/* Section Tags et Connexions */}
             {((scandal.tags && scandal.tags.length > 0) || (scandal.relatedScandals && scandal.relatedScandals.length > 0)) && (

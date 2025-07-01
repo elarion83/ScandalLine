@@ -40,6 +40,7 @@ export const scandals2022_2023: Scandal[] = [
     startDate: '2022-03-15',
     moneyAmount: 200000000,
     type: 'favoritisme',
+    politicalParty: 'LREM',
     status: 'ongoing',
     sanctions: [],
     sources: [
@@ -93,6 +94,7 @@ export const scandals2022_2023: Scandal[] = [
     startDate: '2022-06-20',
     moneyAmount: 2500000,
     type: 'evasion-fiscale',
+    politicalParty: 'LREM',
     status: 'ongoing',
     sanctions: [],
     sources: [
@@ -115,6 +117,7 @@ export const scandals2022_2023: Scandal[] = [
     startDate: '2022-08-15',
     moneyAmount: 500000,
     type: 'conflit-interets',
+    politicalParty: 'LREM',
     status: 'ongoing',
     sanctions: [],
     sources: [
@@ -136,6 +139,7 @@ export const scandals2022_2023: Scandal[] = [
     positions: ['Ministre Budget', 'Président République', 'Compagnon', 'Ministre Transports'],
     startDate: '2022-10-25',
     type: 'nepotisme',
+    politicalParty: 'LREM',
     status: 'ongoing',
     sanctions: [],
     sources: [
