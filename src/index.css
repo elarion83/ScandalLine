@@ -274,3 +274,7 @@
   opacity: 0.3;
   z-index: 9;
 }
+
+.texture-overlay.bg-gradient-to-r::before {
+  opacity: 0.6;
+}

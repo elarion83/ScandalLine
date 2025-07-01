@@ -269,61 +269,69 @@ export const calculateScandalPositions = (
 ): ScandalPosition[] => {
   if (scandals.length === 0) return [];
 
-  // Si nous n'avons qu'un seul scandale, le centrer
-  if (scandals.length === 1) {
-    const scandal = scandals[0];
-    return [{
-      id: scandal.id,
-      x: timelineWidth / 2 - CARD_WIDTH / 2,
-      y: TIMELINE_Y + MIN_VERTICAL_SPACING,
-      width: CARD_WIDTH,
-      height: CARD_HEIGHT,
-      date: new Date(scandal.startDate)
-    }];
-  }
-
-  const positions: ScandalPosition[] = [];
-  const tracks: Array<{ endX: number }> = [];
-
-  // Trier les scandales par date
-  const sortedScandals = [...scandals].sort(
-    (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+  // Sort scandals by date to process them chronologically
+  const sortedScandals = [...scandals].sort((a, b) => 
+    new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
   );
 
-  // Calculer la position X pour chaque scandale
-  for (const scandal of sortedScandals) {
+  const positions: ScandalPosition[] = [];
+  const tracks: Array<{ 
+    scandals: Array<{ startX: number; endX: number; id: string }>;
+    y: number;
+  }> = [];
+
+  sortedScandals.forEach(scandal => {
     const x = getXPositionForDate(scandal.startDate, startYear, endYear, timelineWidth);
+    const startX = x - CARD_WIDTH / 2;
+    const endX = x + CARD_WIDTH / 2;
     
-    // Trouver une piste disponible
-    let trackIndex = 0;
-    while (
-      trackIndex < tracks.length &&
-      tracks[trackIndex].endX > x - (CARD_WIDTH + MIN_HORIZONTAL_SPACING)
-    ) {
-      trackIndex++;
+    // Find the best track for this scandal
+    let assignedTrack = -1;
+    
+    // Try to find an existing track where this scandal fits
+    for (let i = 0; i < tracks.length; i++) {
+      const track = tracks[i];
+      let canFit = true;
+      
+      // Check collision with all scandals in this track
+      for (const existingScandal of track.scandals) {
+        const horizontalOverlap = !(endX + MIN_HORIZONTAL_SPACING < existingScandal.startX || 
+                                   startX - MIN_HORIZONTAL_SPACING > existingScandal.endX);
+        if (horizontalOverlap) {
+          canFit = false;
+          break;
+        }
+      }
+      
+      if (canFit) {
+        assignedTrack = i;
+        break;
+      }
     }
-
-    // Si aucune piste n'est disponible, en créer une nouvelle
-    if (trackIndex === tracks.length) {
-      tracks.push({ endX: 0 });
+    
+    // If no existing track works, create a new one
+    if (assignedTrack === -1) {
+      assignedTrack = tracks.length;
+      tracks.push({
+        scandals: [],
+        y: TIMELINE_Y + 50 + (assignedTrack * TRACK_HEIGHT)
+      });
     }
-
-    // Calculer la position Y
-    const y = TIMELINE_Y + MIN_VERTICAL_SPACING + (trackIndex * TRACK_HEIGHT);
-
-    // Mettre à jour la fin de la piste
-    tracks[trackIndex].endX = x + CARD_WIDTH;
-
-    // Ajouter la position
+    
+    // Add scandal to the assigned track
+    tracks[assignedTrack].scandals.push({ startX, endX, id: scandal.id });
+    
+    const y = tracks[assignedTrack].y;
+    
     positions.push({
       id: scandal.id,
-      x: Math.max(0, Math.min(timelineWidth - CARD_WIDTH, x - CARD_WIDTH / 2)),
-      y,
+      x: startX,
+      y: y,
       width: CARD_WIDTH,
       height: CARD_HEIGHT,
       date: new Date(scandal.startDate)
     });
-  }
+  });
 
   return positions;
 };
@@ -447,31 +455,9 @@ export const calculateCurrentYear = (
   startYear: number,
   endYear: number
 ): number => {
-  // On regarde la position du centre de l'écran
   const centerPosition = scrollPosition + viewportWidth / 2;
-  
-  // On génère les positions des marqueurs d'années
-  const yearMarkers = generateYearMarkers(startYear, endYear, timelineWidth, 1);
-  
-  // On trouve entre quels marqueurs on se trouve
-  for (let i = 0; i < yearMarkers.length - 1; i++) {
-    const currentMarker = yearMarkers[i];
-    const nextMarker = yearMarkers[i + 1];
-    
-    if (centerPosition >= currentMarker.x && centerPosition < nextMarker.x) {
-      return currentMarker.year;
-    }
-  }
-  
-  // Si on est après le dernier marqueur
-  if (yearMarkers.length > 0 && centerPosition >= yearMarkers[yearMarkers.length - 1].x) {
-    return yearMarkers[yearMarkers.length - 1].year;
-  }
-  
-  // Si on est avant le premier marqueur
-  if (yearMarkers.length > 0 && centerPosition < yearMarkers[0].x) {
-    return yearMarkers[0].year;
-  }
-  
-  return startYear; // Fallback
+  const yearSpan = endYear - startYear;
+  const yearProgress = centerPosition / timelineWidth;
+  const currentYear = startYear + (yearProgress * yearSpan);
+  return Math.round(Math.max(startYear, Math.min(endYear, currentYear)));
 };

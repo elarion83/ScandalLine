@@ -21,41 +21,6 @@ export const shareUtils: ShareUtils = {
     }
   },
 
-  shareNative: async (title: string, text: string, url: string): Promise<void> => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title,
-          text,
-          url
-        });
-      } catch (err) {
-        if (err instanceof Error && err.name !== 'AbortError') {
-          console.error('Error sharing:', err);
-        }
-      }
-    } else {
-      await shareUtils.copyToClipboard(`${title}\n\n${text}\n\n${url}`);
-    }
-  },
-
-  generateShareTitle: (contextualFilter: ContextualFilter | null): string => {
-    if (!contextualFilter) return 'ScandalList : La bibliothèque aux scandales';
-
-    switch (contextualFilter.type) {
-      case 'personality':
-        return `ScandalList de ${contextualFilter.label}`;
-      case 'party':
-        return `Affaires liées au ${contextualFilter.label}`;
-      case 'status':
-        return `Affaires ${contextualFilter.label}`;
-      case 'scandalType':
-        return `Affaires de type "${contextualFilter.label}"`;
-      default:
-        return 'ScandalList : La bibliothèque aux scandales';
-    }
-  },
-
   generateShareUrl: (contextualFilter: ContextualFilter | null): string => {
     if (!contextualFilter) return baseUrl;
 

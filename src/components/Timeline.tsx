@@ -111,8 +111,21 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
   }, [scandalPositions, filteredScandals, state.scrollPosition, state.viewportWidth, shouldUseAdaptiveLayout]);
 
   const scrollProgress = useMemo(() => {
+    // Si la timeline est plus petite que la viewport ou si on utilise le layout adaptatif, on est à 100%
     if (shouldUseAdaptiveLayout || timelineWidth <= state.viewportWidth) return 1;
-    return Math.min(1, (state.scrollPosition + state.viewportWidth) / timelineWidth);
+
+    // Si le bord gauche est visible (scrollPosition = 0) et que le bord droit n'est pas visible
+    if (state.scrollPosition === 0 && state.scrollPosition + state.viewportWidth < timelineWidth) {
+      return 0;
+    }
+
+    // Si le bord droit est visible
+    if (state.scrollPosition + state.viewportWidth >= timelineWidth) {
+      return 1;
+    }
+
+    // Sinon, on calcule le pourcentage de progression
+    return (state.scrollPosition) / (timelineWidth - state.viewportWidth);
   }, [state.scrollPosition, state.viewportWidth, timelineWidth, shouldUseAdaptiveLayout]);
 
   // Handle contextual filter changes with transition
@@ -120,13 +133,29 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
     dispatch({ type: 'SET_TRANSITIONING', payload: true });
     
     setTimeout(() => {
+      // Set contextual filter
       dispatch({ type: 'SET_CONTEXTUAL_FILTER', payload: filter });
+      
+      // Get filtered scandals
+      const filteredContextScandals = filterTimelineBy(scandals, filter);
+      
+      // Calculate new date range based on filtered scandals
+      const { start, end } = calculateDynamicDateRange(filteredContextScandals);
+      
+      // Update filters with new date range
+      dispatch({ 
+        type: 'SET_FILTERS', 
+        payload: { 
+          ...state.filters,
+          dateRange: { start, end }
+        } 
+      });
+      
       dispatch({ type: 'SET_TRANSITIONING', payload: false });
       
-      // Get filtered scandals and their positions
-      const filteredContextScandals = filterTimelineBy(scandals, filter);
-      const width = calculateTimelineWidth(startYear, endYear, state.zoomLevel);
-      const positions = calculateScandalPositions(filteredContextScandals, startYear, endYear, width);
+      // Calculate positions with new date range
+      const width = calculateTimelineWidth(start, end, state.zoomLevel);
+      const positions = calculateScandalPositions(filteredContextScandals, start, end, width);
       
       // Get the last scandal's position
       if (positions.length > 0 && containerRef.current) {
@@ -140,14 +169,31 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
         dispatch({ type: 'SET_SCROLL_POSITION', payload: newScrollPosition });
       }
     }, 150);
-  }, [dispatch, scandals, startYear, endYear, state.zoomLevel]);
+  }, [dispatch, scandals, state.filters, state.zoomLevel]);
 
   // Handle back to main timeline
   const handleBackToMain = useCallback(() => {
     dispatch({ type: 'SET_TRANSITIONING', payload: true });
     
     setTimeout(() => {
+      // Reset contextual filter
       dispatch({ type: 'SET_CONTEXTUAL_FILTER', payload: null });
+      
+      // Calculate new date range based on all scandals
+      const { start, end } = calculateDynamicDateRange(scandals);
+      
+      // Reset filters with new date range
+      dispatch({ 
+        type: 'SET_FILTERS', 
+        payload: { 
+          ...state.filters,
+          dateRange: { start, end },
+          types: [],
+          parties: [],
+          personalities: []
+        } 
+      });
+      
       dispatch({ type: 'SET_TRANSITIONING', payload: false });
       
       // Reset scroll position when returning to main
@@ -156,7 +202,7 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
         dispatch({ type: 'SET_SCROLL_POSITION', payload: 0 });
       }
     }, 150);
-  }, [dispatch]);
+  }, [dispatch, scandals, state.filters]);
 
   // Handle viewport width changes
   useEffect(() => {
@@ -547,8 +593,8 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
               }`}
               style={{ 
                 width: timelineWidth, 
-                height: '100vh',
-                minHeight: '700px',
+                height: 'auto',
+                minHeight: '500px',
                 paddingTop: '60px',
                 paddingBottom: '100px'
               }}

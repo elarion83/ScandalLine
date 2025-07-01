@@ -45,12 +45,17 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
     (scandal.ineligibilityYears ?? 0) > 0 || 
     (scandal.sanctions?.length ?? 0) > 0;
   
-  // Calculate dynamic z-index based on interaction states
+  // Calculate dynamic z-index based on interaction states and vertical position
   // Higher z-index for hovered/focused cards to ensure they appear above others
+  // Lower z-index for cards lower on the timeline
   const getZIndex = () => {
-    if (isSelected) return 50; // Selected cards always on top
-    if (isHovered || isFocused) return 40; // Hovered/focused cards above normal cards
-    return 10; // Default z-index for normal cards
+    // Base z-index inversement proportionnel à la position Y
+    // Plus la carte est basse, plus son z-index de base est bas
+    const baseZIndex = Math.max(1, Math.floor(1000 - position.y));
+
+    if (isSelected) return baseZIndex + 1000; // Selected cards always on top
+    if (isHovered || isFocused) return baseZIndex + 500; // Hovered/focused cards above normal cards
+    return baseZIndex; // Default z-index based on vertical position
   };
   
   const getStatusIcon = () => {

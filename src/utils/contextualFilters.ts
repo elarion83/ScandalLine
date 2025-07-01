@@ -57,7 +57,7 @@ export const getContextualDescription = (
   
   switch (contextualFilter.type) {
     case 'personality':
-      return `${baseText} impliquant ${contextualFilter.label}`;
+      return `${contextualFilter.label} est impliqué(e) dans ${baseText}`;
     case 'party':
       return `${baseText} liée${filteredCount > 1 ? 's' : ''} au ${contextualFilter.label}`;
     case 'status':
