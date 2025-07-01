@@ -1,29 +1,20 @@
-import express from 'express';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { getAllScandals } from './src/data/index.js';
+import { getAllScandals } from '../src/data';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-// Serve static files
-app.use(express.static(path.join(__dirname, 'dist')));
-
-// Timeline route with named parameter
-app.get('/timeline/:personName', (req, res) => {
+// API route handler for timeline pages
+export default function handler(req, res) {
+  // Get the name parameter from the URL
+  const name = req.query.name;
+  
+  // Get all scandals data
   const scandals = getAllScandals();
-  const personName = req.params.personName;
   
   // Find the scandal data for this person
-  const scandalData = scandals.find(s => s.name.toLowerCase() === personName.toLowerCase());
+  const scandalData = scandals.find(s => s.name.toLowerCase() === name.toLowerCase());
   
   // Default meta tags
   let title = "ScandalLine - La timeline des scandales";
   let description = "Découvrez la chronologie interactive des scandales politiques et médiatiques.";
-  let image = "https://scandalline.fr/default-image.jpg";
+  let image = "https://scandalline.fr/default-image.jpg"; // Assurez-vous d'avoir une image par défaut
   
   // If we found specific scandal data, use it for meta tags
   if (scandalData) {
@@ -32,7 +23,8 @@ app.get('/timeline/:personName', (req, res) => {
     image = scandalData.image || image;
   }
 
-  // Send index.html with injected meta tags
+  // Send the HTML with dynamic meta tags
+  res.setHeader('Content-Type', 'text/html');
   res.send(`
     <!DOCTYPE html>
     <html lang="fr">
@@ -47,38 +39,22 @@ app.get('/timeline/:personName', (req, res) => {
 
         <!-- Open Graph / Facebook -->
         <meta property="og:type" content="website">
-        <meta property="og:url" content="https://scandalline.fr/timeline/${personName}">
+        <meta property="og:url" content="https://scandalline.fr/timeline/${name}">
         <meta property="og:title" content="${title}">
         <meta property="og:description" content="${description}">
         <meta property="og:image" content="${image}">
 
         <!-- Twitter -->
         <meta property="twitter:card" content="summary_large_image">
-        <meta property="twitter:url" content="https://scandalline.fr/timeline/${personName}">
+        <meta property="twitter:url" content="https://scandalline.fr/timeline/${name}">
         <meta property="twitter:title" content="${title}">
         <meta property="twitter:description" content="${description}">
         <meta property="twitter:image" content="${image}">
-
-        <!-- Vite assets -->
-        <script type="module" crossorigin src="/assets/index.js"></script>
-        <link rel="stylesheet" href="/assets/index.css">
       </head>
       <body>
         <div id="root"></div>
+        <script type="module" src="/src/main.tsx"></script>
       </body>
     </html>
   `);
-});
-
-// Catch all other routes
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-});
-
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
-// Export for Vercel
-export default app;
+} 
