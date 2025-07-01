@@ -47,43 +47,68 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
       {/* Year markers and labels */}
       {yearMarkers.map(({ year, x, isMainMarker }) => (
         <div key={year} className="absolute" style={{ left: x, top: timelineY }}>
-          {/* Tick mark */}
-          <div
-            className={`absolute transition-all duration-200 ${
-              isMainMarker 
-                ? 'w-1 h-10 bg-gradient-to-b from-violet-400 to-fuchsia-500 rounded-full shadow-lg shadow-fuchsia-200/20 dark:shadow-fuchsia-900/20' 
-                : 'w-0.5 h-6 bg-gradient-to-b from-violet-300 to-fuchsia-400 rounded-full opacity-70'
-            }`}
-            style={{
-              left: '-2px',
-              top: isMainMarker ? '-20px' : '-12px'
-            }}
-          />
-          
-          {/* Year label */}
-          {isMainMarker && (
-            <div
-              className="absolute text-sm font-semibold text-gray-800 dark:text-gray-200 whitespace-nowrap transform -translate-x-1/2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-lg shadow-fuchsia-200/10 dark:shadow-fuchsia-900/10 border border-violet-100 dark:border-violet-800"
+          {isMainMarker ? (
+            <div 
+              className="absolute writing-mode-vertical text-4xl font-black whitespace-nowrap"
               style={{
-                top: '-52px',
-                left: '0'
+                writingMode: 'vertical-rl',
+                transform: 'translateX(-50%) rotate(180deg)',
+                top: '-80px'
               }}
             >
-              {year}
+              <div className="relative">
+                {/* Motif quadrillé */}
+                <div 
+                  className="absolute inset-0 opacity-10"
+                  style={{
+                    backgroundImage: `
+                      linear-gradient(to right, rgb(139, 92, 246) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgb(139, 92, 246) 1px, transparent 1px)
+                    `,
+                    backgroundSize: '8px 8px'
+                  }}
+                />
+                
+                {/* Conteneur avec effet glassmorphism */}
+                <div className="relative px-3 py-4 rounded-2xl bg-white/20 dark:bg-gray-900/20 backdrop-blur-[2px] border border-white/30 dark:border-white/10">
+                  <span className="relative z-10 text-gray-800 dark:text-white tracking-wide">
+                    {year}
+                  </span>
+                </div>
+              </div>
             </div>
-          )}
-          
-          {/* Minor tick labels for high zoom */}
-          {!isMainMarker && zoomLevel > 2 && (
-            <div
-              className="absolute text-xs text-violet-600 dark:text-violet-400 whitespace-nowrap transform -translate-x-1/2"
-              style={{
-                top: '-32px',
-                left: '0'
-              }}
-            >
-              {year}
-            </div>
+          ) : (
+            zoomLevel > 2 && (
+              <div
+                className="absolute writing-mode-vertical text-xl font-bold whitespace-nowrap"
+                style={{
+                  writingMode: 'vertical-rl',
+                  transform: 'translateX(-50%) rotate(180deg)',
+                  top: '-50px'
+                }}
+              >
+                <div className="relative">
+                  {/* Motif quadrillé plus petit */}
+                  <div 
+                    className="absolute inset-0 opacity-5"
+                    style={{
+                      backgroundImage: `
+                        linear-gradient(to right, rgb(139, 92, 246) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgb(139, 92, 246) 1px, transparent 1px)
+                      `,
+                      backgroundSize: '6px 6px'
+                    }}
+                  />
+                  
+                  {/* Conteneur avec effet glassmorphism plus léger */}
+                  <div className="relative px-2 py-3 rounded-xl bg-white/10 dark:bg-gray-900/10 backdrop-blur-[1px] border border-white/20 dark:border-white/5">
+                    <span className="relative z-10 text-gray-600 dark:text-gray-300 tracking-wide">
+                      {year}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )
           )}
         </div>
       ))}
