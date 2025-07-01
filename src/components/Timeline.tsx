@@ -41,6 +41,13 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
   const initialScrollDoneRef = useRef(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
 
+  // Scroll to top when timeline opens
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.scrollTop = 0;
+    }
+  }, [scandals, state.contextualFilter]); // Déclencher quand les scandales changent ou quand on change de contexte
+
   // Apply contextual filter first, then regular filters
   const contextuallyFilteredScandals = state.contextualFilter 
     ? filterTimelineBy(scandals, state.contextualFilter)
@@ -484,14 +491,9 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
       </div>
 
       <div className="flex flex-1 overflow-hidden relative">
-        {/* Timeline Controls - Hide when only one scandal */}
-        {filteredScandals.length > 1 && (
           <div className={`timeline-controls ${showOnboarding ? 'tour-highlight' : ''} ${
             state.showFilters ? 'filters-open' : ''
-          } ${state.showStats ? 'stats-open' : ''}`} style={{ zIndex: 99 }}>
-            {/* Zoom controls - only show for scrollable timelines */}
-            {!shouldUseAdaptiveLayout && (
-              <>
+          } ${state.showStats ? 'stats-open' : ''}`} style={{ zIndex: 999 }}>
                 <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg px-0.5">
                 <button
                   onClick={handleZoomOut}
@@ -519,8 +521,6 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
                 </button>
               </div>
                 <div className="w-px h-6 bg-gray-200 dark:bg-gray-600 self-center mx-1"></div>
-              </>
-            )}
             
             <button
               onClick={() => dispatch({ type: 'TOGGLE_FILTERS' })}
@@ -561,7 +561,6 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
               <HelpCircle className="w-5 h-5" />
             </button>
           </div>
-        )}
 
         {/* Filters Panel */}
         <AnimatePresence>
@@ -580,7 +579,14 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
           {/* Timeline Container */}
           <div
             ref={containerRef}
-            className={`flex-1 h-full transition-all duration-300 overflow-auto ${state.isDragging ? 'cursor-grabbing' : 'cursor-grab'} ${state.isTransitioning ? 'pointer-events-none' : ''}`}
+            className={`relative flex-1 overflow-x-auto overflow-y-scroll ${
+              state.isTransitioning ? 'opacity-0' : 'opacity-100'
+            } transition-opacity duration-150`}
+            style={{
+              height: '100%',
+              cursor: state.isDragging ? 'grabbing' : 'grab',
+              WebkitOverflowScrolling: 'touch'
+            }}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
@@ -588,17 +594,14 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
             onScroll={handleScroll}
           >
             <div 
-              className={`relative bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-all duration-300 timeline-grid-bg timeline-container ${
-                state.isTransitioning ? 'scale-95 opacity-70' : 'scale-100 opacity-100'
-              }`}
+              className="relative timeline-container"
               style={{ 
-                width: timelineWidth, 
-                height: 'auto',
-                minHeight: '500px',
-                paddingTop: '60px',
+                width: timelineWidth,
+                minHeight: '800px',
                 paddingBottom: '100px'
               }}
             >
+              <div className="timeline-grid-bg" />
               {/* Timeline background with grid */}
               <div 
                 className="absolute inset-0"

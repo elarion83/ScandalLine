@@ -95,7 +95,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ onComplete }) => {
       
       {/* Tooltip avec z-index encore plus élevé */}
       <div
-        className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 z-[103] w-full max-w-md"
+        className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 z-[999] w-full max-w-md"
       >
         <div className="flex items-start justify-between gap-4 mb-4">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">

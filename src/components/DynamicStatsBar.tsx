@@ -122,7 +122,7 @@ const DynamicStatsBar: React.FC<DynamicStatsBarProps> = ({
           transitionProperty: isDraggingRef.current ? 'none' : 'all'
         }}
       >
-        <div className="flex items-center gap-1 bg-blue-500/50 dark:bg-blue-600 text-white px-2 py-1 mt-1 rounded-full text-sm font-medium shadow-md">
+        <div className="flex texture-overlay items-center gap-1 bg-blue-500/50 dark:bg-blue-600 text-white px-2 py-1 mt-1 rounded-full text-sm font-medium shadow-md">
           <Calendar className="w-4 h-4" />
           {currentYear}
         </div>

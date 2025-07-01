@@ -102,6 +102,16 @@
   opacity: 0.5;
 }
 
+/* Texture animation au hover */
+.scandal-card .texture-overlay::before {
+  transition: transform 0.2s ease-in-out;
+  will-change: transform;
+}
+
+.scandal-card:hover .texture-overlay::before {
+  transform: translate(-20px, +20px);
+}
+
 /* Focus styles for better accessibility */
 @layer base {
   *:focus-visible {
@@ -121,12 +131,19 @@
 }
 
 .timeline-grid-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-image: 
     linear-gradient(to right, rgba(156, 163, 175, 0.15) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(156, 163, 175, 0.15) 1px, transparent 1px);
   background-size: 50px 50px;
   background-attachment: local;
   animation: gridMove 20s linear infinite;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .dark .timeline-grid-bg {
@@ -205,18 +222,20 @@
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(243, 244, 246, 0.95);
-  backdrop-filter: blur(8px);
-  border-radius: 20px 20px 0 0;
-  padding: 0px 12px;
+  background: rgba(243, 244, 246, 0.98);
+  backdrop-filter: blur(12px);
+  border-radius: 24px 24px 0 0;
+  padding: 8px 20px;
   display: flex;
-  gap: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  gap: 12px;
+  box-shadow: 
+    0 -4px 6px rgba(0, 0, 0, 0.1),
+    0 -2px 4px rgba(0, 0, 0, 0.06);
   border: 1px solid rgba(0, 0, 0, 0.1);
-  border-top: none;
+  border-bottom: none;
   z-index: 40;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  opacity: 0.6;
+  opacity: 0.95;
 }
 
 .timeline-controls:hover,
@@ -224,34 +243,85 @@
 .timeline-controls.filters-open,
 .timeline-controls.stats-open {
   opacity: 1;
-  padding: 8px 16px;
-  gap: 8px;
+  padding: 12px 24px;
+  gap: 16px;
+  transform: translateX(-50%) translateY(-4px);
+  box-shadow: 
+    0 -8px 16px rgba(0, 0, 0, 0.1),
+    0 -4px 6px rgba(0, 0, 0, 0.06);
 }
 
 .dark .timeline-controls {
-  background: rgba(17, 24, 39, 0.95);
+  background: rgba(31, 41, 55, 0.98);
   border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 
+    0 -4px 6px rgba(0, 0, 0, 0.4),
+    0 -2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .timeline-controls button {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  transform: scale(0.9);
+  transform: scale(0.95);
+  padding: 8px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.timeline-controls:hover button,
-.timeline-controls:focus-within button,
-.timeline-controls.filters-open button,
-.timeline-controls.stats-open button {
-  transform: scale(1);
+/* Bouton des filtres actif */
+.timeline-controls.filters-open button[data-tour="filters"] {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  border-color: #2563eb;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+  transform: scale(1.05);
+}
+
+/* Bouton des stats actif */
+.timeline-controls.stats-open button[data-tour="stats"] {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border-color: #059669;
+  box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2);
+  transform: scale(1.05);
+}
+
+/* Version sombre */
+.dark .timeline-controls.filters-open button[data-tour="filters"] {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  border-color: #1d4ed8;
+  box-shadow: 0 2px 4px rgba(29, 78, 216, 0.4);
+}
+
+.dark .timeline-controls.stats-open button[data-tour="stats"] {
+  background: linear-gradient(135deg, #059669, #047857);
+  border-color: #047857;
+  box-shadow: 0 2px 4px rgba(4, 120, 87, 0.4);
 }
 
 .timeline-controls button:hover {
-  transform: translateY(1px) scale(1);
+  transform: translateY(-2px) scale(1.05);
+  background: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .timeline-controls button:active {
-  transform: translateY(2px) scale(1);
+  transform: translateY(0) scale(0.98);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.dark .timeline-controls button {
+  background: rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .timeline-controls button:hover {
+  background: rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.dark .timeline-controls button:active {
+  background: rgba(0, 0, 0, 0.4);
 }
 
 .scandal-card-collapsed .statOrDesc {

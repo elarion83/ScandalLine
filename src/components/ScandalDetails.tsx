@@ -53,8 +53,9 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
 
   return (
     <div 
-      className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+      className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-100"
       onClick={handleOverlayClick}
+      style={{zIndex: 9999}}
     >
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
         {/* Header Sticky */}
@@ -63,7 +64,7 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-3">
                 {scandal.region && (
-                  <span className="flex items-center gap-1.5 px-2 py-1 text-sm font-medium bg-white/20 rounded-md">
+                  <span className="flex items-center gap-1.5 ml-5 px-2 py-1 text-sm font-medium bg-white/20 rounded-md">
                     <MapPin className="w-3 h-3" />
                     {scandal.region}
                   </span>
@@ -106,7 +107,7 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
             <ScandalModalSection 
               title="Description" 
               icon={FileText}
-              className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-100 dark:border-gray-700/50"
+              className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-2 border-gray-300 dark:border-gray-700/50"
             >
               <div className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
                 {scandal.description}

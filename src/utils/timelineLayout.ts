@@ -18,7 +18,7 @@ export interface TimelineGap {
 
 export const CARD_WIDTH = 280;
 export const CARD_HEIGHT = 180;
-export const TIMELINE_HEIGHT = 4;
+export const TIMELINE_HEIGHT = 3;
 export const TIMELINE_Y = 120;
 export const MIN_VERTICAL_SPACING = 25;
 export const MIN_HORIZONTAL_SPACING = 15;
