@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useCallback, useMemo, useState } from 'react';
-import { ZoomIn, ZoomOut, Filter, BarChart3, RotateCcw, HelpCircle } from 'lucide-react';
+import { ZoomIn, ZoomOut, Filter, BarChart3 } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
 import { Scandal } from '../types/scandal';
 import { filterScandals, calculateStats } from '../utils/scandalUtils';
@@ -27,7 +27,6 @@ import ScandalDetails from './ScandalDetails';
 import DynamicStatsBar from './DynamicStatsBar';
 import ContextualHeader from './ContextualHeader';
 import ShareTimeline from './ShareTimeline';
-import OnboardingTour from './modals/OnboardingTour';
 
 interface TimelineProps {
   scandals: Scandal[];
@@ -37,9 +36,8 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
   const { state, dispatch } = useTimeline();
   const containerRef = useRef<HTMLDivElement>(null);
   const dragStartRef = useRef({ x: 0, scrollLeft: 0 });
-  const scrollTimeoutRef = useRef<number>();
+  const scrollTimeoutRef = useRef<NodeJS.Timeout>();
   const initialScrollDoneRef = useRef(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
 
   // Scroll to top when timeline opens
   useEffect(() => {
@@ -418,20 +416,6 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
            state.filters.personalities.length > 0;
   }, [state.filters]);
 
-  // Gestion de l'onboarding
-  const handleOnboardingComplete = () => {
-    setShowOnboarding(false);
-    localStorage.setItem('hasSeenOnboarding', 'true');
-  };
-
-  useEffect(() => {
-    // Check if it's the first visit
-    const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding');
-    if (!hasSeenOnboarding) {
-      setShowOnboarding(true);
-    }
-  }, []);
-
   return (
     <div className="flex flex-col h-full">
       {/* Main Header */}
@@ -464,7 +448,7 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
         />
       )}
 
-      {/* Dynamic Stats Bar - Only show for scrollable timelines */}
+      {/* Dynamic Stats Bar */}
       <DynamicStatsBar 
         visibleScandals={cumulativeScandals}
         totalScandals={filteredScandals.length}
@@ -489,9 +473,7 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
       </div>
 
       <div className="flex flex-1 overflow-hidden relative">
-          <div className={`timeline-controls ${showOnboarding ? 'tour-highlight' : ''} ${
-            state.showFilters ? 'filters-open' : ''
-          } ${state.showStats ? 'stats-open' : ''}`} style={{ zIndex: 999 }}>
+          <div className={`timeline-controls ${state.showFilters ? 'filters-open' : ''} ${state.showStats ? 'stats-open' : ''}`} style={{ zIndex: 50 }}>
                 <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg px-0.5">
                 <button
                   onClick={handleZoomOut}
@@ -522,7 +504,6 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
             
             <button
               onClick={() => dispatch({ type: 'TOGGLE_FILTERS' })}
-              data-tour="filters"
               className={`p-2 rounded-lg transition-colors relative ${
                 state.showFilters 
                   ? 'bg-blue-500 text-white dark:bg-blue-600' 
@@ -538,7 +519,6 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
             
             <button
               onClick={() => dispatch({ type: 'TOGGLE_STATS' })}
-              data-tour="stats"
               className={`p-2 rounded-lg transition-colors ${
                 state.showStats 
                   ? 'bg-green-500 text-white dark:bg-green-600' 
@@ -547,16 +527,6 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
               title="Statistiques"
             >
               <BarChart3 className="w-5 h-5" />
-            </button>
-
-            <div className="w-px h-6 bg-gray-200 dark:bg-gray-600 self-center mx-1"></div>
-            
-            <button
-              onClick={() => setShowOnboarding(true)}
-              className="p-2 rounded-lg transition-colors bg-purple-100 text-purple-600 dark:bg-purple-900 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-800"
-              title="Aide"
-            >
-              <HelpCircle className="w-5 h-5" />
             </button>
           </div>
 
@@ -631,7 +601,6 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
                   timelineWidth={timelineWidth}
                   zoomLevel={state.zoomLevel}
                   timelineY={TIMELINE_Y}
-                  data-tour="timeline-axis"
                 />
               </div>
 
@@ -693,9 +662,6 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
           onClose={() => dispatch({ type: 'SELECT_SCANDAL', payload: null })}
         />
       )}
-
-      {/* Onboarding Tour */}
-      {showOnboarding && <OnboardingTour onComplete={handleOnboardingComplete} />}
     </div>
   );
 };

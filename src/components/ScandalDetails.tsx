@@ -53,9 +53,9 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
 
   return (
     <div 
-      className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-100"
+      className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4"
       onClick={handleOverlayClick}
-      style={{zIndex: 9999}}
+      style={{zIndex: 60}}
     >
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
         {/* Header Sticky */}

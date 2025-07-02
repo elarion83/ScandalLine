@@ -49,13 +49,16 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
   // Higher z-index for hovered/focused cards to ensure they appear above others
   // Lower z-index for cards lower on the timeline
   const getZIndex = () => {
-    // Base z-index inversement proportionnel à la position Y
-    // Plus la carte est basse, plus son z-index de base est bas
-    const baseZIndex = Math.max(1, Math.floor(1000 - position.y));
+    // Base z-index entre 15 et 30 en fonction de la position Y
+    const baseZIndex = Math.max(15, Math.floor(30 - (position.y / 100)));
 
-    if (isSelected) return baseZIndex + 1000; // Selected cards always on top
-    if (isHovered || isFocused) return baseZIndex + 500; // Hovered/focused cards above normal cards
-    return baseZIndex; // Default z-index based on vertical position
+    // Ajouter 15 au z-index quand la carte est survolée ou sélectionnée
+    // en s'assurant de ne pas dépasser 45
+    if (isSelected || isHovered || isFocused) {
+      return Math.min(45, baseZIndex + 15);
+    }
+    
+    return baseZIndex;
   };
   
   const getStatusIcon = () => {

@@ -27,11 +27,11 @@ const ScandalCard = ({ scandal, onClick, isSelected, position, timelineY, classN
     const getZIndex = () => {
         // Base z-index inversement proportionnel à la position Y
         // Plus la carte est basse, plus son z-index de base est bas
-        const baseZIndex = Math.max(1, Math.floor(1000 - position.y));
+        const baseZIndex = Math.max(1, Math.floor(10 - position.y));
         if (isSelected)
-            return baseZIndex + 1000; // Selected cards always on top
+            return baseZIndex + 10; // Selected cards always on top
         if (isHovered || isFocused)
-            return baseZIndex + 500; // Hovered/focused cards above normal cards
+            return baseZIndex + 50; // Hovered/focused cards above normal cards
         return baseZIndex; // Default z-index based on vertical position
     };
     const getStatusIcon = () => {
@@ -212,7 +212,7 @@ const ScandalCard = ({ scandal, onClick, isSelected, position, timelineY, classN
             }
         };
     }, []);
-    return (<div ref={ref} className={`scandal-card absolute ${isSelected ? 'z-50' : `z-${getZIndex()}`} ${isVisible ? 'visible' : ''}`} style={{
+    return (<div ref={ref} className={`scandal-card absolute ${isSelected ? 'z-10' : `& z-${getZIndex()}`} ${isVisible ? 'visible' : ''}`} style={{
             left: position.x,
             top: position.y,
             zIndex: getZIndex(),

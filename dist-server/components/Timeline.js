@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useCallback, useMemo, useState } from 'react';
-import { ZoomIn, ZoomOut, Filter, BarChart3, HelpCircle } from 'lucide-react';
+import { ZoomIn, ZoomOut, Filter, BarChart3 } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
 import { filterScandals, calculateStats } from '../utils/scandalUtils';
 import { filterTimelineBy } from '../utils/contextualFilters';
@@ -14,14 +14,13 @@ import ScandalDetails from './ScandalDetails';
 import DynamicStatsBar from './DynamicStatsBar';
 import ContextualHeader from './ContextualHeader';
 import ShareTimeline from './ShareTimeline';
-import OnboardingTour from './modals/OnboardingTour';
+
 const Timeline = ({ scandals }) => {
     const { state, dispatch } = useTimeline();
     const containerRef = useRef(null);
     const dragStartRef = useRef({ x: 0, scrollLeft: 0 });
     const scrollTimeoutRef = useRef();
     const initialScrollDoneRef = useRef(false);
-    const [showOnboarding, setShowOnboarding] = useState(false);
     // Scroll to top when timeline opens
     useEffect(() => {
         if (containerRef.current) {
@@ -339,18 +338,6 @@ const Timeline = ({ scandals }) => {
             state.filters.parties.length > 0 ||
             state.filters.personalities.length > 0;
     }, [state.filters]);
-    // Gestion de l'onboarding
-    const handleOnboardingComplete = () => {
-        setShowOnboarding(false);
-        localStorage.setItem('hasSeenOnboarding', 'true');
-    };
-    useEffect(() => {
-        // Check if it's the first visit
-        const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding');
-        if (!hasSeenOnboarding) {
-            setShowOnboarding(true);
-        }
-    }, []);
     return (<div className="flex flex-col h-full">
       {/* Main Header */}
       {!state.contextualFilter ? (<div className="texture-overlay bg-gradient-to-r from-gray-800 to-gray-900 text-white px-6 py-4 border-b border-gray-700">
@@ -383,7 +370,7 @@ const Timeline = ({ scandals }) => {
       </div>
 
       <div className="flex flex-1 overflow-hidden relative">
-          <div className={`timeline-controls ${showOnboarding ? 'tour-highlight' : ''} ${state.showFilters ? 'filters-open' : ''} ${state.showStats ? 'stats-open' : ''}`} style={{ zIndex: 9999 }}>
+          <div className={`timeline-controls ${state.showFilters ? 'filters-open' : ''} ${state.showStats ? 'stats-open' : ''}`} style={{ zIndex: 50 }}>
                 <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg px-0.5">
                 <button onClick={handleZoomOut} className="p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" title="Dézoomer" disabled={state.zoomLevel <= 5}>
                   <ZoomOut className="w-4 h-4 text-gray-700 dark:text-gray-300"/>
@@ -399,23 +386,17 @@ const Timeline = ({ scandals }) => {
               </div>
                 <div className="w-px h-6 bg-gray-200 dark:bg-gray-600 self-center mx-1"></div>
             
-            <button onClick={() => dispatch({ type: 'TOGGLE_FILTERS' })} data-tour="filters" className={`p-2 rounded-lg transition-colors relative ${state.showFilters
+            <button onClick={() => dispatch({ type: 'TOGGLE_FILTERS' })} className={`p-2 rounded-lg transition-colors relative ${state.showFilters
             ? 'bg-blue-500 text-white dark:bg-blue-600'
             : 'bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800'}`} title="Filtres">
               <Filter className="w-5 h-5"/>
               {hasActiveFilters && !state.showFilters && (<div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white dark:border-gray-800"></div>)}
             </button>
             
-            <button onClick={() => dispatch({ type: 'TOGGLE_STATS' })} data-tour="stats" className={`p-2 rounded-lg transition-colors ${state.showStats
+            <button onClick={() => dispatch({ type: 'TOGGLE_STATS' })} className={`p-2 rounded-lg transition-colors ${state.showStats
             ? 'bg-green-500 text-white dark:bg-green-600'
             : 'bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800'}`} title="Statistiques">
               <BarChart3 className="w-5 h-5"/>
-            </button>
-
-            <div className="w-px h-6 bg-gray-200 dark:bg-gray-600 self-center mx-1"></div>
-            
-            <button onClick={() => setShowOnboarding(true)} className="p-2 rounded-lg transition-colors bg-purple-100 text-purple-600 dark:bg-purple-900 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-800" title="Aide">
-              <HelpCircle className="w-5 h-5"/>
             </button>
           </div>
 
@@ -451,7 +432,7 @@ const Timeline = ({ scandals }) => {
                   </span>
                 </div>
 
-                <TimelineAxis startYear={startYear} endYear={endYear} timelineWidth={timelineWidth} zoomLevel={state.zoomLevel} timelineY={TIMELINE_Y} data-tour="timeline-axis"/>
+                <TimelineAxis startYear={startYear} endYear={endYear} timelineWidth={timelineWidth} zoomLevel={state.zoomLevel} timelineY={TIMELINE_Y}/>
               </div>
 
               {/* Timeline Gaps */}
@@ -484,9 +465,6 @@ const Timeline = ({ scandals }) => {
 
       {/* Scandal Details Modal */}
       {selectedScandal && (<ScandalDetails scandal={selectedScandal} onClose={() => dispatch({ type: 'SELECT_SCANDAL', payload: null })}/>)}
-
-      {/* Onboarding Tour */}
-      {showOnboarding && <OnboardingTour onComplete={handleOnboardingComplete}/>}
     </div>);
 };
 export default Timeline;

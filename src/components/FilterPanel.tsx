@@ -160,7 +160,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
       animate={{ x: 0 }}
       exit={{ x: '-100%' }}
       transition={{ type: 'tween', duration: 0.2 }}
-      style={{ zIndex: 9999 }}
+      style={{ zIndex: 50 }}
       className="w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col h-full absolute top-0 left-0 shadow-2xl"
     >
       {/* Header */}

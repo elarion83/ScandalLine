@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Timeline from './components/Timeline';
 import { TimelineProvider } from './contexts/TimelineContext';
-import { allScandals } from './data';
+import SplashScreen from './components/SplashScreen';
+import allScandals from './data';
 import { createContextualFilter } from './utils/contextualFilters';
 import { slugToName } from './utils/shareUtils';
 
@@ -16,7 +17,13 @@ declare global {
   }
 }
 
-function App() {
+const App: React.FC = () => {
+  const [showSplash, setShowSplash] = useState(true);
+
+  const handleSplashComplete = () => {
+    setShowSplash(false);
+  };
+
   // Utiliser les données initiales du serveur si elles existent
   const initialData = window.__INITIAL_DATA__;
 
@@ -54,12 +61,17 @@ function App() {
   }, [initialData]);
 
   return (
-    <TimelineProvider initialContext={initialData ? { type: 'personality', value: initialData.value } : undefined}>
-      <div className="h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
-        <Timeline scandals={initialData?.scandals || allScandals} />
-      </div>
-    </TimelineProvider>
+    <>
+      {/* SplashScreen au niveau le plus haut */}
+      <SplashScreen onComplete={handleSplashComplete} />
+
+      <TimelineProvider initialContext={initialData ? { type: 'personality', value: initialData.value } : undefined}>
+        <div className="h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
+          <Timeline scandals={initialData?.scandals || allScandals} />
+        </div>
+      </TimelineProvider>
+    </>
   );
-}
+};
 
 export default App;

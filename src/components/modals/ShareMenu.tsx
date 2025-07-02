@@ -47,11 +47,11 @@ export const ShareMenu: React.FC<ShareMenuProps> = ({ scandal }) => {
 
       {isOpen && (
         <>
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setIsOpen(false)}
-          />
-          <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50">
+          {/* Overlay */}
+          <div className="fixed inset-0" style={{ zIndex: 55 }} onClick={() => setIsOpen(false)} />
+
+          {/* Menu */}
+          <div className="absolute top-full right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden" style={{ zIndex: 60 }}>
             <div className="p-2 space-y-1">
               <button
                 onClick={() => handleShare('facebook')}
