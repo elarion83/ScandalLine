@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { X, ChevronDown, ChevronUp, Calendar, FileText, Building2, Users, Filter } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { X, ChevronDown, ChevronUp, FileText, Building2, Users, Filter } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { FilterOptions, Scandal } from '../types/scandal';
 import { getMainCategory, getCategoryLabel } from '../utils/scandalUtils';
 
@@ -123,11 +123,6 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
     onFiltersChange({ ...filters, personalities: newPersonalities });
   };
 
-  const handleDateRangeChange = (field: 'start' | 'end', value: number) => {
-    const newDateRange = { ...filters.dateRange, [field]: value };
-    onFiltersChange({ ...filters, dateRange: newDateRange });
-  };
-
   const clearFilters = () => {
     onFiltersChange({
       types: [],
@@ -137,15 +132,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
     });
   };
 
-  const getTypeLabel = (type: string) => {
-    const labels = {
-      political: 'Politique',
-      media: 'Médiatique',
-      financial: 'Financier',
-      corruption: 'Corruption'
-    };
-    return labels[type as keyof typeof labels] || type;
-  };
+ 
 
   const toggleSection = (section: string) => {
     setExpandedSections(prev => ({

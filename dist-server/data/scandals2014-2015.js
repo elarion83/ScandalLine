@@ -1,4 +1,4 @@
-export var scandals2014_2015 = [
+export const scandals2014_2015 = [
     {
         "id": "sarkozy-ecoutes-2014-01",
         "name": "Affaire des écoutes de Sarkozy",

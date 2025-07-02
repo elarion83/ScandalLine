@@ -1,4 +1,4 @@
-export var scandals2010_2011 = [
+export const scandals2010_2011 = [
     {
         "id": "woerth-bettencourt-2010-01",
         "name": "Affaire Woerth-Bettencourt",

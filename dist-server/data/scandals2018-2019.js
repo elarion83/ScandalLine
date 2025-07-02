@@ -1,4 +1,4 @@
-export var scandals2018_2019 = [
+export const scandals2018_2019 = [
     {
         id: 'benalla-revelation-publique-2018-01',
         name: 'Benalla - Révélation publique',

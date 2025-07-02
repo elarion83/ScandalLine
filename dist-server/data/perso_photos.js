@@ -1,4 +1,4 @@
-export var perso_Photos = [
+export const perso_Photos = [
     {
         "emmanuel-macron": {
             "nom": "Emmanuel Macron",

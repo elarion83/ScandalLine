@@ -1,4 +1,4 @@
-export var scandals2008_2009 = [
+export const scandals2008_2009 = [
     {
         id: 'kerviel-revelation-societe-generale-2008-01',
         name: 'Révélation Kerviel - Société Générale',

@@ -1,4 +1,4 @@
-export var scandals2022_2023 = [
+export const scandals2022_2023 = [
     {
         id: 'bygmalion-sarkozy-condamnation-appel-2022-01',
         name: 'Bygmalion - Condamnation Sarkozy en appel',
