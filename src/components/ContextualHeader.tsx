@@ -1,8 +1,8 @@
-import React from 'react';
-import { ArrowLeft, Users, Building, Scale, FileText } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowLeft, Users, Building, Scale, FileText, Copy, Check } from 'lucide-react';
 import { ContextualFilter } from '../types/scandal';
 import { getContextualTitle, getContextualDescription } from '../utils/contextualFilters';
-import ShareTimeline from './ShareTimeline';
+import { nameToSlug } from '../utils/shareUtils';
 
 interface ContextualHeaderProps {
   contextualFilter: ContextualFilter;
@@ -23,6 +23,7 @@ const ContextualHeader: React.FC<ContextualHeaderProps> = ({
   filteredScandals,
   onBack
 }) => {
+  const [copied, setCopied] = useState(false);
 
   const getIcon = () => {
     switch (contextualFilter.type) {
@@ -51,6 +52,28 @@ const ContextualHeader: React.FC<ContextualHeaderProps> = ({
         return 'bg-slate-800 text-white';
       default:
         return 'bg-gray-500 text-white';
+    }
+  };
+
+  const handleCopyUrl = async () => {
+    try {
+      // Générer l'URL au format /timeline/nom
+      let url = '';
+      if (contextualFilter.type === 'personality') {
+        const slug = nameToSlug(contextualFilter.value.toString());
+        url = `${window.location.origin}/timeline/${slug}`;
+      } else {
+        // Pour les autres types, utiliser l'URL actuelle
+        url = window.location.href;
+      }
+
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      
+      // Reset après 2 secondes
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error('Erreur lors de la copie:', error);
     }
   };
 
@@ -83,7 +106,23 @@ const ContextualHeader: React.FC<ContextualHeaderProps> = ({
           </div>
         </div>
 
-        <ShareTimeline scandals={filteredScandals} contextualFilter={contextualFilter} />
+        <button
+          onClick={handleCopyUrl}
+          className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
+          title="Copier l'URL de la page"
+        >
+          {copied ? (
+            <>
+              <Check className="w-4 h-4 text-green-400" />
+              <span className="text-sm font-medium text-green-400">Copié !</span>
+            </>
+          ) : (
+            <>
+              <Copy className="w-4 h-4" />
+              <span className="text-sm font-medium">Copier l'URL</span>
+            </>
+          )}
+        </button>
       </div>
     </div>
   );
