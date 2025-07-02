@@ -6,20 +6,36 @@ import { createContextualFilter, filterTimelineBy } from '../../utils/contextual
 import { nameToSlug } from '../../utils/shareUtils';
 import { calculateStats, formatLargeNumber } from '../../utils/scandalUtils';
 import { Scandal } from '../../types/scandal';
+import allScandals from '../../data';
+import { perso_Photos } from '../../data/perso_photos';
 
 interface PersonalityModalProps {
   name: string;
   onClose: () => void;
-  scandals: Scandal[];
+  onCloseParent?: () => void; // Pour fermer la modal parent (ScandalDetails)
 }
 
-const PersonalityModal: React.FC<PersonalityModalProps> = ({ name, onClose, scandals }) => {
-  const { dispatch } = useTimeline();
+const PersonalityModal: React.FC<PersonalityModalProps> = ({ name, onClose, onCloseParent }) => {
+  const { dispatch, state } = useTimeline();
+
+  // Récupérer les scandales depuis le contexte ou utiliser tous les scandales
+  const scandals = state.contextualFilter ? 
+    filterTimelineBy(allScandals, state.contextualFilter) : 
+    allScandals;
 
   // Filtrer les scandales pour cette personne
   const personalityFilter = createContextualFilter('personality', name, name);
   const filteredScandals = filterTimelineBy(scandals, personalityFilter);
   const stats = calculateStats(filteredScandals);
+
+  // Récupérer la photo de la personne
+  const getPersonPhoto = () => {
+    const slug = nameToSlug(name);
+    const photoData = perso_Photos[0]?.[slug];
+    return photoData?.url || null;
+  };
+
+  const personPhoto = getPersonPhoto();
 
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
@@ -51,13 +67,17 @@ const PersonalityModal: React.FC<PersonalityModalProps> = ({ name, onClose, scan
     }, 300);
     
     onClose();
+    if (onCloseParent) {
+      onCloseParent();
+    }
   };
 
   return (
     <AnimatePresence>
       <div 
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-120 flex items-center justify-center p-4"
         onClick={handleOverlayClick}
+        style={{ zIndex: 120 }}
       >
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
@@ -66,11 +86,27 @@ const PersonalityModal: React.FC<PersonalityModalProps> = ({ name, onClose, scan
           transition={{ duration: 0.2 }}
           className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl max-w-lg w-full overflow-hidden"
         >
-          {/* Header avec bouton de fermeture */}
-          <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              {name}
-            </h2>
+          {/* Header avec photo et bouton de fermeture */}
+          <div className="flex justify-between items-start p-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-4">
+              {personPhoto ? (
+                <img 
+                  src={personPhoto} 
+                  alt={name}
+                  className="w-16 h-16 rounded object-cover"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              ) : (
+                <div className="w-16 h-16 rounded bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+                  <Users className="w-8 h-8 text-gray-500 dark:text-gray-400" />
+                </div>
+              )}
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                {name}
+              </h2>
+            </div>
             <button
               onClick={onClose}
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
@@ -134,7 +170,7 @@ const PersonalityModal: React.FC<PersonalityModalProps> = ({ name, onClose, scan
                 onClick={handleTimelineClick}
                 className="px-6 py-3 bg-gradient-to-r from-violet-500 to-pink-500 text-white font-medium rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 ease-out"
               >
-                Accéder à la timeline
+                Voir la timeline de {name}
               </button>
             </div>
           </div>

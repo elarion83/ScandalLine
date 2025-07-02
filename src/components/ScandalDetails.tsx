@@ -10,6 +10,8 @@ import { ClickablePerson, ClickableParty, ClickableStatus, ClickableType } from 
 import { ScandalModalSection } from './modals/ScandalModalSection';
 import { ScandalTimeline } from './modals/ScandalTimeline';
 import PersonalityModal from './modals/PersonalityModal';
+import { perso_Photos } from '../data/perso_photos';
+import { nameToSlug } from '../utils/shareUtils';
 //import { ShareMenu } from './modals/ShareMenu';
 
 interface ScandalDetailsProps {
@@ -30,6 +32,16 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
 
   const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
     if (event.target === event.currentTarget) onClose();
+  };
+
+  const getPersonPhoto = (personName: string) => {
+    const slug = nameToSlug(personName);
+    const photoData = perso_Photos[0]?.[slug];
+    return photoData?.url || null;
+  };
+
+  const handlePersonClick = (personName: string) => {
+    setSelectedPerson(personName);
   };
 
   // Construction des événements de la timeline
@@ -225,20 +237,41 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
                   {scandal.personalities.map((person, index) => {
                     // Chercher si la personne a des sanctions
                     const sanction = scandal.sanctions?.find(s => s.person === person);
+                    const personPhoto = getPersonPhoto(person);
                     
                     return (
                       <div key={index} className="flex flex-col gap-2 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-200/50 dark:border-gray-600/50">
-                        <div>
-                          <div className="font-medium text-gray-900 dark:text-white">
-                                <ClickablePerson name={person} onFilter={onClose}>
-                              {person}
-                            </ClickablePerson>
-                          </div>
-                          {scandal.positions[index] && (
-                            <div className="text-sm text-gray-600 dark:text-gray-400">
-                              {scandal.positions[index]}
+                        <div className="flex items-center gap-3">
+                          {personPhoto ? (
+                            <img 
+                              src={personPhoto} 
+                              alt={person}
+                              className="w-10 h-10 rounded object-cover"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                              }}
+                            />
+                          ) : (
+                            <div className="w-10 h-10 rounded bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+                              <Users className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                             </div>
                           )}
+                          <div className="flex-1">
+                            <div className="font-medium text-gray-900 dark:text-white">
+                              <button
+                                onClick={() => handlePersonClick(person)}
+                                className="hover:underline hover:text-slate-600 dark:hover:text-slate-400 transition-colors cursor-pointer"
+                                title={`Voir les détails de ${person}`}
+                              >
+                                {person}
+                              </button>
+                            </div>
+                            {scandal.positions[index] && (
+                              <div className="text-sm text-gray-600 dark:text-gray-400">
+                                {scandal.positions[index]}
+                              </div>
+                            )}
+                          </div>
                         </div>
                         
                         {/* Afficher les sanctions si elles existent */}
@@ -382,6 +415,7 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
         <PersonalityModal
           name={selectedPerson}
           onClose={() => setSelectedPerson(null)}
+          onCloseParent={onClose}
         />
       )}
     </>

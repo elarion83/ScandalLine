@@ -29,6 +29,7 @@ import DynamicStatsBar from './DynamicStatsBar';
 import ContextualHeader from './ContextualHeader';
 import ShareTimeline from './ShareTimeline';
 import ScrollHint from './modals/ScrollHint';
+import PersonalityHint from './modals/PersonalityHint';
 import CurrentYearDisplay from './CurrentYearDisplay';
 import TimelineGrid from './TimelineGrid';
 
@@ -636,7 +637,15 @@ const Timeline: React.FC<TimelineProps> = ({
                 paddingBottom: '100px'
               }}
             >
-              <ScrollHint scrollPosition={state.scrollPosition} />
+              {/* Afficher PersonalityHint pour les timelines contextuelles, ScrollHint pour la timeline générale */}
+              {state.contextualFilter && state.contextualFilter.type === 'personality' ? (
+                <PersonalityHint 
+                  contextualFilter={state.contextualFilter}
+                  scrollPosition={state.scrollPosition} 
+                />
+              ) : (
+                <ScrollHint scrollPosition={state.scrollPosition} />
+              )}
               <TimelineGrid timelineWidth={timelineWidth} />
               {/* Timeline background with grid */}
               <div 

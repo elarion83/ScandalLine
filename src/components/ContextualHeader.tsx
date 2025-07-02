@@ -60,14 +60,15 @@ const ContextualHeader: React.FC<ContextualHeaderProps> = ({
     if (contextualFilter.type !== 'personality') return null;
     
     const slug = nameToSlug(contextualFilter.value.toString());
-    const photoData = perso_Photos[0]?.[slug];
+    // Type assertion pour éviter l'erreur TypeScript
+    const photoData = (perso_Photos[0] as any)?.[slug];
     
     if (photoData?.url) {
       return (
         <img 
           src={photoData.url} 
           alt={contextualFilter.value.toString()}
-          className="w-6 h-6 rounded object-cover"
+          className="w-8 h-8 rounded object-cover"
           onError={(e) => {
             // En cas d'erreur de chargement, remplacer par l'icône
             e.currentTarget.style.display = 'none';
@@ -77,6 +78,7 @@ const ContextualHeader: React.FC<ContextualHeaderProps> = ({
       );
     }
     
+    // Si aucune photo n'est trouvée, retourner null pour que l'icône de fallback s'affiche
     return null;
   };
 
@@ -121,7 +123,8 @@ const ContextualHeader: React.FC<ContextualHeaderProps> = ({
               {contextualFilter.type === 'personality' ? (
                 <>
                   {getPersonalityPhoto()}
-                  <div className="hidden">
+                  {/* Icône de fallback qui s'affiche si pas de photo ou en cas d'erreur */}
+                  <div>
                     {getIcon()}
                   </div>
                 </>
