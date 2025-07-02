@@ -20,8 +20,8 @@ export const CARD_WIDTH = 280;
 export const CARD_HEIGHT = 180;
 export const TIMELINE_HEIGHT = 3;
 export const TIMELINE_Y = 120;
-export const MIN_VERTICAL_SPACING = 25;
-export const MIN_HORIZONTAL_SPACING = 15;
+export const MIN_VERTICAL_SPACING = 40;
+export const MIN_HORIZONTAL_SPACING = 40;
 export const TRACK_HEIGHT = CARD_HEIGHT + MIN_VERTICAL_SPACING;
 export const BASE_PIXELS_PER_YEAR = 150;
 export const MIN_GAP_YEARS = 6; // Minimum years to show a gap
@@ -447,17 +447,23 @@ export const calculateDynamicDateRange = (scandals: Scandal[]): { start: number;
   };
 };
 
-// Calculate the current year being viewed based on scroll position
-export const calculateCurrentYear = (
+export const findNearestYearMarker = (
   scrollPosition: number,
   viewportWidth: number,
-  timelineWidth: number,
-  startYear: number,
-  endYear: number
+  yearMarkers: Array<{ year: number; x: number; isMainMarker: boolean }>
 ): number => {
+  // Position du centre de l'écran
   const centerPosition = scrollPosition + viewportWidth / 2;
-  const yearSpan = endYear - startYear;
-  const yearProgress = centerPosition / timelineWidth;
-  const currentYear = startYear + (yearProgress * yearSpan);
-  return Math.round(Math.max(startYear, Math.min(endYear, currentYear)));
+  
+  // Trouver le dernier marqueur à gauche du centre
+  const markersToLeft = yearMarkers.filter(marker => marker.x <= centerPosition);
+  
+  if (markersToLeft.length > 0) {
+    // Prendre le dernier marqueur à gauche (le plus proche du centre)
+    return markersToLeft[markersToLeft.length - 1].year;
+  } else {
+    // Si aucun marqueur à gauche, prendre le premier marqueur à droite et soustraire 1
+    const firstMarkerToRight = yearMarkers[0];
+    return firstMarkerToRight ? firstMarkerToRight.year - 1 : new Date().getFullYear();
+  }
 };

@@ -389,28 +389,17 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
         </div>
       </div>
 
-      {/* Clear Filters Button - Fixed at bottom */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-        <button
-          onClick={clearFilters}
-          className={`w-full py-2 px-4 rounded-lg text-sm font-medium transition-all ${
-            hasActiveFilters 
-              ? 'bg-blue-500 hover:bg-blue-600 text-white dark:bg-blue-600 dark:hover:bg-blue-700 shadow-md' 
-              : 'bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300'
-          }`}
-        >
-          {hasActiveFilters ? (
-            <div className="flex items-center justify-center gap-2">
-              <span>Réinitialiser les filtres</span>
-              <span className="bg-blue-600 dark:bg-blue-700 px-2 py-0.5 rounded-full text-xs">
-                {filters.types.length + filters.parties.length + filters.personalities.length}
-              </span>
-            </div>
-          ) : (
-            'Réinitialiser les filtres'
-          )}
-        </button>
-      </div>
+      {/* Reset Filters Button */}
+      {hasActiveFilters && (
+        <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+          <button
+            onClick={clearFilters}
+            className="w-full py-2 px-4 rounded-lg font-medium text-white bg-gradient-to-r from-violet-500 to-pink-500 hover:from-violet-600 hover:to-pink-600 transition-all duration-200 hover:scale-[1.02] shadow-md"
+          >
+            Réinitialiser les filtres
+          </button>
+        </div>
+      )}
     </motion.div>
   );
 };

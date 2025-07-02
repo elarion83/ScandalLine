@@ -19,9 +19,11 @@ declare global {
 
 const App: React.FC = () => {
   const [showSplash, setShowSplash] = useState(true);
+  const [splashClosedTime, setSplashClosedTime] = useState<number | null>(null);
 
-  const handleSplashComplete = () => {
+  const handleSplashComplete = (wantsTutorial: boolean) => {
     setShowSplash(false);
+    setSplashClosedTime(Date.now());
   };
 
   // Utiliser les données initiales du serveur si elles existent
@@ -62,12 +64,11 @@ const App: React.FC = () => {
 
   return (
     <>
-      {/* SplashScreen au niveau le plus haut */}
-      <SplashScreen onComplete={handleSplashComplete} />
+      {showSplash && <SplashScreen onComplete={handleSplashComplete} />}
 
       <TimelineProvider initialContext={initialData ? { type: 'personality', value: initialData.value } : undefined}>
         <div className="h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
-          <Timeline scandals={initialData?.scandals || allScandals} />
+          <Timeline scandals={initialData?.scandals || allScandals} splashClosedTime={splashClosedTime} />
         </div>
       </TimelineProvider>
     </>

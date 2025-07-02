@@ -1,7 +1,9 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { TrendingUp, DollarSign, Scale, Award, Calendar } from 'lucide-react';
 import { Scandal } from '../types/scandal';
 import { formatCurrency, formatLargeNumber } from '../utils/scandalUtils';
+import { generateYearMarkers, findNearestYearMarker } from '../utils/timelineLayout';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface DynamicStatsBarProps {
   visibleScandals: Scandal[];
@@ -13,6 +15,7 @@ interface DynamicStatsBarProps {
   viewportWidth: number;
   timelineWidth: number;
   onScrollChange?: (newPosition: number) => void;
+  splashClosedTime?: number | null;
 }
 
 const DynamicStatsBar: React.FC<DynamicStatsBarProps> = ({ 
@@ -24,18 +27,47 @@ const DynamicStatsBar: React.FC<DynamicStatsBarProps> = ({
   scrollPosition,
   viewportWidth,
   timelineWidth,
-  onScrollChange
+  onScrollChange,
+  splashClosedTime
 }) => {
   const isDraggingRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [showDragHelp, setShowDragHelp] = useState(false);
+  const dragHelpTimeoutRef = useRef<NodeJS.Timeout>();
+
+  // Afficher la tooltip d'aide après la fermeture du SplashScreen
+  useEffect(() => {
+    if (!splashClosedTime) return;
+
+    console.log('⌚ SplashScreen fermé à:', new Date(splashClosedTime).toLocaleTimeString());
+    console.log('🚀 Début du compte à rebours pour la tooltip (12s)');
+    
+    // On attend 12 secondes après la fermeture du SplashScreen
+    dragHelpTimeoutRef.current = setTimeout(() => {
+      console.log('⏰ 12 secondes écoulées - Affichage de la tooltip');
+      setShowDragHelp(true);
+      // On cache la tooltip après 4 secondes
+      setTimeout(() => {
+        console.log('🔚 4 secondes écoulées - Masquage de la tooltip');
+        setShowDragHelp(false);
+      }, 4000);
+    }, 12000);
+
+    return () => {
+      if (dragHelpTimeoutRef.current) {
+        console.log('♻️ Nettoyage des timeouts de la tooltip');
+        clearTimeout(dragHelpTimeoutRef.current);
+      }
+    };
+  }, [splashClosedTime]);
 
   // Calculate the current year being viewed based on scroll position
   const calculateCurrentYear = (): number => {
-    const centerPosition = scrollPosition + viewportWidth / 2;
-    const yearSpan = endYear - startYear;
-    const yearProgress = centerPosition / timelineWidth;
-    const currentYear = startYear + (yearProgress * yearSpan);
-    return Math.round(Math.max(startYear, Math.min(endYear, currentYear)));
+    // Générer les markers d'années
+    const yearMarkers = generateYearMarkers(startYear, endYear, timelineWidth, 1);
+    
+    // Utiliser la même fonction que dans la timeline
+    return findNearestYearMarker(scrollPosition, viewportWidth, yearMarkers);
   };
 
   const currentYear = calculateCurrentYear();
@@ -122,7 +154,7 @@ const DynamicStatsBar: React.FC<DynamicStatsBarProps> = ({
           transitionProperty: isDraggingRef.current ? 'none' : 'all'
         }}
       >
-        <div className="flex texture-overlay items-center gap-1 bg-blue-500/50 dark:bg-blue-600 text-white px-2 py-1 mt-1 rounded-full text-sm font-medium shadow-md">
+        <div className="flex texture-overlay items-center gap-1 bg-gradient-to-r from-violet-500 to-pink-500 text-white px-2 py-1 mt-1 rounded-full text-sm font-medium shadow-md hover:scale-105 transition-transform">
           <Calendar className="w-4 h-4" />
           {currentYear}
         </div>

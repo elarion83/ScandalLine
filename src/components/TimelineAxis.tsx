@@ -52,9 +52,8 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
                 >
                   <span className="relative z-10 text-grey dark:text-white tracking-wide inline-block"
                      style={{ transform: 'rotate(0deg) translateY(25px)',
-
                       fontSize: '1em', opacity: 0.1 }}>
-                    {year}
+                    {`01.01.${year.toString().slice(-2)}`}
                   </span>
                 </div>
               </div>
@@ -70,17 +69,7 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
                 }}
               >
                 <div className="relative">
-                  {/* Motif quadrillé plus petit */}
-                  <div 
-                    className="absolute inset-0 opacity-5"
-                    style={{
-                      backgroundImage: `
-                        linear-gradient(to right, rgb(139, 92, 246) 1px, transparent 1px),
-                        linear-gradient(to bottom, rgb(139, 92, 246) 1px, transparent 1px)
-                      `,
-                      backgroundSize: '6px 6px'
-                    }}
-                  />
+
                   
                   {/* Conteneur avec effet glassmorphism plus léger */}
                   <div 
@@ -88,7 +77,7 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
                     style={{ transform: 'rotate(90deg)' }}
                   >
                     <span className="relative z-10 text-black/60 dark:text-gray-300 tracking-wide inline-block">
-                      {year}
+                      {`01.01.${year.toString().slice(-2)}`}
                     </span>
                   </div>
                 </div>

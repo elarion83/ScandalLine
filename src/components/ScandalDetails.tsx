@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { 
   MapPin, Users, Building, Tag, Link2, Scale, DollarSign, 
   FileText, ExternalLink, Calendar, X, Building2, AlertTriangle, BadgeCheck, Timer, Ban 
@@ -9,7 +10,6 @@ import { ClickablePerson, ClickableParty, ClickableStatus, ClickableType } from 
 import { ScandalModalSection } from './modals/ScandalModalSection';
 import { ScandalTimeline } from './modals/ScandalTimeline';
 //import { ShareMenu } from './modals/ShareMenu';
-import { AnimatedNumber } from './AnimatedNumber';
 
 interface ScandalDetailsProps {
   scandal: Scandal;
@@ -94,7 +94,7 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
                 className="p-2 rounded-lg hover:bg-white/20 transition-colors"
                 title="Fermer (Échap)"
             >
-                <X className="w-5 h-5 text-white" />
+                <X className="w-8 h-8 text-white" />
             </button>
             </div>
           </div>
@@ -161,10 +161,7 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
                         </span>
                       </div>
                       <div className="text-xl font-bold text-red-700 dark:text-red-300">
-                        <AnimatedNumber 
-                          value={scandal.moneyAmount ?? 0} 
-                          formatFn={formatLargeNumber} 
-                        />
+                        {formatLargeNumber(scandal.moneyAmount ?? 0)}
                       </div>
                     </div>
                   )}
@@ -178,10 +175,7 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
                         </span>
                       </div>
                       <div className="text-xl font-bold text-blue-700 dark:text-blue-300">
-                        <AnimatedNumber 
-                          value={scandal.fine ?? 0} 
-                          formatFn={formatLargeNumber} 
-                        />
+                        {formatLargeNumber(scandal.fine ?? 0)}
                       </div>
                     </div>
                   )}
@@ -195,10 +189,7 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
                         </span>
                       </div>
                       <div className="text-xl font-bold text-orange-700 dark:text-orange-300">
-                        <AnimatedNumber 
-                          value={scandal.prisonYears ?? 0} 
-                          formatFn={(val: number) => `${val} an${val > 1 ? 's' : ''}`} 
-                        />
+                        {`${scandal.prisonYears ?? 0} an${(scandal.prisonYears ?? 0) > 1 ? 's' : ''}`}
                       </div>
                     </div>
                   )}
@@ -212,10 +203,7 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
                         </span>
                       </div>
                       <div className="text-xl font-bold text-purple-700 dark:text-purple-300">
-                        <AnimatedNumber 
-                          value={scandal.ineligibilityYears ?? 0} 
-                          formatFn={(val: number) => `${val} an${val > 1 ? 's' : ''}`} 
-                        />
+                        {`${scandal.ineligibilityYears ?? 0} an${(scandal.ineligibilityYears ?? 0) > 1 ? 's' : ''}`}
                       </div>
                     </div>
                   )}

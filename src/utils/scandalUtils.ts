@@ -379,18 +379,23 @@ export const formatCurrency = (amount: number): string => {
 };
 
 export const formatDate = (dateString: string, format?: string): string => {
-  if (format === 'MMM yyyy') {
-    const date = new Date(dateString);
-    const month = date.toLocaleDateString('fr-FR', { month: 'short' });
-    const year = date.getFullYear();
-    return `${month.charAt(0).toUpperCase()}${month.slice(1)} ${year}`;
+  const date = new Date(dateString);
+  const month = date.toLocaleString('fr-FR', { month: 'short' });
+  
+  // Si on demande un format spécifique, on le respecte
+  if (format) {
+    if (format === 'MMM yyyy') {
+      return `${month} ${date.getFullYear()}`;
+    }
+    return date.toLocaleString('fr-FR', { 
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
   }
   
-  return new Date(dateString).toLocaleDateString('fr-FR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
+  // Par défaut, on ne retourne que le mois
+  return month.charAt(0).toUpperCase() + month.slice(1);
 };
 
 /**

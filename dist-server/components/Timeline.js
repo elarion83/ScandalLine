@@ -371,18 +371,18 @@ const Timeline = ({ scandals }) => {
 
       <div className="flex flex-1 overflow-hidden relative">
           <div className={`timeline-controls ${state.showFilters ? 'filters-open' : ''} ${state.showStats ? 'stats-open' : ''}`} style={{ zIndex: 50 }}>
-                <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg px-0.5">
-                <button onClick={handleZoomOut} className="p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" title="Dézoomer" disabled={state.zoomLevel <= 5}>
-                  <ZoomOut className="w-4 h-4 text-gray-700 dark:text-gray-300"/>
-                </button>
-                
-                <button onClick={handleResetZoom} className="px-2 py-1.5 min-w-[3.5rem] text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors">
-                    {Math.round((state.zoomLevel / 15) * 100)}%
-                </button>
-                
-                <button onClick={handleZoomIn} className="p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" title="Zoomer" disabled={state.zoomLevel >= 300}>
-                  <ZoomIn className="w-4 h-4 text-gray-700 dark:text-gray-300"/>
-                </button>
+                <div className="flex items-center gap-0 bg-gray-100 dark:bg-gray-700 rounded-lg px-0.5">
+                    <button onClick={handleZoomOut} className="p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" title="Dézoomer" disabled={state.zoomLevel <= 5}>
+                    <ZoomOut className="w-4 h-4 text-gray-700 dark:text-gray-300"/>
+                    </button>
+                    
+                    <button onClick={handleResetZoom} className="px-2 py-1.5 min-w-[3.5rem] text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors">
+                        {Math.round((state.zoomLevel / 15) * 100)}%
+                    </button>
+                    
+                    <button onClick={handleZoomIn} className="p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" title="Zoomer" disabled={state.zoomLevel >= 300}>
+                    <ZoomIn className="w-4 h-4 text-gray-700 dark:text-gray-300"/>
+                    </button>
               </div>
                 <div className="w-px h-6 bg-gray-200 dark:bg-gray-600 self-center mx-1"></div>
             

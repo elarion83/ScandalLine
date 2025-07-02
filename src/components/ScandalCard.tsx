@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Calendar, Users, DollarSign, Scale, Tag, Building2, BadgeCheck, Timer, AlertTriangle } from 'lucide-react';
+import { Calendar, Users, DollarSign, Scale, Tag, Building2, BadgeCheck, Timer, AlertTriangle, Ban } from 'lucide-react';
 import { Scandal } from '../types/scandal';
 import { formatCurrency, cleanScandalName, formatLargeNumber, formatDate, getCategoryColors, getCategoryLabel, getMainCategory } from '../utils/scandalUtils';
 import { ClickablePerson, ClickableParty, ClickableStatus, ClickableType } from './ClickableElements';
-import { AnimatedNumber } from './AnimatedNumber';
 import { useTimeline } from '../contexts/TimelineContext';
+import { motion } from 'framer-motion';
 
 interface ScandalCardProps {
   scandal: Scandal;
@@ -262,15 +262,28 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
     >
       {/* Date label */}
       <div 
-        className="absolute text-sm font-medium text-gray-600 dark:text-gray-400"
+        className={`
+          absolute text-[10px] font-medium 
+          bg-white/95 dark:bg-gray-800/95 
+          px-2 py-0.5 rounded-md 
+          shadow-sm backdrop-blur-sm
+          border border-gray-100/50 dark:border-gray-700/50
+          transition-all duration-300 ease-out
+          ${isSelected || (position.x >= state.scrollPosition && position.x <= state.scrollPosition + state.viewportWidth / 2) 
+            ? 'text-violet-600 dark:text-violet-400 min-w-[4em]' 
+            : 'text-gray-500 dark:text-gray-400 min-w-[2.5em]'
+          }
+        `}
         style={{
-          left: '57%',
-          top: -(connectionHeight + 70),
-          transform: 'translateX(-50%) rotate(-65deg)',
-          transformOrigin: 'bottom center'
+          left: '50%',
+          top: -(connectionHeight + 35),
+          transform: 'translateX(-50%)'
         }}
       >
-        {formatDate(scandal.startDate, 'MMM yyyy')}
+        {isSelected || (position.x >= state.scrollPosition && position.x <= state.scrollPosition + state.viewportWidth / 2)
+          ? formatDate(scandal.startDate)
+          : formatDate(scandal.startDate).slice(0, 3)
+        }
       </div>
 
       {/* Connection line to timeline */}
@@ -372,10 +385,12 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
                     <span className="text-xs text-gray-600 dark:text-gray-300 font-semibold">Concernés</span>
                   </div>
                   <div className="text-sm font-bold text-red-600 dark:text-red-400">
-                    <AnimatedNumber 
-                      value={scandal.moneyAmount ?? 0} 
-                      formatFn={formatLargeNumber} 
-                    />
+                    <div className="flex items-center gap-1">
+                      <DollarSign className="w-3 h-3 text-red-500 dark:text-red-400" />
+                      <span className="text-xs font-medium text-red-600 dark:text-red-400">
+                        {formatLargeNumber(scandal.moneyAmount ?? 0)}
+                      </span>
+                    </div>
                   </div>
                 </div>
               )}
@@ -408,10 +423,12 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
                     <span className="text-xs text-gray-600 dark:text-gray-300 font-semibold">Amende</span>
                   </div>
                   <div className="text-sm font-bold text-blue-600 dark:text-blue-400">
-                    <AnimatedNumber 
-                      value={scandal.fine ?? 0} 
-                      formatFn={formatLargeNumber} 
-                    />
+                    <div className="flex items-center gap-1">
+                      <DollarSign className="w-3 h-3 text-blue-500 dark:text-blue-400" />
+                      <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
+                        {formatLargeNumber(scandal.fine ?? 0)}
+                      </span>
+                    </div>
                   </div>
                 </div>
               )}
@@ -424,10 +441,12 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
                     <span className="text-xs text-gray-600 dark:text-gray-300 font-semibold">Prison</span>
                   </div>
                   <div className="text-sm font-bold text-orange-600 dark:text-orange-400">
-                    <AnimatedNumber 
-                      value={scandal.prisonYears ?? 0} 
-                      formatFn={(val: number) => `${val} an${val > 1 ? 's' : ''}`} 
-                    />
+                    <div className="flex items-center gap-1">
+                      <Scale className="w-3 h-3 text-orange-500 dark:text-orange-400" />
+                      <span className="text-xs font-medium text-orange-600 dark:text-orange-400">
+                        {`${scandal.prisonYears ?? 0} an${(scandal.prisonYears ?? 0) > 1 ? 's' : ''}`}
+                      </span>
+                    </div>
                   </div>
                 </div>
               )}
@@ -436,14 +455,16 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
               {(scandal.ineligibilityYears ?? 0) > 0 && (
                 <div className="bg-white dark:bg-gray-700 p-3 rounded-xl shadow-sm">
                   <div className="flex items-center gap-2 mb-2">
-                    <Building2 className="w-4 h-4 text-purple-500 dark:text-purple-400" />
+                    <Ban className="w-4 h-4 text-purple-500 dark:text-purple-400" />
                     <span className="text-xs text-gray-600 dark:text-gray-300 font-semibold">Inéligibilité</span>
                   </div>
                   <div className="text-sm font-bold text-purple-600 dark:text-purple-400">
-                    <AnimatedNumber 
-                      value={scandal.ineligibilityYears ?? 0} 
-                      formatFn={(val: number) => `${val} an${val > 1 ? 's' : ''}`} 
-                    />
+                    <div className="flex items-center gap-1">
+                      <Ban className="w-3 h-3 text-purple-500 dark:text-purple-400" />
+                      <span className="text-xs font-medium text-purple-600 dark:text-purple-400">
+                        {`${scandal.ineligibilityYears ?? 0} an${(scandal.ineligibilityYears ?? 0) > 1 ? 's' : ''}`}
+                      </span>
+                    </div>
                   </div>
                 </div>
               )}

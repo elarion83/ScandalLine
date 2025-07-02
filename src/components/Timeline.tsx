@@ -1,8 +1,8 @@
 import React, { useRef, useEffect, useCallback, useMemo, useState } from 'react';
-import { ZoomIn, ZoomOut, Filter, BarChart3 } from 'lucide-react';
-import { AnimatePresence } from 'framer-motion';
+import { ZoomIn, ZoomOut, Filter, BarChart3, FileText, Building2, Users } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Scandal } from '../types/scandal';
-import { filterScandals, calculateStats } from '../utils/scandalUtils';
+import { filterScandals, calculateStats, getCategoryLabel } from '../utils/scandalUtils';
 import { filterTimelineBy } from '../utils/contextualFilters';
 import { 
   calculateTimelineWidth, 
@@ -15,7 +15,8 @@ import {
   calculateOptimizedTimelineWidth,
   calculateOptimizedScandalPositions,
   calculateDynamicDateRange,
-  calculateCurrentYear
+  generateYearMarkers,
+  findNearestYearMarker
 } from '../utils/timelineLayout';
 import { useTimeline } from '../contexts/TimelineContext';
 import ScandalCard from './ScandalCard';
@@ -30,14 +31,51 @@ import ShareTimeline from './ShareTimeline';
 
 interface TimelineProps {
   scandals: Scandal[];
+  splashClosedTime: number | null;
 }
 
-const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
+const Timeline: React.FC<TimelineProps> = ({ 
+  scandals,
+  splashClosedTime
+}) => {
   const { state, dispatch } = useTimeline();
   const containerRef = useRef<HTMLDivElement>(null);
   const dragStartRef = useRef({ x: 0, scrollLeft: 0 });
   const scrollTimeoutRef = useRef<NodeJS.Timeout>();
   const initialScrollDoneRef = useRef(false);
+  const [showDragHelp, setShowDragHelp] = useState(false);
+  const dragHelpTimeoutRef = useRef<NodeJS.Timeout>();
+
+  // Afficher la tooltip d'aide après la fermeture du SplashScreen
+  useEffect(() => {
+    if (!splashClosedTime) return;
+
+    console.log('⌚ SplashScreen fermé à:', new Date(splashClosedTime).toLocaleTimeString());
+    console.log('🚀 Début du compte à rebours pour la tooltip (12s)');
+    
+    // On attend 12 secondes après la fermeture du SplashScreen
+    dragHelpTimeoutRef.current = setTimeout(() => {
+      console.log('⏰ 12 secondes écoulées - Affichage de la tooltip');
+      setShowDragHelp(true);
+      // On cache la tooltip après 4 secondes
+      setTimeout(() => {
+        console.log('🔚 4 secondes écoulées - Masquage de la tooltip');
+        setShowDragHelp(false);
+      }, 4000);
+    }, 12000);
+
+    return () => {
+      if (dragHelpTimeoutRef.current) {
+        console.log('♻️ Nettoyage des timeouts de la tooltip');
+        clearTimeout(dragHelpTimeoutRef.current);
+      }
+    };
+  }, [splashClosedTime]); // On réagit au changement de splashClosedTime
+
+  // Effet pour logger les changements d'état de la tooltip
+  useEffect(() => {
+    console.log('🔄 État de la tooltip:', showDragHelp ? 'visible' : 'cachée');
+  }, [showDragHelp]);
 
   // Scroll to top when timeline opens
   useEffect(() => {
@@ -425,10 +463,10 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
             <div className="flex items-center gap-4">
               <div>
                 <h1 className="text-xl font-bold">
-                  Skandalz : La bibliothèque aux scandales
+                  Skandalz : Timeline globale des données
                 </h1>
                 <span className="text-sm text-gray-300">
-                  Affaires et controverses du paysage politique français
+                  25 années d'ffaires et de controverses du paysage politique français
                 </span>
               </div>
             </div>
@@ -458,6 +496,7 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
         scrollPosition={state.scrollPosition}
         viewportWidth={state.viewportWidth}
         timelineWidth={timelineWidth}
+        splashClosedTime={splashClosedTime}
         onScrollChange={(newPosition) => {
           if (containerRef.current) {
             containerRef.current.scrollLeft = newPosition;
@@ -466,68 +505,127 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
         }}
       />
 
-      {/* Timeline years */}
-      <div className="absolute left-2 opacity-50 right-4 flex justify-between font-bold text-sm text-gray-500 dark:text-gray-400" style={{ top: '130px', marginTop: '2px' }}>
-        <span>{startYear}</span>
-        <span>{endYear}</span>
-      </div>
-
       <div className="flex flex-1 overflow-hidden relative">
-          <div className={`timeline-controls ${state.showFilters ? 'filters-open' : ''} ${state.showStats ? 'stats-open' : ''}`} style={{ zIndex: 50 }}>
-                <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg px-0.5">
-                <button
-                  onClick={handleZoomOut}
-                    className="p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    title="Dézoomer"
-                    disabled={state.zoomLevel <= 5}
+          <div 
+            className={`timeline-controls ${state.showFilters ? 'filters-open' : ''} ${state.showStats ? 'stats-open' : ''} fixed`} 
+            style={{ zIndex: 50 }}
+          >
+                {/* Container principal */}
+                <div 
+                  className="flex items-center px-3 py-2 rounded-full shadow-lg bg-gradient-to-r from-violet-500 to-pink-500 transition-all duration-200 hover:scale-105 hover:shadow-2xl relative"
+                  style={{ transformOrigin: 'center' }}
                 >
-                  <ZoomOut className="w-4 h-4 text-gray-700 dark:text-gray-300" />
-                </button>
-                
-                <button
-                  onClick={handleResetZoom}
-                    className="px-2 py-1.5 min-w-[3.5rem] text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors"
-                >
-                    {Math.round((state.zoomLevel / 15) * 100)}%
-                </button>
-                
-                <button
-                  onClick={handleZoomIn}
-                    className="p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  title="Zoomer"
-                  disabled={state.zoomLevel >= 300}
-                >
-                  <ZoomIn className="w-4 h-4 text-gray-700 dark:text-gray-300" />
-                </button>
-              </div>
-                <div className="w-px h-6 bg-gray-200 dark:bg-gray-600 self-center mx-1"></div>
-            
-            <button
-              onClick={() => dispatch({ type: 'TOGGLE_FILTERS' })}
-              className={`p-2 rounded-lg transition-colors relative ${
-                state.showFilters 
-                  ? 'bg-blue-500 text-white dark:bg-blue-600' 
-                  : 'bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800'
-              }`}
-              title="Filtres"
-            >
-              <Filter className="w-5 h-5" />
-              {hasActiveFilters && !state.showFilters && (
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white dark:border-gray-800"></div>
-              )}
-            </button>
-            
-            <button
-              onClick={() => dispatch({ type: 'TOGGLE_STATS' })}
-              className={`p-2 rounded-lg transition-colors ${
-                state.showStats 
-                  ? 'bg-green-500 text-white dark:bg-green-600' 
-                  : 'bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800'
-              }`}
-              title="Statistiques"
-            >
-              <BarChart3 className="w-5 h-5" />
-            </button>
+
+                    {/* Groupe de zoom */}
+                    <div className="flex items-center">
+                        <button
+                          onClick={handleZoomOut}
+                          className="w-10 h-10 rounded-full flex items-center justify-center bg-black/10 hover:bg-black/20 active:bg-black/30 disabled:opacity-50 disabled:hover:bg-black/10 transition-all"
+                          title="Dézoomer"
+                          disabled={state.zoomLevel <= 5}
+                        >
+                          <ZoomOut className="w-6 h-6 text-white" />
+                        </button>
+                        
+                        <span className="w-12 text-center text-sm font-bold text-white">
+                            {Math.round((state.zoomLevel / 15) * 100)}%
+                        </span>
+                        
+                        <button
+                          onClick={handleZoomIn}
+                          className="w-10 h-10 rounded-full flex items-center justify-center bg-black/10 hover:bg-black/20 active:bg-black/30 disabled:opacity-50 disabled:hover:bg-black/10 transition-all"
+                          title="Zoomer"
+                          disabled={state.zoomLevel >= 300}
+                        >
+                          <ZoomIn className="w-6 h-6 text-white" />
+                        </button>
+                    </div>
+
+                    {/* Séparateur invisible pour l'espacement */}
+                    <div className="w-[25px]"></div>
+                    
+                    {/* Groupe des boutons filtres et stats */}
+                    <div className="flex items-center">
+                        <button
+                          onClick={() => dispatch({ type: 'TOGGLE_FILTERS' })}
+                          className={`w-10 h-10 rounded-full flex items-center justify-center relative transition-all group ${
+                            state.showFilters 
+                              ? 'bg-black/30 ring-2 ring-white/50' 
+                              : 'bg-black/10 hover:bg-black/20 active:bg-black/30'
+                          }`}
+                          title="Filtres"
+                        >
+                          <Filter className={`w-6 h-6 text-white transition-transform ${state.showFilters ? 'scale-110' : ''}`} />
+                          {hasActiveFilters && (
+                            <>
+                              {/* Pastille avec le nombre de filtres */}
+                              <div className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 bg-red-500 rounded-full ring-2 ring-violet-500 animate-pulse flex items-center justify-center">
+                                <span className="text-xs font-bold text-white">
+                                  {state.filters.types.length + state.filters.parties.length + state.filters.personalities.length}
+                                </span>
+                              </div>
+                              
+                              {/* Tooltip qui liste les filtres */}
+                              <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-max max-w-[300px] bg-gradient-to-br from-gray-900 to-gray-800 text-white text-xs rounded-xl py-3 px-4 hidden group-hover:block z-50 shadow-xl border border-gray-700/50 backdrop-blur-sm transform origin-bottom scale-95 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-200">
+                                <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-gradient-to-br from-gray-900 to-gray-800 rotate-45 border-r border-b border-gray-700/50"></div>
+                                <div className="space-y-2">
+                                  {state.filters.types.length > 0 && (
+                                    <div className="flex items-center gap-2">
+                                      <FileText className="w-3 h-3 text-violet-400" />
+                                      <span className="font-semibold text-violet-400">Types :</span>
+                                      <span className="text-gray-300">{state.filters.types.map(type => getCategoryLabel(type)).join(', ')}</span>
+                                    </div>
+                                  )}
+                                  {state.filters.parties.length > 0 && (
+                                    <div className="flex items-center gap-2">
+                                      <Building2 className="w-3 h-3 text-blue-400" />
+                                      <span className="font-semibold text-blue-400">Partis :</span>
+                                      <span className="text-gray-300">{state.filters.parties.join(', ')}</span>
+                                    </div>
+                                  )}
+                                  {state.filters.personalities.length > 0 && (
+                                    <div className="flex items-center gap-2">
+                                      <Users className="w-3 h-3 text-pink-400" />
+                                      <span className="font-semibold text-pink-400">Personnalités :</span>
+                                      <span className="text-gray-300">{state.filters.personalities.join(', ')}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </>
+                          )}
+                        </button>
+                        
+                        <button
+                          onClick={() => dispatch({ type: 'TOGGLE_STATS' })}
+                          className={`w-10 h-10 ml-1 rounded-full flex items-center justify-center transition-all ${
+                            state.showStats 
+                              ? 'bg-black/30 ring-2 ring-white/50' 
+                              : 'bg-black/10 hover:bg-black/20 active:bg-black/30'
+                          }`}
+                          title="Statistiques"
+                        >
+                          <BarChart3 className={`w-6 h-6 text-white transition-transform ${state.showStats ? 'scale-110' : ''}`} />
+                        </button>
+                    </div>
+                </div>
+          </div>
+
+          {/* Tooltip d'aide pour le drag */}
+          <div 
+            className="absolute top-2 px-4 py-3 bg-black/90 backdrop-blur-sm rounded-xl shadow-xl text-white text-sm font-medium z-[100] border border-white/10 whitespace-nowrap pointer-events-none"
+            style={{
+              left: `${(state.scrollPosition + state.viewportWidth / 2) / timelineWidth * 100}%`,
+              transform: 'translateX(-50%)'
+            }}
+          >
+            <div className="absolute -top-1 right-3/4 -translate-x-2/3 w-2 h-2 bg-black/90 rotate-45"></div>
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-2 w-2">
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-violet-500"></span>
+              </span>
+              Glissez-moi pour sroller !
+            </div>
           </div>
 
         {/* Filters Panel */}
@@ -577,21 +675,19 @@ const Timeline: React.FC<TimelineProps> = ({ scandals }) => {
               >
                 {/* Current year background */}
                 <div 
-                  className="absolute inset-0 flex items-center justify-center pointer-events-none select-none"
+                  className="absolute flex items-center justify-center pointer-events-none select-none"
                   style={{
                     left: state.scrollPosition,
                     width: state.viewportWidth,
-                    transition: 'left 150ms ease'
+                    transition: 'left 150ms ease',
+                    top: '-55px'  // Déplace l'année vers le haut
                   }}
                 >
-                  <span className="text-[20rem] font-bold text-gray-100 dark:text-gray-800/50 opacity-80">
-                    {calculateCurrentYear(
-                      state.scrollPosition,
-                      state.viewportWidth,
-                      timelineWidth,
-                      startYear,
-                      endYear
-                    )}
+                  <span className="text-[9rem] font-bold bg-gradient-to-r from-violet-200 to-pink-200 dark:from-violet-900 dark:to-pink-900 bg-clip-text text-transparent">
+                    {(() => {
+                      const yearMarkers = generateYearMarkers(startYear, endYear, timelineWidth, 1);
+                      return findNearestYearMarker(state.scrollPosition, state.viewportWidth, yearMarkers);
+                    })()}
                   </span>
                 </div>
 
