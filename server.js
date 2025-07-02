@@ -109,9 +109,12 @@ const createHandler = async () => {
     try {
       const url = new URL(req.url, `http://${req.headers.host}`);
       const pathname = url.pathname;
+      
+      console.log(`[DEBUG] Requête reçue: ${req.method} ${pathname}`);
 
       // Servir index.html pour la racine
       if (pathname === '/') {
+        console.log('[DEBUG] Servir page d\'accueil');
         const indexHtml = fs.readFileSync(path.join(__dirname, 'dist', 'index.html'), 'utf-8');
         res.writeHead(200, { 'Content-Type': 'text/html' });
         res.end(indexHtml);
@@ -120,6 +123,7 @@ const createHandler = async () => {
 
       // Servir les fichiers statiques
       if (pathname.startsWith('/assets/')) {
+        console.log('[DEBUG] Servir fichier statique:', pathname);
         const filePath = path.join(__dirname, 'dist', pathname);
         try {
           const content = fs.readFileSync(filePath);
@@ -142,19 +146,24 @@ const createHandler = async () => {
       if (match) {
         const slug = match[1];
         const name = slugToName(slug);
+        console.log(`[DEBUG] Route timeline détectée: slug=${slug}, name=${name}`);
 
         // Filtrer les scandales pour cette personnalité
         const personalityScandals = allScandals.filter(scandal => 
           scandal.personalities && scandal.personalities.includes(name)
         );
+        
+        console.log(`[DEBUG] Scandales trouvés pour ${name}: ${personalityScandals.length}`);
 
         // Si aucun scandale trouvé, rediriger vers la page d'accueil
         if (personalityScandals.length === 0) {
+          console.log(`[DEBUG] Aucun scandale trouvé, redirection vers /`);
           res.writeHead(302, { Location: '/' });
           res.end();
           return;
         }
 
+        console.log(`[DEBUG] Génération de la page pour ${name}`);
         // Calculer les statistiques
         const totalAmount = personalityScandals.reduce((sum, scandal) => 
           sum + (scandal.moneyAmount || 0), 0
@@ -215,12 +224,15 @@ const createHandler = async () => {
             .replace(/<meta property="twitter:image" content=".*?"/, `<meta property="twitter:image" content="${photoUrl}"`);
         }
 
+        console.log(`[DEBUG] Envoi de la page pour ${name}`);
         res.writeHead(200, { 'Content-Type': 'text/html' });
-        res.end(modifiedHtml);
+        // Temporairement, servir le HTML brut sans modification pour débugger
+        res.end(indexHtml);
         return;
       }
 
       // Pour toutes les autres routes, servir index.html (SPA)
+      console.log(`[DEBUG] Route non reconnue, servir index.html: ${pathname}`);
       const indexHtml = fs.readFileSync(path.join(__dirname, 'dist', 'index.html'), 'utf-8');
       res.writeHead(200, { 'Content-Type': 'text/html' });
       res.end(indexHtml);
