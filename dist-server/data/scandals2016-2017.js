@@ -1,4 +1,4 @@
-export const scandals2016_2017 = [
+export var scandals2016_2017 = [
     {
         id: 'fillon-penelope-emplois-fictifs-2016-01',
         name: 'Fillon - Emplois fictifs Penelope',

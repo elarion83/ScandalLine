@@ -1,4 +1,4 @@
-export const scandals2000_2001 = [
+export var scandals2000_2001 = [
     {
         id: 'elf-loik-le-floch-2000-01',
         name: 'Affaire Elf - Condamnation Loïk Le Floch-Prigent',

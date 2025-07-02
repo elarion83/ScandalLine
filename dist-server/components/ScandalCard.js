@@ -1,49 +1,52 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Users, DollarSign, Scale, Tag, Building2, BadgeCheck, Timer, AlertTriangle } from 'lucide-react';
+import { Users, DollarSign, Scale, Tag, Building2, BadgeCheck, Timer, AlertTriangle, Ban } from 'lucide-react';
 import { cleanScandalName, formatLargeNumber, formatDate, getCategoryColors, getCategoryLabel, getMainCategory } from '../utils/scandalUtils';
-import { ClickablePerson, ClickableParty, ClickableStatus, ClickableType } from './ClickableElements';
-import { AnimatedNumber } from './AnimatedNumber';
+import { ClickableParty, ClickableStatus, ClickableType } from './ClickableElements';
 import { useTimeline } from '../contexts/TimelineContext';
-const ScandalCard = ({ scandal, onClick, isSelected, position, timelineY, className, style }) => {
-    const { state } = useTimeline();
-    const year = new Date(scandal.startDate).getFullYear();
-    const connectionHeight = position.y - timelineY - 4;
+import PersonalityModal from './modals/PersonalityModal';
+var ScandalCard = function (_a) {
+    var _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w;
+    var scandal = _a.scandal, onClick = _a.onClick, isSelected = _a.isSelected, position = _a.position, timelineY = _a.timelineY, className = _a.className, style = _a.style, allScandals = _a.allScandals;
+    var state = useTimeline().state;
+    var year = new Date(scandal.startDate).getFullYear();
+    var connectionHeight = position.y - timelineY - 4;
     // State to track hover and focus states for dynamic z-index management
-    const [isHovered, setIsHovered] = useState(false);
-    const [isFocused, setIsFocused] = useState(false);
-    const [isVisible, setIsVisible] = useState(false);
-    const [intersectionRatio, setIntersectionRatio] = useState(0);
+    var _x = useState(false), isHovered = _x[0], setIsHovered = _x[1];
+    var _y = useState(false), isFocused = _y[0], setIsFocused = _y[1];
+    var _z = useState(false), isVisible = _z[0], setIsVisible = _z[1];
+    var _0 = useState(0), intersectionRatio = _0[0], setIntersectionRatio = _0[1];
+    var _1 = useState(null), selectedPerson = _1[0], setSelectedPerson = _1[1];
     // Check if content should be collapsed (zoom < 67%)
-    const isContentCollapsed = (state.zoomLevel / 15) * 100 < 67;
+    var isContentCollapsed = (state.zoomLevel / 15) * 100 < 67;
     // Check if there are any sanctions
-    const hasSanctions = (scandal.moneyAmount ?? 0) > 0 ||
-        (scandal.fine ?? 0) > 0 ||
-        (scandal.prisonYears ?? 0) > 0 ||
-        (scandal.ineligibilityYears ?? 0) > 0 ||
-        (scandal.sanctions?.length ?? 0) > 0;
+    var hasSanctions = ((_b = scandal.moneyAmount) !== null && _b !== void 0 ? _b : 0) > 0 ||
+        ((_c = scandal.fine) !== null && _c !== void 0 ? _c : 0) > 0 ||
+        ((_d = scandal.prisonYears) !== null && _d !== void 0 ? _d : 0) > 0 ||
+        ((_e = scandal.ineligibilityYears) !== null && _e !== void 0 ? _e : 0) > 0 ||
+        ((_g = (_f = scandal.sanctions) === null || _f === void 0 ? void 0 : _f.length) !== null && _g !== void 0 ? _g : 0) > 0;
     // Calculate dynamic z-index based on interaction states and vertical position
     // Higher z-index for hovered/focused cards to ensure they appear above others
     // Lower z-index for cards lower on the timeline
-    const getZIndex = () => {
-        // Base z-index inversement proportionnel à la position Y
-        // Plus la carte est basse, plus son z-index de base est bas
-        const baseZIndex = Math.max(1, Math.floor(10 - position.y));
-        if (isSelected)
-            return baseZIndex + 10; // Selected cards always on top
-        if (isHovered || isFocused)
-            return baseZIndex + 50; // Hovered/focused cards above normal cards
-        return baseZIndex; // Default z-index based on vertical position
+    var getZIndex = function () {
+        // Base z-index entre 15 et 30 en fonction de la position Y
+        var baseZIndex = Math.max(15, Math.floor(30 - (position.y / 100)));
+        // Ajouter 15 au z-index quand la carte est survolée ou sélectionnée
+        // en s'assurant de ne pas dépasser 45
+        if (isSelected || isHovered || isFocused) {
+            return Math.min(45, baseZIndex + 15);
+        }
+        return baseZIndex;
     };
-    const getStatusIcon = () => {
+    var getStatusIcon = function () {
         switch (scandal.status) {
-            case 'convicted': return <AlertTriangle className="w-4 h-4"/>;
-            case 'acquitted': return <BadgeCheck className="w-4 h-4"/>;
-            default: return <Timer className="w-4 h-4"/>;
+            case 'convicted': return React.createElement(AlertTriangle, { className: "w-4 h-4" });
+            case 'acquitted': return React.createElement(BadgeCheck, { className: "w-4 h-4" });
+            default: return React.createElement(Timer, { className: "w-4 h-4" });
         }
     };
     // Get color scheme based on scandal type
-    const getColorScheme = () => {
-        const mainCategory = getMainCategory(scandal.type);
+    var getColorScheme = function () {
+        var mainCategory = getMainCategory(scandal.type);
         switch (mainCategory) {
             case 'corruption':
                 return {
@@ -182,17 +185,18 @@ const ScandalCard = ({ scandal, onClick, isSelected, position, timelineY, classN
                 };
         }
     };
-    const colorScheme = getColorScheme();
-    const getState = () => {
+    var colorScheme = getColorScheme();
+    var getState = function () {
         if (isSelected)
             return 'selected';
         if (isHovered || isFocused)
             return 'hover';
         return 'default';
     };
-    const ref = useRef(null);
-    useEffect(() => {
-        const observer = new IntersectionObserver(([entry]) => {
+    var ref = useRef(null);
+    useEffect(function () {
+        var observer = new IntersectionObserver(function (_a) {
+            var entry = _a[0];
             // Mettre à jour le ratio d'intersection
             setIntersectionRatio(entry.intersectionRatio);
             // Une fois que la carte est entrée dans le viewport, elle reste "visible"
@@ -206,180 +210,113 @@ const ScandalCard = ({ scandal, onClick, isSelected, position, timelineY, classN
         if (ref.current) {
             observer.observe(ref.current);
         }
-        return () => {
+        return function () {
             if (ref.current) {
                 observer.unobserve(ref.current);
             }
         };
     }, []);
-    return (<div ref={ref} className={`scandal-card absolute ${isSelected ? 'z-10' : `& z-${getZIndex()}`} ${isVisible ? 'visible' : ''}`} style={{
-            left: position.x,
-            top: position.y,
-            zIndex: getZIndex(),
-            '--intersection-ratio': intersectionRatio
-        }}>
-      {/* Date label */}
-      <div className="absolute text-sm font-medium text-gray-600 dark:text-gray-400" style={{
-            left: '57%',
-            top: -(connectionHeight + 70),
-            transform: 'translateX(-50%) rotate(-65deg)',
-            transformOrigin: 'bottom center'
-        }}>
-        {formatDate(scandal.startDate, 'MMM yyyy')}
-      </div>
-
-      {/* Connection line to timeline */}
-      <div className={`absolute transition-all duration-500 ${colorScheme[getState()].line}`} style={{
-            left: '50%',
-            top: -connectionHeight,
-            height: connectionHeight,
-            transform: 'translateX(-50%)'
-        }}/>
-      
-      {/* Anchor point on timeline */}
-      <div className={`absolute rounded-full transition-all duration-500 ${colorScheme[getState()].dot}`} style={{
-            left: '50%',
-            top: -(connectionHeight + (isSelected ? 15 : isHovered || isFocused ? 15 : 13)),
-            transform: 'translateX(-50%)'
-        }}/>
-
-      {/* Card */}
-      <div className={`
-          backdrop-blur-sm bg-white/95 dark:bg-gray-800/95 rounded-xl shadow-lg transition-all duration-500 cursor-pointer
-          hover:shadow-xl hover:-translate-y-2 select-none overflow-hidden w-[320px]
-          focus:outline-none focus:ring-2 focus:ring-purple-500/50 border-2 border-t-0
-          ${isSelected
-            ? `shadow-2xl transform -translate-y-2 scale-105 ${getCategoryColors(scandal.type).border}`
-            : isHovered || isFocused
-                ? getCategoryColors(scandal.type).border
-                : `border-gray-200/80 dark:border-gray-700/80 ${getCategoryColors(scandal.type).darkBorder}`}
-          ${(isHovered || isFocused) && !isSelected ? 'shadow-2xl -translate-y-1 scale-102' : ''}
-          ${isContentCollapsed ? 'scandal-card-collapsed' : ''}
-          relative
-        `} onClick={onClick} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} onFocus={() => setIsFocused(true)} onBlur={() => setIsFocused(false)} tabIndex={0}>
-        {/* Bordure supérieure floue */}
-        <div className={`absolute -top-0.5 left-0 right-0 h-2 blur-[3px] ${isSelected || isHovered || isFocused
-            ? getCategoryColors(scandal.type).border.replace('border-', 'bg-')
-            : getCategoryColors(scandal.type).darkBorder.replace('border-t-', 'bg-')}`}/>
-
-        {/* Header with gradient background */}
-        <div className="relative overflow-hidden texture-overlay">
-          <div className={`absolute inset-0 ${getCategoryColors(scandal.type).gradient}`}></div>
-          <div className="relative p-4">
-            <h3 className="font-bold text-lg text-white leading-tight">
-              {cleanScandalName(scandal.name)}
-            </h3>
-          </div>
-        </div>
-
-        {/* Content Grid */}
-        <div className="p-4 grid grid-cols-2 gap-3 bg-gray-50/50 dark:bg-gray-800/50">
-          {/* Personalities */}
-          <div className="col-span-2  bg-white dark:bg-gray-700 p-3 rounded-xl shadow-sm">
-            <div className="flex items-center gap-2 mb-2">
-              <Users className="w-4 h-4 text-purple-500 dark:text-purple-400"/>
-              <span className="text-xs text-gray-600 dark:text-gray-300  font-semibold">Impliqués</span>
-            </div>
-            <div className="text-sm text-gray-800 dark:text-gray-100">
-              {(scandal.personalities || []).slice(0, 2).map((person, index) => (<span key={person}>
-                  <ClickablePerson name={person} data-tour="timeline" className="cursor-pointer hover:text-purple-600 dark:hover:text-purple-400 transition-colors hover:underline decoration-purple-400/50 dark:decoration-purple-600/50">
-                    {person}
-                  </ClickablePerson>
-                  {index < Math.min((scandal.personalities || []).length - 1, 1) && ", "}
-                </span>))}
-              {(scandal.personalities || []).length > 2 && (<span className="text-gray-500 dark:text-gray-400"> et {(scandal.personalities || []).length - 2} autres</span>)}
-            </div>
-          </div>
-
-          {/* Stats or Description */}
-          {hasSanctions ? (<div className="col-span-2 statOrDesc grid grid-cols-2 gap-3">
-              {/* Money Amount */}
-              {(scandal.moneyAmount ?? 0) > 0 && (<div className="bg-white dark:bg-gray-700 p-3 rounded-xl shadow-sm">
-                  <div className="flex items-center gap-2 mb-2">
-                    <DollarSign className="w-4 h-4 text-red-500 dark:text-red-400"/>
-                    <span className="text-xs text-gray-600 dark:text-gray-300 font-semibold">Concernés</span>
-                  </div>
-                  <div className="text-sm font-bold text-red-600 dark:text-red-400">
-                    <AnimatedNumber value={scandal.moneyAmount ?? 0} formatFn={formatLargeNumber}/>
-                  </div>
-                </div>)}
-
-              {/* Parti politique si on n'a que la somme concernée */}
-              {scandal.politicalParty && (scandal.moneyAmount ?? 0) > 0 &&
-                !(scandal.fine ?? 0) && !(scandal.prisonYears ?? 0) && !(scandal.ineligibilityYears ?? 0) && (<div className="bg-white dark:bg-gray-700 p-3 rounded-xl shadow-sm">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Building2 className="w-4 h-4 text-blue-500 dark:text-blue-400"/>
-                    <span className="text-xs text-gray-600 dark:text-gray-300 font-semibold">Parti</span>
-                  </div>
-                  <div className="text-sm text-gray-800 dark:text-gray-100">
-                    <ClickableParty party={scandal.politicalParty} data-tour="timeline" className="cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors hover:underline decoration-blue-400/50 dark:decoration-blue-600/50">
-                      {scandal.politicalParty}
-                    </ClickableParty>
-                  </div>
-                </div>)}
-
-              {/* Fine */}
-              {(scandal.fine ?? 0) > 0 && (<div className="bg-white dark:bg-gray-700 p-3 rounded-xl shadow-sm">
-                  <div className="flex items-center gap-2 mb-2">
-                    <DollarSign className="w-4 h-4 text-blue-500 dark:text-blue-400"/>
-                    <span className="text-xs text-gray-600 dark:text-gray-300 font-semibold">Amende</span>
-                  </div>
-                  <div className="text-sm font-bold text-blue-600 dark:text-blue-400">
-                    <AnimatedNumber value={scandal.fine ?? 0} formatFn={formatLargeNumber}/>
-                  </div>
-                </div>)}
-
-              {/* Prison Sentence */}
-              {(scandal.prisonYears ?? 0) > 0 && (<div className="bg-white dark:bg-gray-700 p-3 rounded-xl shadow-sm">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Scale className="w-4 h-4 text-orange-500 dark:text-orange-400"/>
-                    <span className="text-xs text-gray-600 dark:text-gray-300 font-semibold">Prison</span>
-                  </div>
-                  <div className="text-sm font-bold text-orange-600 dark:text-orange-400">
-                    <AnimatedNumber value={scandal.prisonYears ?? 0} formatFn={(val) => `${val} an${val > 1 ? 's' : ''}`}/>
-                  </div>
-                </div>)}
-
-              {/* Ineligibility */}
-              {(scandal.ineligibilityYears ?? 0) > 0 && (<div className="bg-white dark:bg-gray-700 p-3 rounded-xl shadow-sm">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Building2 className="w-4 h-4 text-purple-500 dark:text-purple-400"/>
-                    <span className="text-xs text-gray-600 dark:text-gray-300 font-semibold">Inéligibilité</span>
-                  </div>
-                  <div className="text-sm font-bold text-purple-600 dark:text-purple-400">
-                    <AnimatedNumber value={scandal.ineligibilityYears ?? 0} formatFn={(val) => `${val} an${val > 1 ? 's' : ''}`}/>
-                  </div>
-                </div>)}
-            </div>) : (
-        // Description
-        <div className="col-span-2 statOrDesc bg-white dark:bg-gray-700 p-3 rounded-xl shadow-sm">
-              <div className="flex items-center gap-2 mb-2">
-                <Tag className="w-4 h-4 text-gray-500 dark:text-gray-400"/>
-                <span className="text-xs text-gray-600 dark:text-gray-300 font-semibold">Description</span>
-              </div>
-              <div className="text-sm text-gray-800 dark:text-gray-100 line-clamp-3">
-                {scandal.description}
-              </div>
-            </div>)}
-
-          {/* Status Badge */}
-          <div className="col-span-2 flex justify-between items-center">
-            <ClickableStatus status={scandal.status} data-tour="timeline" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm cursor-pointer hover:scale-105 transition-transform active:scale-95 ${scandal.status === 'convicted'
-            ? 'bg-red-100 text-red-700 dark:bg-red-900/60 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800/60'
-            : scandal.status === 'acquitted'
-                ? 'bg-green-100 text-green-700 dark:bg-green-900/60 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800/60'
-                : 'bg-orange-100 text-orange-700 dark:bg-orange-900/60 dark:text-orange-300 hover:bg-orange-200 dark:hover:bg-orange-800/60'}`}>
-              {getStatusIcon()}
-              {scandal.status === 'convicted' ? 'Condamné' :
-            scandal.status === 'acquitted' ? 'Acquitté' :
-                scandal.status === 'ongoing' ? 'En cours' : 'Jugé'}
-            </ClickableStatus>
-            <ClickableType type={getMainCategory(scandal.type)} data-tour="timeline" className="text-xs text-gray-500 dark:text-gray-400 font-medium hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
-              {getCategoryLabel(getMainCategory(scandal.type))}
-            </ClickableType>
-          </div>
-        </div>
-      </div>
-    </div>);
+    return (React.createElement(React.Fragment, null,
+        React.createElement("div", { ref: ref, className: "scandal-card absolute ".concat(isSelected ? 'z-50' : "z-".concat(getZIndex()), " ").concat(isVisible ? 'visible' : ''), style: {
+                left: position.x,
+                top: position.y,
+                zIndex: getZIndex(),
+                '--intersection-ratio': intersectionRatio
+            } },
+            React.createElement("div", { className: "\n            absolute text-[10px] font-medium \n            bg-white/95 dark:bg-gray-800/95 \n            px-2 py-0.5 rounded-md \n            shadow-sm backdrop-blur-sm\n            border border-gray-100/50 dark:border-gray-700/50\n            transition-all duration-300 ease-out\n            ".concat(isSelected || (position.x >= state.scrollPosition && position.x <= state.scrollPosition + state.viewportWidth / 2)
+                    ? 'text-violet-600 dark:text-violet-400 min-w-[4em]'
+                    : 'text-gray-500 dark:text-gray-400 min-w-[2.5em]', "\n          "), style: {
+                    left: '50%',
+                    top: -(connectionHeight + 35),
+                    transform: 'translateX(-50%)'
+                } }, isSelected || (position.x >= state.scrollPosition && position.x <= state.scrollPosition + state.viewportWidth / 2)
+                ? formatDate(scandal.startDate)
+                : formatDate(scandal.startDate).slice(0, 3)),
+            React.createElement("div", { className: "absolute transition-all duration-500 ".concat(colorScheme[getState()].line), style: {
+                    left: '50%',
+                    top: -connectionHeight,
+                    height: connectionHeight,
+                    transform: 'translateX(-50%)'
+                } }),
+            React.createElement("div", { className: "absolute rounded-full transition-all duration-500 ".concat(colorScheme[getState()].dot), style: {
+                    left: '50%',
+                    top: -(connectionHeight + (isSelected ? 15 : isHovered || isFocused ? 15 : 13)),
+                    transform: 'translateX(-50%)'
+                } }),
+            React.createElement("div", { className: "\n            backdrop-blur-sm bg-white/95 dark:bg-gray-800/95 rounded-xl shadow-lg transition-all duration-500 cursor-pointer\n            hover:shadow-xl hover:-translate-y-2 select-none overflow-hidden w-[320px]\n            focus:outline-none focus:ring-2 focus:ring-purple-500/50 border-2 border-t-0\n            ".concat(isSelected
+                    ? "shadow-2xl transform -translate-y-2 scale-105 ".concat(getCategoryColors(scandal.type).border)
+                    : isHovered || isFocused
+                        ? getCategoryColors(scandal.type).border
+                        : "border-gray-200/80 dark:border-gray-700/80 ".concat(getCategoryColors(scandal.type).darkBorder), "\n            ").concat((isHovered || isFocused) && !isSelected ? 'shadow-2xl -translate-y-1 scale-102' : '', "\n            ").concat(isContentCollapsed ? 'scandal-card-collapsed' : '', "\n            relative\n          "), onClick: onClick, onMouseEnter: function () { return setIsHovered(true); }, onMouseLeave: function () { return setIsHovered(false); }, onFocus: function () { return setIsFocused(true); }, onBlur: function () { return setIsFocused(false); }, tabIndex: 0 },
+                React.createElement("div", { className: "absolute -top-0.5 left-0 right-0 h-2 blur-[3px] ".concat(isSelected || isHovered || isFocused
+                        ? getCategoryColors(scandal.type).border.replace('border-', 'bg-')
+                        : getCategoryColors(scandal.type).darkBorder.replace('border-t-', 'bg-')) }),
+                React.createElement("div", { className: "relative overflow-hidden texture-overlay" },
+                    React.createElement("div", { className: "absolute inset-0 ".concat(getCategoryColors(scandal.type).gradient) }),
+                    React.createElement("div", { className: "relative p-4" },
+                        React.createElement("h3", { className: "font-bold text-lg text-white leading-tight" }, cleanScandalName(scandal.name)))),
+                React.createElement("div", { className: "p-4 grid grid-cols-2 gap-3 bg-gray-50/50 dark:bg-gray-800/50" },
+                    React.createElement("div", { className: "col-span-2 bg-white dark:bg-gray-700 p-3 pt-0 rounded-xl shadow-sm" },
+                        React.createElement("div", { className: "flex items-center gap-2 mb-2" },
+                            React.createElement(Users, { className: "w-4 h-4 text-purple-500 dark:text-purple-400" }),
+                            React.createElement("span", { className: "text-xs text-gray-600 dark:text-gray-300 font-semibold" }, "Impliqu\u00E9s")),
+                        React.createElement("div", { className: "text-sm text-gray-800 dark:text-gray-100" },
+                            (scandal.personalities || []).slice(0, 2).map(function (person, index) { return (React.createElement("span", { key: person },
+                                React.createElement("button", { onClick: function (e) {
+                                        e.stopPropagation();
+                                        setSelectedPerson(person);
+                                    }, className: "inline-flex items-center px-2 py-1 rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-gray-700/50 dark:hover:bg-gray-600/50 text-gray-900 dark:text-gray-100 transition-colors cursor-pointer" },
+                                    React.createElement(Users, { className: "w-3 h-3 mr-1 text-gray-500 dark:text-gray-400" }),
+                                    person),
+                                index < Math.min((scandal.personalities || []).length - 1, 1) && " ")); }),
+                            (scandal.personalities || []).length > 2 && (React.createElement("span", { className: "inline-flex items-center justify-center ml-1 px-1.5 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300 rounded" },
+                                "+",
+                                (scandal.personalities || []).length - 2)))),
+                    hasSanctions ? (React.createElement("div", { className: "col-span-2 statOrDesc grid grid-cols-2 gap-3" },
+                        ((_h = scandal.moneyAmount) !== null && _h !== void 0 ? _h : 0) > 0 && (React.createElement("div", { className: "bg-red-50 dark:bg-red-900/20 p-2.5 rounded-xl border border-red-100 dark:border-red-800/30" },
+                            React.createElement("div", { className: "flex items-center gap-1.5 mb-1" },
+                                React.createElement(DollarSign, { className: "w-3.5 h-3.5 text-red-500 dark:text-red-400" }),
+                                React.createElement("span", { className: "text-xs text-red-600 dark:text-red-400" }, "Montant concern\u00E9")),
+                            React.createElement("div", { className: "text-sm font-bold text-red-700 dark:text-red-300" }, formatLargeNumber((_j = scandal.moneyAmount) !== null && _j !== void 0 ? _j : 0)))),
+                        ((_k = scandal.fine) !== null && _k !== void 0 ? _k : 0) > 0 && (React.createElement("div", { className: "bg-blue-50 dark:bg-blue-900/20 p-2.5 rounded-xl border border-blue-100 dark:border-blue-800/30" },
+                            React.createElement("div", { className: "flex items-center gap-1.5 mb-1" },
+                                React.createElement(DollarSign, { className: "w-3.5 h-3.5 text-blue-500 dark:text-blue-400" }),
+                                React.createElement("span", { className: "text-xs text-blue-600 dark:text-blue-400" }, "Amende")),
+                            React.createElement("div", { className: "text-sm font-bold text-blue-700 dark:text-blue-300" }, formatLargeNumber((_l = scandal.fine) !== null && _l !== void 0 ? _l : 0)))),
+                        ((_m = scandal.prisonYears) !== null && _m !== void 0 ? _m : 0) > 0 && (React.createElement("div", { className: "bg-orange-50 dark:bg-orange-900/20 p-2.5 rounded-xl border border-orange-100 dark:border-orange-800/30" },
+                            React.createElement("div", { className: "flex items-center gap-1.5 mb-1" },
+                                React.createElement(Scale, { className: "w-3.5 h-3.5 text-orange-500 dark:text-orange-400" }),
+                                React.createElement("span", { className: "text-xs text-orange-600 dark:text-orange-400" }, "Prison")),
+                            React.createElement("div", { className: "text-sm font-bold text-orange-700 dark:text-orange-300" }, "".concat((_o = scandal.prisonYears) !== null && _o !== void 0 ? _o : 0, " an").concat(((_p = scandal.prisonYears) !== null && _p !== void 0 ? _p : 0) > 1 ? 's' : '')))),
+                        ((_q = scandal.ineligibilityYears) !== null && _q !== void 0 ? _q : 0) > 0 && (React.createElement("div", { className: "bg-purple-50 dark:bg-purple-900/20 p-2.5 rounded-xl border border-purple-100 dark:border-purple-800/30" },
+                            React.createElement("div", { className: "flex items-center gap-1.5 mb-1" },
+                                React.createElement(Ban, { className: "w-3.5 h-3.5 text-purple-500 dark:text-purple-400" }),
+                                React.createElement("span", { className: "text-xs text-purple-600 dark:text-purple-400" }, "In\u00E9ligibilit\u00E9")),
+                            React.createElement("div", { className: "text-sm font-bold text-purple-700 dark:text-purple-300" }, "".concat((_r = scandal.ineligibilityYears) !== null && _r !== void 0 ? _r : 0, " an").concat(((_s = scandal.ineligibilityYears) !== null && _s !== void 0 ? _s : 0) > 1 ? 's' : '')))),
+                        scandal.politicalParty && ((_t = scandal.moneyAmount) !== null && _t !== void 0 ? _t : 0) > 0 &&
+                            !((_u = scandal.fine) !== null && _u !== void 0 ? _u : 0) && !((_v = scandal.prisonYears) !== null && _v !== void 0 ? _v : 0) && !((_w = scandal.ineligibilityYears) !== null && _w !== void 0 ? _w : 0) && (React.createElement("div", { className: "bg-white dark:bg-gray-700 p-3 rounded-xl shadow-sm" },
+                            React.createElement("div", { className: "flex items-center gap-2 mb-2" },
+                                React.createElement(Building2, { className: "w-4 h-4 text-blue-500 dark:text-blue-400" }),
+                                React.createElement("span", { className: "text-xs text-gray-600 dark:text-gray-300 font-semibold" }, "Parti")),
+                            React.createElement("div", { className: "text-sm text-gray-800 dark:text-gray-100" },
+                                React.createElement(ClickableParty, { party: scandal.politicalParty, "data-tour": "timeline", className: "cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors hover:underline decoration-blue-400/50 dark:decoration-blue-600/50" }, scandal.politicalParty)))))) : (
+                    // Description
+                    React.createElement("div", { className: "col-span-2 statOrDesc bg-white dark:bg-gray-700 p-3 rounded-xl shadow-sm" },
+                        React.createElement("div", { className: "flex items-center gap-2 mb-2" },
+                            React.createElement(Tag, { className: "w-4 h-4 text-gray-500 dark:text-gray-400" }),
+                            React.createElement("span", { className: "text-xs text-gray-600 dark:text-gray-300 font-semibold" }, "Description")),
+                        React.createElement("div", { className: "text-sm text-gray-800 dark:text-gray-100 line-clamp-3" }, scandal.description))),
+                    React.createElement("div", { className: "col-span-2 flex justify-between items-center" },
+                        React.createElement(ClickableStatus, { status: scandal.status, "data-tour": "timeline", className: "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm cursor-pointer hover:scale-105 transition-transform active:scale-95 ".concat(scandal.status === 'convicted'
+                                ? 'bg-red-100 text-red-700 dark:bg-red-900/60 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800/60'
+                                : scandal.status === 'acquitted'
+                                    ? 'bg-green-100 text-green-700 dark:bg-green-900/60 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800/60'
+                                    : 'bg-orange-100 text-orange-700 dark:bg-orange-900/60 dark:text-orange-300 hover:bg-orange-200 dark:hover:bg-orange-800/60') },
+                            getStatusIcon(),
+                            scandal.status === 'convicted' ? 'Condamné' :
+                                scandal.status === 'acquitted' ? 'Acquitté' :
+                                    scandal.status === 'ongoing' ? 'En cours' : 'Jugé'),
+                        React.createElement(ClickableType, { type: getMainCategory(scandal.type), "data-tour": "timeline", className: "text-xs text-gray-500 dark:text-gray-400 font-medium hover:text-gray-700 dark:hover:text-gray-300 transition-colors" }, getCategoryLabel(getMainCategory(scandal.type))))))),
+        selectedPerson && (React.createElement(PersonalityModal, { name: selectedPerson, onClose: function () { return setSelectedPerson(null); }, scandals: allScandals }))));
 };
 export default ScandalCard;

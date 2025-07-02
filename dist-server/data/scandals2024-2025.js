@@ -1,4 +1,4 @@
-export const scandals2024_2025 = [
+export var scandals2024_2025 = [
     {
         id: 'le-pen-condamnation-ineligibilite-2024-01',
         name: 'Le Pen - Condamnation et inéligibilité',

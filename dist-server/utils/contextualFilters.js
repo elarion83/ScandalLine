@@ -1,52 +1,63 @@
-export const filterTimelineBy = (scandals, contextualFilter) => {
+export var filterTimelineBy = function (scandals, contextualFilter) {
     if (!contextualFilter)
         return scandals;
     switch (contextualFilter.type) {
         case 'personality':
-            return scandals.filter(scandal => scandal.personalities?.some(person => person === contextualFilter.value.toString()) ?? false);
+            return scandals.filter(function (scandal) {
+                var _a, _b;
+                return (_b = (_a = scandal.personalities) === null || _a === void 0 ? void 0 : _a.some(function (person) {
+                    return person === contextualFilter.value.toString();
+                })) !== null && _b !== void 0 ? _b : false;
+            });
         case 'party':
-            return scandals.filter(scandal => scandal.politicalParty && scandal.politicalParty === contextualFilter.value);
+            return scandals.filter(function (scandal) {
+                return scandal.politicalParty && scandal.politicalParty === contextualFilter.value;
+            });
         case 'status':
-            return scandals.filter(scandal => scandal.status === contextualFilter.value);
+            return scandals.filter(function (scandal) {
+                return scandal.status === contextualFilter.value;
+            });
         case 'scandalType':
-            return scandals.filter(scandal => scandal.type === contextualFilter.value);
+            return scandals.filter(function (scandal) {
+                return scandal.type === contextualFilter.value;
+            });
         default:
             return scandals;
     }
 };
-export const getContextualTitle = (contextualFilter) => {
+export var getContextualTitle = function (contextualFilter) {
     switch (contextualFilter.type) {
         case 'personality':
-            return `Skandalz de ${contextualFilter.label}`;
+            return "Skandalz de ".concat(contextualFilter.label);
         case 'party':
-            return `Affaires liées au ${contextualFilter.label}`;
+            return "Affaires li\u00E9es au ".concat(contextualFilter.label);
         case 'status':
-            return `Affaires ${contextualFilter.label}`;
+            return "Affaires ".concat(contextualFilter.label);
         case 'scandalType':
-            return `Affaires de type "${contextualFilter.label}"`;
+            return "Affaires de type \"".concat(contextualFilter.label, "\"");
         default:
             return 'Timeline Contextuelle';
     }
 };
-export const getContextualDescription = (contextualFilter, filteredCount) => {
-    const baseText = `${filteredCount} affaire${filteredCount > 1 ? 's' : ''}`;
+export var getContextualDescription = function (contextualFilter, filteredCount) {
+    var baseText = "".concat(filteredCount, " affaire").concat(filteredCount > 1 ? 's' : '');
     switch (contextualFilter.type) {
         case 'personality':
-            return `${contextualFilter.label} est impliqué(e) dans ${baseText}`;
+            return "".concat(contextualFilter.label, " est impliqu\u00E9(e) dans ").concat(baseText);
         case 'party':
-            return `${baseText} liée${filteredCount > 1 ? 's' : ''} au ${contextualFilter.label}`;
+            return "".concat(baseText, " li\u00E9e").concat(filteredCount > 1 ? 's' : '', " au ").concat(contextualFilter.label);
         case 'status':
-            return `${baseText} avec le statut "${contextualFilter.label}"`;
+            return "".concat(baseText, " avec le statut \"").concat(contextualFilter.label, "\"");
         case 'scandalType':
-            return `${baseText} de type "${contextualFilter.label}"`;
+            return "".concat(baseText, " de type \"").concat(contextualFilter.label, "\"");
         default:
             return baseText;
     }
 };
-export const createContextualFilter = (type, value, label) => {
+export var createContextualFilter = function (type, value, label) {
     return {
-        type,
-        value,
+        type: type,
+        value: value,
         label: label || value.toString()
     };
 };

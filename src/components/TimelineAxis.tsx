@@ -7,6 +7,8 @@ interface TimelineAxisProps {
   timelineWidth: number;
   zoomLevel: number;
   timelineY: number;
+  scrollPosition: number;
+  viewportWidth: number;
 }
 
 const TimelineAxis: React.FC<TimelineAxisProps> = ({
@@ -14,7 +16,9 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
   endYear,
   timelineWidth,
   zoomLevel,
-  timelineY
+  timelineY,
+  scrollPosition,
+  viewportWidth
 }) => {
   const yearMarkers = generateYearMarkers(startYear, endYear, timelineWidth, zoomLevel);
 
@@ -32,7 +36,6 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
         }}
       />
 
-
       {/* Year markers and labels */}
       {yearMarkers.map(({ year, x, isMainMarker }) => (
         <div key={year} className="absolute" style={{ left: x, top: timelineY }}>
@@ -48,41 +51,43 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
               <div className="relative">
                 {/* Conteneur avec effet glassmorphism */}
                 <div 
-                  className="relative px-3  py-4 rounded-2x border border-white/30 dark:border-white/10 pb-0"
+                  className="relative px-3 py-4 rounded-2x border border-white/30 dark:border-white/10 pb-0"
                 >
                   <span className="relative z-10 text-grey dark:text-white tracking-wide inline-block"
                      style={{ transform: 'rotate(0deg) translateY(25px)',
                       fontSize: '1em', opacity: 0.1 }}>
-                    {`01.01.${year.toString().slice(-2)}`}
+                    {year}
                   </span>
                 </div>
               </div>
             </div>
           ) : (
-            zoomLevel > 2 && (
-              <div
-                className="absolute writing-mode-vertical text-xl font-bold whitespace-nowrap"
-                style={{
-                  writingMode: 'vertical-rl',
-                  transform: 'translateX(-50%) rotate(180deg)',
-                  top: '-50px'
-                }}
-              >
-                <div className="relative">
-
-                  
-                  {/* Conteneur avec effet glassmorphism plus léger */}
-                  <div 
-                    className="relative px-2 py-3 rounded-xl bg-white/10 dark:bg-gray-900/10 backdrop-blur-[1px] border border-white/20 dark:border-white/5"
-                    style={{ transform: 'rotate(90deg)' }}
-                  >
-                    <span className="relative z-10 text-black/60 dark:text-gray-300 tracking-wide inline-block">
-                      {`01.01.${year.toString().slice(-2)}`}
-                    </span>
-                  </div>
+            <div 
+              className="absolute writing-mode-vertical text-sm whitespace-nowrap"
+              style={{
+                writingMode: 'vertical-rl',
+                transform: 'translateX(-50%) rotate(180deg)',
+                top: '-50px'
+              }}
+            >
+              <div className="relative">
+                {/* Motif quadrillé plus petit */}
+                <div className="absolute inset-0 opacity-5" style={{
+                  backgroundImage: `
+                      linear-gradient(to right, rgb(139, 92, 246) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgb(139, 92, 246) 1px, transparent 1px)
+                    `,
+                  backgroundSize: '6px 6px'
+                }}/>
+                
+                {/* Conteneur avec effet glassmorphism plus léger */}
+                <div className="relative px-2 py-3 rounded-xl bg-white/10 dark:bg-gray-900/10 backdrop-blur-[1px] border border-white/20 dark:border-white/5" style={{ transform: 'rotate(90deg)' }}>
+                  <span className="relative z-10 text-black/60 dark:text-gray-300 tracking-wide inline-block">
+                    {year}
+                  </span>
                 </div>
               </div>
-            )
+            </div>
           )}
         </div>
       ))}

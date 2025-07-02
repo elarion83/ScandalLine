@@ -1,4 +1,4 @@
-export const scandals2002_2003 = [
+export var scandals2002_2003 = [
     {
         id: 'angolagate-falcone-gaydamak-2002-01',
         name: 'Angolagate - Pierre Falcone et Arcadi Gaydamak',

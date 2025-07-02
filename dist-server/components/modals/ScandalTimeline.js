@@ -1,7 +1,8 @@
 import React from 'react';
 import { formatDate } from '../../utils/scandalUtils';
-export const ScandalTimeline = ({ events }) => {
-    const getEventStyle = (type) => {
+export var ScandalTimeline = function (_a) {
+    var events = _a.events;
+    var getEventStyle = function (type) {
         switch (type) {
             case 'start':
                 return {
@@ -25,21 +26,13 @@ export const ScandalTimeline = ({ events }) => {
                 };
         }
     };
-    return (<div className="relative py-8 overflow-x-auto">
-      <div className="absolute left-0 right-0 top-11 h-0.5 bg-gray-200 dark:bg-gray-700 -translate-y-1"/>
-      <div className="relative flex justify-between items-center min-w-[600px] px-4">
-        {events.map((event, index) => {
-            const style = getEventStyle(event.type);
-            return (<div key={index} className="flex flex-col items-center">
-              <div className={`w-4 h-4 rounded-full ${style.dot} ring-4 mb-2`}/>
-              <div className="text-sm font-medium text-gray-900 dark:text-white">
-                {formatDate(event.date)}
-              </div>
-              <div className={`text-xs ${style.text}`}>
-                {event.label}
-              </div>
-            </div>);
-        })}
-      </div>
-    </div>);
+    return (React.createElement("div", { className: "relative py-8 overflow-x-auto" },
+        React.createElement("div", { className: "absolute left-0 right-0 top-11 h-0.5 bg-gray-200 dark:bg-gray-700 -translate-y-1" }),
+        React.createElement("div", { className: "relative flex justify-between items-center min-w-[600px] px-4" }, events.map(function (event, index) {
+            var style = getEventStyle(event.type);
+            return (React.createElement("div", { key: index, className: "flex flex-col items-center" },
+                React.createElement("div", { className: "w-4 h-4 rounded-full ".concat(style.dot, " ring-4 mb-2") }),
+                React.createElement("div", { className: "text-sm font-medium text-gray-900 dark:text-white" }, formatDate(event.date)),
+                React.createElement("div", { className: "text-xs ".concat(style.text) }, event.label)));
+        }))));
 };

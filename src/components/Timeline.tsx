@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useCallback, useMemo, useState } from 'react';
-import { ZoomIn, ZoomOut, Filter, BarChart3, FileText, Building2, Users } from 'lucide-react';
+import { ZoomIn, ZoomOut, Filter, BarChart3, FileText, Building2, Users, ArrowRight } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Scandal } from '../types/scandal';
 import { filterScandals, calculateStats, getCategoryLabel } from '../utils/scandalUtils';
@@ -28,6 +28,9 @@ import ScandalDetails from './ScandalDetails';
 import DynamicStatsBar from './DynamicStatsBar';
 import ContextualHeader from './ContextualHeader';
 import ShareTimeline from './ShareTimeline';
+import ScrollHint from './modals/ScrollHint';
+import CurrentYearDisplay from './CurrentYearDisplay';
+import TimelineGrid from './TimelineGrid';
 
 interface TimelineProps {
   scandals: Scandal[];
@@ -43,46 +46,10 @@ const Timeline: React.FC<TimelineProps> = ({
   const dragStartRef = useRef({ x: 0, scrollLeft: 0 });
   const scrollTimeoutRef = useRef<NodeJS.Timeout>();
   const initialScrollDoneRef = useRef(false);
-  const [showDragHelp, setShowDragHelp] = useState(false);
-  const dragHelpTimeoutRef = useRef<NodeJS.Timeout>();
-
-  // Afficher la tooltip d'aide après la fermeture du SplashScreen
-  useEffect(() => {
-    if (!splashClosedTime) return;
-
-    console.log('⌚ SplashScreen fermé à:', new Date(splashClosedTime).toLocaleTimeString());
-    console.log('🚀 Début du compte à rebours pour la tooltip (12s)');
-    
-    // On attend 12 secondes après la fermeture du SplashScreen
-    dragHelpTimeoutRef.current = setTimeout(() => {
-      console.log('⏰ 12 secondes écoulées - Affichage de la tooltip');
-      setShowDragHelp(true);
-      // On cache la tooltip après 4 secondes
-      setTimeout(() => {
-        console.log('🔚 4 secondes écoulées - Masquage de la tooltip');
-        setShowDragHelp(false);
-      }, 4000);
-    }, 12000);
-
-    return () => {
-      if (dragHelpTimeoutRef.current) {
-        console.log('♻️ Nettoyage des timeouts de la tooltip');
-        clearTimeout(dragHelpTimeoutRef.current);
-      }
-    };
-  }, [splashClosedTime]); // On réagit au changement de splashClosedTime
-
-  // Effet pour logger les changements d'état de la tooltip
-  useEffect(() => {
-    console.log('🔄 État de la tooltip:', showDragHelp ? 'visible' : 'cachée');
-  }, [showDragHelp]);
-
-  // Scroll to top when timeline opens
-  useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.scrollTop = 0;
-    }
-  }, [scandals, state.contextualFilter]); // Déclencher quand les scandales changent ou quand on change de contexte
+  const [showDragHelp, setShowDragHelp] = useState(true);
+  const [hasUsedDrag, setHasUsedDrag] = useState(false);
+  const [showScrollHint, setShowScrollHint] = useState(true);
+  const [hasScrolledHorizontally, setHasScrolledHorizontally] = useState(false);
 
   // Apply contextual filter first, then regular filters
   const contextuallyFilteredScandals = state.contextualFilter 
@@ -98,25 +65,6 @@ const Timeline: React.FC<TimelineProps> = ({
     [filteredScandals]
   );
 
-  // Update filters with new date range
-  useEffect(() => {
-    // Ne pas mettre à jour les dates si les filtres ont changé à cause d'une case à cocher
-    const hasOnlyCheckboxChanges = 
-      state.filters.types.length > 0 || 
-      state.filters.parties.length > 0 || 
-      state.filters.personalities.length > 0;
-
-    if (!hasOnlyCheckboxChanges && (startYear !== state.filters.dateRange.start || endYear !== state.filters.dateRange.end)) {
-      dispatch({ 
-        type: 'SET_FILTERS', 
-        payload: { 
-          ...state.filters, 
-          dateRange: { start: startYear, end: endYear } 
-        } 
-      });
-    }
-  }, [startYear, endYear, state.filters]);
-  
   // Determine if we need adaptive layout
   const shouldUseAdaptiveLayout = false;
   
@@ -134,24 +82,6 @@ const Timeline: React.FC<TimelineProps> = ({
       return { timelineWidth: width, gaps: [], scandalPositions: positions };
     }
   }, [filteredScandals, startYear, endYear, state.zoomLevel, shouldUseAdaptiveLayout]);
-
-  // Calculate visible scandals for rendering optimization
-  const visibleScandalPositions = useMemo(() => {
-    if (shouldUseAdaptiveLayout) {
-      // For adaptive layout, show all scandals (no scrolling)
-      return scandalPositions;
-    }
-    return getVisibleScandals(scandalPositions, state.scrollPosition, state.viewportWidth);
-  }, [scandalPositions, state.scrollPosition, state.viewportWidth, shouldUseAdaptiveLayout]);
-
-  // Calculate cumulative scandals for statistics (from start to current position)
-  const cumulativeScandals = useMemo(() => {
-    if (shouldUseAdaptiveLayout) {
-      // For adaptive layout, always show all scandals in stats
-      return filteredScandals;
-    }
-    return getCumulativeScandals(scandalPositions, filteredScandals, state.scrollPosition, state.viewportWidth);
-  }, [scandalPositions, filteredScandals, state.scrollPosition, state.viewportWidth, shouldUseAdaptiveLayout]);
 
   const scrollProgress = useMemo(() => {
     // Si la timeline est plus petite que la viewport ou si on utilise le layout adaptatif, on est à 100%
@@ -171,11 +101,86 @@ const Timeline: React.FC<TimelineProps> = ({
     return (state.scrollPosition) / (timelineWidth - state.viewportWidth);
   }, [state.scrollPosition, state.viewportWidth, timelineWidth, shouldUseAdaptiveLayout]);
 
+  // Gérer l'affichage initial de la modal d'aide
+  useEffect(() => {
+    if (hasUsedDrag) {
+      setShowDragHelp(false);
+    }
+  }, [hasUsedDrag]);
+
+  // Scroll to top when timeline opens
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.scrollTop = 0;
+    }
+  }, [scandals, state.contextualFilter]); // Déclencher quand les scandales changent ou quand on change de contexte
+
+  // Update filters with new date range
+  useEffect(() => {
+    // Ne pas mettre à jour les dates si les filtres ont changé à cause d'une case à cocher
+    const hasOnlyCheckboxChanges = 
+      state.filters.types.length > 0 || 
+      state.filters.parties.length > 0 || 
+      state.filters.personalities.length > 0;
+
+    if (!hasOnlyCheckboxChanges && (startYear !== state.filters.dateRange.start || endYear !== state.filters.dateRange.end)) {
+      dispatch({ 
+        type: 'SET_FILTERS', 
+        payload: { 
+          ...state.filters, 
+          dateRange: { start: startYear, end: endYear } 
+        } 
+      });
+    }
+  }, [startYear, endYear, state.filters]);
+
+  // Calculate visible scandals for rendering optimization
+  const visibleScandalPositions = useMemo(() => {
+    if (shouldUseAdaptiveLayout) {
+      // For adaptive layout, show all scandals (no scrolling)
+      return scandalPositions;
+    }
+    return getVisibleScandals(scandalPositions, state.scrollPosition, state.viewportWidth);
+  }, [scandalPositions, state.scrollPosition, state.viewportWidth, shouldUseAdaptiveLayout]);
+
+  // Calculate cumulative scandals for statistics (from start to current position)
+  const cumulativeScandals = useMemo(() => {
+    if (shouldUseAdaptiveLayout) {
+      // For adaptive layout, always show all scandals in stats
+      return filteredScandals;
+    }
+    return getCumulativeScandals(scandalPositions, filteredScandals, state.scrollPosition, state.viewportWidth);
+  }, [scandalPositions, filteredScandals, state.scrollPosition, state.viewportWidth, shouldUseAdaptiveLayout]);
+
+  // Méthode commune pour gérer le scroll initial
+  const handleInitialScroll = useCallback(() => {
+    if (!initialScrollDoneRef.current && containerRef.current) {
+      // On commence toujours au début de la timeline
+      containerRef.current.scrollLeft = 0;
+      dispatch({ type: 'SET_SCROLL_POSITION', payload: 0 });
+      initialScrollDoneRef.current = true;
+      console.log('🎯 Scroll initial appliqué - Position: début de la timeline');
+    }
+  }, [dispatch]);
+
+  // Scroll initial uniquement au montage et changement de contexte
+  useEffect(() => {
+    // Reset du flag quand le contexte change
+    initialScrollDoneRef.current = false;
+    
+    if (scandalPositions.length > 0) {
+      handleInitialScroll();
+    }
+  }, [state.contextualFilter]); // Ne dépend plus de scandalPositions
+
   // Handle contextual filter changes with transition
   const handleContextualFilterChange = useCallback((filter: any) => {
     dispatch({ type: 'SET_TRANSITIONING', payload: true });
     
     setTimeout(() => {
+      // Reset du flag avant de changer de contexte
+      initialScrollDoneRef.current = false;
+      
       // Set contextual filter
       dispatch({ type: 'SET_CONTEXTUAL_FILTER', payload: filter });
       
@@ -196,28 +201,18 @@ const Timeline: React.FC<TimelineProps> = ({
       
       dispatch({ type: 'SET_TRANSITIONING', payload: false });
       
-      // Calculate positions with new date range
-      const width = calculateTimelineWidth(start, end, state.zoomLevel);
-      const positions = calculateScandalPositions(filteredContextScandals, start, end, width);
-      
-      // Get the last scandal's position
-      if (positions.length > 0 && containerRef.current) {
-        const lastPosition = positions[positions.length - 1];
-        const viewportWidth = containerRef.current.clientWidth;
-        
-        // Calculate scroll position to center the last scandal
-        const newScrollPosition = Math.max(0, lastPosition.x - (viewportWidth / 2));
-        
-        containerRef.current.scrollLeft = newScrollPosition;
-        dispatch({ type: 'SET_SCROLL_POSITION', payload: newScrollPosition });
-      }
+      // Utiliser la méthode commune pour le scroll initial
+      handleInitialScroll();
     }, 150);
-  }, [dispatch, scandals, state.filters, state.zoomLevel]);
+  }, [dispatch, scandals, state.filters, handleInitialScroll]);
 
   // Handle back to main timeline
   const handleBackToMain = useCallback(() => {
     dispatch({ type: 'SET_TRANSITIONING', payload: true });
     setTimeout(() => {
+      // Reset du flag avant de revenir au main
+      initialScrollDoneRef.current = false;
+      
       // Reset contextual filter
       dispatch({ type: 'SET_CONTEXTUAL_FILTER', payload: null });
       
@@ -238,14 +233,11 @@ const Timeline: React.FC<TimelineProps> = ({
       
       dispatch({ type: 'SET_TRANSITIONING', payload: false });
       
-      // Reset scroll position when returning to main
-      if (containerRef.current) {
-        containerRef.current.scrollLeft = 0;
-        dispatch({ type: 'SET_SCROLL_POSITION', payload: 0 });
-      }
+      // Utiliser la méthode commune pour le scroll initial
+      handleInitialScroll();
       window.location.replace('/');
     }, 150);
-  }, [dispatch, scandals, state.filters]);
+  }, [dispatch, scandals, state.filters, handleInitialScroll]);
 
   // Handle viewport width changes
   useEffect(() => {
@@ -259,21 +251,6 @@ const Timeline: React.FC<TimelineProps> = ({
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [dispatch]);
-
-  // Initial scroll to last scandal
-  useEffect(() => {
-    if (!initialScrollDoneRef.current && containerRef.current && scandalPositions.length > 0) {
-      const lastPosition = scandalPositions[scandalPositions.length - 1];
-      const viewportWidth = containerRef.current.clientWidth;
-      
-      // Calculate scroll position to center the last scandal
-      const newScrollPosition = Math.max(0, lastPosition.x - (viewportWidth / 2));
-      
-      containerRef.current.scrollLeft = newScrollPosition;
-      dispatch({ type: 'SET_SCROLL_POSITION', payload: newScrollPosition });
-      initialScrollDoneRef.current = true;
-    }
-  }, [scandalPositions, dispatch]);
 
   // Handle zoom with center preservation (disabled for adaptive layout)
   const handleZoomIn = useCallback(() => {
@@ -352,16 +329,21 @@ const Timeline: React.FC<TimelineProps> = ({
     }, 0);
   }, [dispatch, state.scrollPosition, state.viewportWidth, timelineWidth, startYear, endYear, shouldUseAdaptiveLayout]);
 
-  // Handle mouse drag (disabled for adaptive layout)
+  // Handle mouse drag
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    if (shouldUseAdaptiveLayout) return;
-    
     dispatch({ type: 'SET_DRAGGING', payload: true });
+    
+    if (!hasUsedDrag) {
+      setHasUsedDrag(true);
+    }
+
+    if (containerRef.current) {
     dragStartRef.current = {
-      x: e.pageX,
-      scrollLeft: containerRef.current?.scrollLeft || 0
+        x: e.pageX - containerRef.current.offsetLeft,
+        scrollLeft: containerRef.current.scrollLeft
     };
-  }, [dispatch, shouldUseAdaptiveLayout]);
+    }
+  }, [dispatch, hasUsedDrag]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     if (!state.isDragging || !containerRef.current || shouldUseAdaptiveLayout) return;
@@ -378,74 +360,61 @@ const Timeline: React.FC<TimelineProps> = ({
   }, [dispatch]);
 
   // Handle scroll with debouncing for performance (disabled for adaptive layout)
-  const handleScroll = useCallback(() => {
-    if (containerRef.current && !state.isDragging && !shouldUseAdaptiveLayout) {
-      const scrollLeft = containerRef.current.scrollLeft;
-      
-      // Empêcher le scroll forcé à droite en mode contextuel
-      if (state.contextualFilter) {
-      dispatch({ type: 'SET_SCROLL_POSITION', payload: scrollLeft });
-        return;
-      }
-      
-      // Clear existing timeout
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
-      }
-      
-      // Debounce scroll updates for better performance
-      scrollTimeoutRef.current = setTimeout(() => {
-        dispatch({ type: 'SET_SCROLL_POSITION', payload: scrollLeft });
-      }, 16); // ~60fps
-    }
-  }, [dispatch, state.isDragging, shouldUseAdaptiveLayout, state.contextualFilter]);
+  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement> | WheelEvent | TouchEvent) => {
+    const container = containerRef.current;
+    if (!container) return;
 
-  // Format zoom level for display
-  const formatZoomLevel = (zoom: number): string => {
-    // Normalize zoom level: 15 = 100%, 1 = 6.67%, 30 = 200%
-    const normalizedZoom = (zoom / 15) * 100;
-    return `${Math.round(normalizedZoom)}%`;
-  };
+    // Mettre à jour la position de scroll
+    const newPosition = container.scrollLeft;
+    if (newPosition !== state.scrollPosition) {
+      dispatch({ type: 'SET_SCROLL_POSITION', payload: newPosition });
+      
+      // Si on a scrollé horizontalement, marquer comme utilisé
+      if (newPosition > 0 && !hasScrolledHorizontally) {
+        setHasScrolledHorizontally(true);
+      }
+    }
+  }, [state.scrollPosition, dispatch, hasScrolledHorizontally]);
+
+  // Gérer le scroll avec la molette/pad
+  const handleWheel = useCallback((e: WheelEvent) => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    // Si shift + scroll ou scroll horizontal natif
+    if (e.deltaX !== 0 || e.shiftKey) {
+      container.scrollLeft += e.deltaX || e.deltaY;
+      if (container.scrollLeft > 0 && !hasScrolledHorizontally) {
+        setHasScrolledHorizontally(true);
+      }
+      e.preventDefault();
+    }
+  }, [hasScrolledHorizontally]);
+
+  // Gérer le scroll tactile et pad
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleTouch = (e: TouchEvent) => {
+      if (container.scrollLeft > 0 && !hasScrolledHorizontally) {
+        setHasScrolledHorizontally(true);
+      }
+    };
+
+    container.addEventListener('touchmove', handleTouch, { passive: true });
+    container.addEventListener('wheel', handleWheel, { passive: false });
+
+    return () => {
+      container.removeEventListener('touchmove', handleTouch);
+      container.removeEventListener('wheel', handleWheel);
+    };
+  }, [handleWheel, hasScrolledHorizontally]);
+
 
   const selectedScandal = state.selectedScandalId 
     ? filteredScandals.find(s => s.id === state.selectedScandalId) 
     : null;
-
-  // Scroll to latest scandal on initial load
-  useEffect(() => {
-    if (!initialScrollDoneRef.current && containerRef.current && scandalPositions.length > 0 && !shouldUseAdaptiveLayout) {
-      // Get the latest scandal position
-      const sortedPositions = [...scandalPositions].sort((a, b) => b.date.getTime() - a.date.getTime());
-      const latestPosition = sortedPositions[0];
-      
-      // Ne pas scroller automatiquement si on est en mode contextuel
-      if (state.contextualFilter) {
-        containerRef.current.scrollLeft = 0;
-        dispatch({ type: 'SET_SCROLL_POSITION', payload: 0 });
-      } else {
-      // Calculate scroll position to center the latest scandal
-      const viewportWidth = containerRef.current.clientWidth;
-      const targetScrollLeft = Math.max(0, latestPosition.x - (viewportWidth / 2) + (CARD_WIDTH / 2));
-      
-      // Smooth scroll to position
-      containerRef.current.scrollTo({
-        left: targetScrollLeft,
-        behavior: 'smooth'
-      });
-      
-      // Update scroll position in state
-      dispatch({ type: 'SET_SCROLL_POSITION', payload: targetScrollLeft });
-      }
-      
-      // Mark initial scroll as done
-      initialScrollDoneRef.current = true;
-    }
-  }, [scandalPositions, shouldUseAdaptiveLayout, dispatch, state.contextualFilter]);
-
-  // Reset initial scroll flag when scandals change significantly
-  useEffect(() => {
-    initialScrollDoneRef.current = false;
-  }, [state.filters, state.contextualFilter]);
 
   // Vérifie si des filtres sont actifs
   const hasActiveFilters = useMemo(() => {
@@ -496,13 +465,13 @@ const Timeline: React.FC<TimelineProps> = ({
         scrollPosition={state.scrollPosition}
         viewportWidth={state.viewportWidth}
         timelineWidth={timelineWidth}
-        splashClosedTime={splashClosedTime}
         onScrollChange={(newPosition) => {
           if (containerRef.current) {
             containerRef.current.scrollLeft = newPosition;
             dispatch({ type: 'SET_SCROLL_POSITION', payload: newPosition });
           }
         }}
+        onDragClick={() => setHasUsedDrag(true)}
       />
 
       <div className="flex flex-1 overflow-hidden relative">
@@ -612,21 +581,21 @@ const Timeline: React.FC<TimelineProps> = ({
           </div>
 
           {/* Tooltip d'aide pour le drag */}
-          <div 
-            className="absolute top-2 px-4 py-3 bg-black/90 backdrop-blur-sm rounded-xl shadow-xl text-white text-sm font-medium z-[100] border border-white/10 whitespace-nowrap pointer-events-none"
-            style={{
-              left: `${(state.scrollPosition + state.viewportWidth / 2) / timelineWidth * 100}%`,
-              transform: 'translateX(-50%)'
-            }}
-          >
-            <div className="absolute -top-1 right-3/4 -translate-x-2/3 w-2 h-2 bg-black/90 rotate-45"></div>
-            <div className="flex items-center gap-2">
-              <span className="relative flex h-2 w-2">
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-violet-500"></span>
-              </span>
-              Glissez-moi pour sroller !
+          {!showDragHelp && (
+            <div 
+              className="absolute text-xs top-1 px-4 py-1 bg-gradient-to-r from-black/90 to-gray-900/90 backdrop-blur-sm rounded-xl shadow-xl text-white font-medium z-[49] border border-white/20 whitespace-nowrap pointer-events-none animate-bounce-subtle"
+              style={{
+                left: `${(state.scrollPosition + state.viewportWidth / 2) / timelineWidth * 100}%`,
+                transform: 'translateX(-50%)'
+              }}
+            >
+              <div className="flex items-center gap-2">
+                <span className="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-violet-400 bg-[length:200%_auto] animate-gradient bg-clip-text text-transparent">
+                  Glissez-moi pour un voyage éclair !
+                </span>
+              </div>
             </div>
-          </div>
+          )}
 
         {/* Filters Panel */}
         <AnimatePresence>
@@ -667,29 +636,21 @@ const Timeline: React.FC<TimelineProps> = ({
                 paddingBottom: '100px'
               }}
             >
-              <div className="timeline-grid-bg" />
+              <ScrollHint scrollPosition={state.scrollPosition} />
+              <TimelineGrid timelineWidth={timelineWidth} />
               {/* Timeline background with grid */}
               <div 
                 className="absolute inset-0"
                 style={{ width: timelineWidth }}
               >
                 {/* Current year background */}
-                <div 
-                  className="absolute flex items-center justify-center pointer-events-none select-none"
-                  style={{
-                    left: state.scrollPosition,
-                    width: state.viewportWidth,
-                    transition: 'left 150ms ease',
-                    top: '-55px'  // Déplace l'année vers le haut
-                  }}
-                >
-                  <span className="text-[9rem] font-bold bg-gradient-to-r from-violet-200 to-pink-200 dark:from-violet-900 dark:to-pink-900 bg-clip-text text-transparent">
-                    {(() => {
-                      const yearMarkers = generateYearMarkers(startYear, endYear, timelineWidth, 1);
-                      return findNearestYearMarker(state.scrollPosition, state.viewportWidth, yearMarkers);
-                    })()}
-                  </span>
-                </div>
+                <CurrentYearDisplay
+                  startYear={startYear}
+                  endYear={endYear}
+                  timelineWidth={timelineWidth}
+                  scrollPosition={state.scrollPosition}
+                  viewportWidth={state.viewportWidth}
+                />
 
                 <TimelineAxis
                   startYear={startYear}
@@ -697,6 +658,8 @@ const Timeline: React.FC<TimelineProps> = ({
                   timelineWidth={timelineWidth}
                   zoomLevel={state.zoomLevel}
                   timelineY={TIMELINE_Y}
+                  scrollPosition={state.scrollPosition}
+                  viewportWidth={state.viewportWidth}
                 />
               </div>
 
@@ -715,13 +678,13 @@ const Timeline: React.FC<TimelineProps> = ({
                 
                 return (
                   <ScandalCard
-                    
                     key={scandal.id}
                     scandal={scandal}
-                    position={position}
-                    timelineY={TIMELINE_Y}
                     onClick={() => dispatch({ type: 'SELECT_SCANDAL', payload: scandal.id })}
                     isSelected={state.selectedScandalId === scandal.id}
+                    position={position}
+                    timelineY={TIMELINE_Y}
+                    allScandals={scandals}
                   />
                 );
               })}

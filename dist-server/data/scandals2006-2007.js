@@ -1,4 +1,4 @@
-export const scandals2006_2007 = [
+export var scandals2006_2007 = [
     {
         id: 'clearstream-proces-villepin-2006-01',
         name: 'Procès Clearstream - Dominique de Villepin',

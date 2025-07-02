@@ -1,4 +1,4 @@
-export const scandals2020_2021 = [
+export var scandals2020_2021 = [
     {
         id: 'fillon-condamnation-definitive-2020-01',
         name: 'Fillon - Condamnation définitive',

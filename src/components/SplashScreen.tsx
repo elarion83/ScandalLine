@@ -417,6 +417,18 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
                                                 }
                                             }}
                                         >
+                                            même
+                                        </motion.span>
+                                        <motion.span
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: isClosingStep1 ? 0 : 1 }}
+                                            transition={{ 
+                                                opacity: { 
+                                                    duration: 0.3,
+                                                    delay: isClosingStep1 ? 0.6 : 2.7
+                                                }
+                                            }}
+                                        >
                                             plus,
                                         </motion.span>
                                     </motion.div>
@@ -496,7 +508,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
                                     }}
                                 >
                                     <motion.p 
-                                        className="text-2xl text-gray-800 dark:text-gray-100 leading-relaxed font-medium mt-2 mb-12"
+                                        className="text-2xl text-gray-800 dark:text-gray-100 text-2xl md:text-4xl font-bold mt-2 mb-12"
                                         initial={{ opacity: 0, y: 30 }}
                                         animate={{ opacity: isClosing ? 0 : 1, y: 0 }}
                                         transition={{ 

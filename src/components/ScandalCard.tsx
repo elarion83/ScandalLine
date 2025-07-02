@@ -5,6 +5,7 @@ import { formatCurrency, cleanScandalName, formatLargeNumber, formatDate, getCat
 import { ClickablePerson, ClickableParty, ClickableStatus, ClickableType } from './ClickableElements';
 import { useTimeline } from '../contexts/TimelineContext';
 import { motion } from 'framer-motion';
+import PersonalityModal from './modals/PersonalityModal';
 
 interface ScandalCardProps {
   scandal: Scandal;
@@ -14,6 +15,7 @@ interface ScandalCardProps {
   timelineY: number;
   className?: string;
   style?: React.CSSProperties;
+  allScandals: Scandal[];
 }
 
 const ScandalCard: React.FC<ScandalCardProps> = ({ 
@@ -23,7 +25,8 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
   position,
   timelineY,
   className,
-  style
+  style,
+  allScandals
 }) => {
   const { state } = useTimeline();
   const year = new Date(scandal.startDate).getFullYear();
@@ -34,6 +37,7 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
   const [isFocused, setIsFocused] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [intersectionRatio, setIntersectionRatio] = useState(0);
+  const [selectedPerson, setSelectedPerson] = useState<string | null>(null);
 
   // Check if content should be collapsed (zoom < 67%)
   const isContentCollapsed = (state.zoomLevel / 15) * 100 < 67;
@@ -250,267 +254,271 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
   }, []);
 
   return (
-    <div
-      ref={ref}
-      className={`scandal-card absolute ${isSelected ? 'z-50' : `z-${getZIndex()}`} ${isVisible ? 'visible' : ''}`}
-      style={{
-        left: position.x,
-        top: position.y,
-        zIndex: getZIndex(),
-        '--intersection-ratio': intersectionRatio
-      } as React.CSSProperties}
-    >
-      {/* Date label */}
-      <div 
-        className={`
-          absolute text-[10px] font-medium 
-          bg-white/95 dark:bg-gray-800/95 
-          px-2 py-0.5 rounded-md 
-          shadow-sm backdrop-blur-sm
-          border border-gray-100/50 dark:border-gray-700/50
-          transition-all duration-300 ease-out
-          ${isSelected || (position.x >= state.scrollPosition && position.x <= state.scrollPosition + state.viewportWidth / 2) 
-            ? 'text-violet-600 dark:text-violet-400 min-w-[4em]' 
-            : 'text-gray-500 dark:text-gray-400 min-w-[2.5em]'
-          }
-        `}
+    <>
+      <div
+        ref={ref}
+        className={`scandal-card absolute ${isSelected ? 'z-50' : `z-${getZIndex()}`} ${isVisible ? 'visible' : ''}`}
         style={{
-          left: '50%',
-          top: -(connectionHeight + 35),
-          transform: 'translateX(-50%)'
-        }}
+          left: position.x,
+          top: position.y,
+          zIndex: getZIndex(),
+          '--intersection-ratio': intersectionRatio
+        } as React.CSSProperties}
       >
-        {isSelected || (position.x >= state.scrollPosition && position.x <= state.scrollPosition + state.viewportWidth / 2)
-          ? formatDate(scandal.startDate)
-          : formatDate(scandal.startDate).slice(0, 3)
-        }
-      </div>
-
-      {/* Connection line to timeline */}
-      <div
-        className={`absolute transition-all duration-500 ${colorScheme[getState()].line}`}
-        style={{
-          left: '50%',
-          top: -connectionHeight,
-          height: connectionHeight,
-          transform: 'translateX(-50%)'
-        }}
-      />
-      
-      {/* Anchor point on timeline */}
-      <div
-        className={`absolute rounded-full transition-all duration-500 ${colorScheme[getState()].dot}`}
-        style={{
-          left: '50%',
-          top: -(connectionHeight + (isSelected ? 15 : isHovered || isFocused ? 15 : 13)),
-          transform: 'translateX(-50%)'
-        }}
-      />
-
-      {/* Card */}
-      <div
-        className={`
-          backdrop-blur-sm bg-white/95 dark:bg-gray-800/95 rounded-xl shadow-lg transition-all duration-500 cursor-pointer
-          hover:shadow-xl hover:-translate-y-2 select-none overflow-hidden w-[320px]
-          focus:outline-none focus:ring-2 focus:ring-purple-500/50 border-2 border-t-0
-          ${isSelected 
-            ? `shadow-2xl transform -translate-y-2 scale-105 ${getCategoryColors(scandal.type).border}` 
-            : isHovered || isFocused
-            ? getCategoryColors(scandal.type).border
-            : `border-gray-200/80 dark:border-gray-700/80 ${getCategoryColors(scandal.type).darkBorder}`
+        {/* Date label */}
+        <div 
+          className={`
+            absolute text-[10px] font-medium 
+            bg-white/95 dark:bg-gray-800/95 
+            px-2 py-0.5 rounded-md 
+            shadow-sm backdrop-blur-sm
+            border border-gray-100/50 dark:border-gray-700/50
+            transition-all duration-300 ease-out
+            ${isSelected || (position.x >= state.scrollPosition && position.x <= state.scrollPosition + state.viewportWidth / 2) 
+              ? 'text-violet-600 dark:text-violet-400 min-w-[4em]' 
+              : 'text-gray-500 dark:text-gray-400 min-w-[2.5em]'
+            }
+          `}
+          style={{
+            left: '50%',
+            top: -(connectionHeight + 35),
+            transform: 'translateX(-50%)'
+          }}
+        >
+          {isSelected || (position.x >= state.scrollPosition && position.x <= state.scrollPosition + state.viewportWidth / 2)
+            ? formatDate(scandal.startDate)
+            : formatDate(scandal.startDate).slice(0, 3)
           }
-          ${(isHovered || isFocused) && !isSelected ? 'shadow-2xl -translate-y-1 scale-102' : ''}
-          ${isContentCollapsed ? 'scandal-card-collapsed' : ''}
-          relative
-        `}
-        onClick={onClick}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-        tabIndex={0}
-      >
-        {/* Bordure supérieure floue */}
-        <div className={`absolute -top-0.5 left-0 right-0 h-2 blur-[3px] ${
-          isSelected || isHovered || isFocused
-            ? getCategoryColors(scandal.type).border.replace('border-', 'bg-')
-            : getCategoryColors(scandal.type).darkBorder.replace('border-t-', 'bg-')
-        }`} />
-
-        {/* Header with gradient background */}
-        <div className="relative overflow-hidden texture-overlay">
-          <div className={`absolute inset-0 ${getCategoryColors(scandal.type).gradient}`}></div>
-          <div className="relative p-4">
-            <h3 className="font-bold text-lg text-white leading-tight">
-              {cleanScandalName(scandal.name)}
-            </h3>
-          </div>
         </div>
 
-        {/* Content Grid */}
-        <div className="p-4 grid grid-cols-2 gap-3 bg-gray-50/50 dark:bg-gray-800/50">
-          {/* Personalities */}
-          <div className="col-span-2  bg-white dark:bg-gray-700 p-3 rounded-xl shadow-sm">
-            <div className="flex items-center gap-2 mb-2">
-              <Users className="w-4 h-4 text-purple-500 dark:text-purple-400" />
-              <span className="text-xs text-gray-600 dark:text-gray-300  font-semibold">Impliqués</span>
-            </div>
-            <div className="text-sm text-gray-800 dark:text-gray-100">
-              {(scandal.personalities || []).slice(0, 2).map((person, index) => (
-                <span key={person}>
-                  <ClickablePerson 
-                    name={person}
-                    data-tour="timeline"
-                    className="cursor-pointer hover:text-purple-600 dark:hover:text-purple-400 transition-colors hover:underline decoration-purple-400/50 dark:decoration-purple-600/50"
-                  >
-                    {person}
-                  </ClickablePerson>
-                  {index < Math.min((scandal.personalities || []).length - 1, 1) && ", "}
-                </span>
-              ))}
-              {(scandal.personalities || []).length > 2 && (
-                <span className="text-gray-500 dark:text-gray-400"> et {(scandal.personalities || []).length - 2} autres</span>
-              )}
+        {/* Connection line to timeline */}
+        <div
+          className={`absolute transition-all duration-500 ${colorScheme[getState()].line}`}
+          style={{
+            left: '50%',
+            top: -connectionHeight,
+            height: connectionHeight,
+            transform: 'translateX(-50%)'
+          }}
+        />
+        
+        {/* Anchor point on timeline */}
+        <div
+          className={`absolute rounded-full transition-all duration-500 ${colorScheme[getState()].dot}`}
+          style={{
+            left: '50%',
+            top: -(connectionHeight + (isSelected ? 15 : isHovered || isFocused ? 15 : 13)),
+            transform: 'translateX(-50%)'
+          }}
+        />
+
+        {/* Card */}
+        <div
+          className={`
+            backdrop-blur-sm bg-white/95 dark:bg-gray-800/95 rounded-xl shadow-lg transition-all duration-500 cursor-pointer
+            hover:shadow-xl hover:-translate-y-2 select-none overflow-hidden w-[320px]
+            focus:outline-none focus:ring-2 focus:ring-purple-500/50 border-2 border-t-0
+            ${isSelected 
+              ? `shadow-2xl transform -translate-y-2 scale-105 ${getCategoryColors(scandal.type).border}` 
+              : isHovered || isFocused
+              ? getCategoryColors(scandal.type).border
+              : `border-gray-200/80 dark:border-gray-700/80 ${getCategoryColors(scandal.type).darkBorder}`
+            }
+            ${(isHovered || isFocused) && !isSelected ? 'shadow-2xl -translate-y-1 scale-102' : ''}
+            ${isContentCollapsed ? 'scandal-card-collapsed' : ''}
+            relative
+          `}
+          onClick={onClick}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          tabIndex={0}
+        >
+          {/* Bordure supérieure floue */}
+          <div className={`absolute -top-0.5 left-0 right-0 h-2 blur-[3px] ${
+            isSelected || isHovered || isFocused
+              ? getCategoryColors(scandal.type).border.replace('border-', 'bg-')
+              : getCategoryColors(scandal.type).darkBorder.replace('border-t-', 'bg-')
+          }`} />
+
+          {/* Header with gradient background */}
+          <div className="relative overflow-hidden texture-overlay">
+            <div className={`absolute inset-0 ${getCategoryColors(scandal.type).gradient}`}></div>
+            <div className="relative p-4">
+              <h3 className="font-bold text-lg text-white leading-tight">
+                {cleanScandalName(scandal.name)}
+              </h3>
             </div>
           </div>
 
-          {/* Stats or Description */}
-          {hasSanctions ? (
-            <div className="col-span-2 statOrDesc grid grid-cols-2 gap-3">
-              {/* Money Amount */}
-              {(scandal.moneyAmount ?? 0) > 0 && (
-                <div className="bg-white dark:bg-gray-700 p-3 rounded-xl shadow-sm">
-                  <div className="flex items-center gap-2 mb-2">
-                    <DollarSign className="w-4 h-4 text-red-500 dark:text-red-400" />
-                    <span className="text-xs text-gray-600 dark:text-gray-300 font-semibold">Concernés</span>
-                  </div>
-                  <div className="text-sm font-bold text-red-600 dark:text-red-400">
-                    <div className="flex items-center gap-1">
-                      <DollarSign className="w-3 h-3 text-red-500 dark:text-red-400" />
-                      <span className="text-xs font-medium text-red-600 dark:text-red-400">
-                        {formatLargeNumber(scandal.moneyAmount ?? 0)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Parti politique si on n'a que la somme concernée */}
-              {scandal.politicalParty && (scandal.moneyAmount ?? 0) > 0 && 
-               !(scandal.fine ?? 0) && !(scandal.prisonYears ?? 0) && !(scandal.ineligibilityYears ?? 0) && (
-                <div className="bg-white dark:bg-gray-700 p-3 rounded-xl shadow-sm">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Building2 className="w-4 h-4 text-blue-500 dark:text-blue-400" />
-                    <span className="text-xs text-gray-600 dark:text-gray-300 font-semibold">Parti</span>
-                  </div>
-                  <div className="text-sm text-gray-800 dark:text-gray-100">
-                    <ClickableParty 
-                      party={scandal.politicalParty}
-                      data-tour="timeline"
-                      className="cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors hover:underline decoration-blue-400/50 dark:decoration-blue-600/50"
-                    >
-                      {scandal.politicalParty}
-                    </ClickableParty>
-                  </div>
-                </div>
-              )}
-
-              {/* Fine */}
-              {(scandal.fine ?? 0) > 0 && (
-                <div className="bg-white dark:bg-gray-700 p-3 rounded-xl shadow-sm">
-                  <div className="flex items-center gap-2 mb-2">
-                    <DollarSign className="w-4 h-4 text-blue-500 dark:text-blue-400" />
-                    <span className="text-xs text-gray-600 dark:text-gray-300 font-semibold">Amende</span>
-                  </div>
-                  <div className="text-sm font-bold text-blue-600 dark:text-blue-400">
-                    <div className="flex items-center gap-1">
-                      <DollarSign className="w-3 h-3 text-blue-500 dark:text-blue-400" />
-                      <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
-                        {formatLargeNumber(scandal.fine ?? 0)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Prison Sentence */}
-              {(scandal.prisonYears ?? 0) > 0 && (
-                <div className="bg-white dark:bg-gray-700 p-3 rounded-xl shadow-sm">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Scale className="w-4 h-4 text-orange-500 dark:text-orange-400" />
-                    <span className="text-xs text-gray-600 dark:text-gray-300 font-semibold">Prison</span>
-                  </div>
-                  <div className="text-sm font-bold text-orange-600 dark:text-orange-400">
-                    <div className="flex items-center gap-1">
-                      <Scale className="w-3 h-3 text-orange-500 dark:text-orange-400" />
-                      <span className="text-xs font-medium text-orange-600 dark:text-orange-400">
-                        {`${scandal.prisonYears ?? 0} an${(scandal.prisonYears ?? 0) > 1 ? 's' : ''}`}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Ineligibility */}
-              {(scandal.ineligibilityYears ?? 0) > 0 && (
-                <div className="bg-white dark:bg-gray-700 p-3 rounded-xl shadow-sm">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Ban className="w-4 h-4 text-purple-500 dark:text-purple-400" />
-                    <span className="text-xs text-gray-600 dark:text-gray-300 font-semibold">Inéligibilité</span>
-                  </div>
-                  <div className="text-sm font-bold text-purple-600 dark:text-purple-400">
-                    <div className="flex items-center gap-1">
-                      <Ban className="w-3 h-3 text-purple-500 dark:text-purple-400" />
-                      <span className="text-xs font-medium text-purple-600 dark:text-purple-400">
-                        {`${scandal.ineligibilityYears ?? 0} an${(scandal.ineligibilityYears ?? 0) > 1 ? 's' : ''}`}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : (
-            // Description
-            <div className="col-span-2 statOrDesc bg-white dark:bg-gray-700 p-3 rounded-xl shadow-sm">
+          {/* Content Grid */}
+          <div className="p-4 grid grid-cols-2 gap-3 bg-gray-50/50 dark:bg-gray-800/50">
+            {/* Personalities */}
+            <div className="col-span-2 bg-white dark:bg-gray-700 p-3 pt-0 rounded-xl shadow-sm">
               <div className="flex items-center gap-2 mb-2">
-                <Tag className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                <span className="text-xs text-gray-600 dark:text-gray-300 font-semibold">Description</span>
+                <Users className="w-4 h-4 text-purple-500 dark:text-purple-400" />
+                <span className="text-xs text-gray-600 dark:text-gray-300 font-semibold">Impliqués</span>
               </div>
-              <div className="text-sm text-gray-800 dark:text-gray-100 line-clamp-3">
-                {scandal.description}
+              <div className="text-sm text-gray-800 dark:text-gray-100">
+                {(scandal.personalities || []).slice(0, 2).map((person, index) => (
+                  <span key={person}>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedPerson(person);
+                      }}
+                      className="inline-flex items-center px-2 py-1 rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-gray-700/50 dark:hover:bg-gray-600/50 text-gray-900 dark:text-gray-100 transition-colors cursor-pointer"
+                    >
+                      <Users className="w-3 h-3 mr-1 text-gray-500 dark:text-gray-400" />
+                      {person}
+                    </button>
+                    {index < Math.min((scandal.personalities || []).length - 1, 1) && " "}
+                  </span>
+                ))}
+                {(scandal.personalities || []).length > 2 && (
+                  <span className="inline-flex items-center justify-center ml-1 px-1.5 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300 rounded">
+                    +{(scandal.personalities || []).length - 2}
+                  </span>
+                )}
               </div>
             </div>
-          )}
 
-          {/* Status Badge */}
-          <div className="col-span-2 flex justify-between items-center">
-            <ClickableStatus 
-              status={scandal.status}
-              data-tour="timeline"
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm cursor-pointer hover:scale-105 transition-transform active:scale-95 ${
-                scandal.status === 'convicted' 
-                  ? 'bg-red-100 text-red-700 dark:bg-red-900/60 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800/60' 
-                  : scandal.status === 'acquitted'
-                  ? 'bg-green-100 text-green-700 dark:bg-green-900/60 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800/60'
-                  : 'bg-orange-100 text-orange-700 dark:bg-orange-900/60 dark:text-orange-300 hover:bg-orange-200 dark:hover:bg-orange-800/60'
-              }`}
-            >
-              {getStatusIcon()}
-              {scandal.status === 'convicted' ? 'Condamné' : 
-               scandal.status === 'acquitted' ? 'Acquitté' : 
-               scandal.status === 'ongoing' ? 'En cours' : 'Jugé'}
-            </ClickableStatus>
-            <ClickableType
-              type={getMainCategory(scandal.type)}
-              data-tour="timeline"
-              className="text-xs text-gray-500 dark:text-gray-400 font-medium hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-            >
-              {getCategoryLabel(getMainCategory(scandal.type))}
-            </ClickableType>
+            {/* Stats or Description */}
+            {hasSanctions ? (
+              <div className="col-span-2 statOrDesc grid grid-cols-2 gap-3">
+                {/* Money Amount */}
+                {(scandal.moneyAmount ?? 0) > 0 && (
+                  <div className="bg-red-50 dark:bg-red-900/20 p-2.5 rounded-xl border border-red-100 dark:border-red-800/30">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <DollarSign className="w-3.5 h-3.5 text-red-500 dark:text-red-400" />
+                      <span className="text-xs text-red-600 dark:text-red-400">
+                        Montant concerné
+                      </span>
+                    </div>
+                    <div className="text-sm font-bold text-red-700 dark:text-red-300">
+                      {formatLargeNumber(scandal.moneyAmount ?? 0)}
+                    </div>
+                  </div>
+                )}
+
+                {/* Fine */}
+                {(scandal.fine ?? 0) > 0 && (
+                  <div className="bg-blue-50 dark:bg-blue-900/20 p-2.5 rounded-xl border border-blue-100 dark:border-blue-800/30">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <DollarSign className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400" />
+                      <span className="text-xs text-blue-600 dark:text-blue-400">
+                        Amende
+                      </span>
+                    </div>
+                    <div className="text-sm font-bold text-blue-700 dark:text-blue-300">
+                      {formatLargeNumber(scandal.fine ?? 0)}
+                    </div>
+                  </div>
+                )}
+
+                {/* Prison Sentence */}
+                {(scandal.prisonYears ?? 0) > 0 && (
+                  <div className="bg-orange-50 dark:bg-orange-900/20 p-2.5 rounded-xl border border-orange-100 dark:border-orange-800/30">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <Scale className="w-3.5 h-3.5 text-orange-500 dark:text-orange-400" />
+                      <span className="text-xs text-orange-600 dark:text-orange-400">
+                        Prison
+                      </span>
+                    </div>
+                    <div className="text-sm font-bold text-orange-700 dark:text-orange-300">
+                      {`${scandal.prisonYears ?? 0} an${(scandal.prisonYears ?? 0) > 1 ? 's' : ''}`}
+                    </div>
+                  </div>
+                )}
+
+                {/* Ineligibility */}
+                {(scandal.ineligibilityYears ?? 0) > 0 && (
+                  <div className="bg-purple-50 dark:bg-purple-900/20 p-2.5 rounded-xl border border-purple-100 dark:border-purple-800/30">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <Ban className="w-3.5 h-3.5 text-purple-500 dark:text-purple-400" />
+                      <span className="text-xs text-purple-600 dark:text-purple-400">
+                        Inéligibilité
+                      </span>
+                    </div>
+                    <div className="text-sm font-bold text-purple-700 dark:text-purple-300">
+                      {`${scandal.ineligibilityYears ?? 0} an${(scandal.ineligibilityYears ?? 0) > 1 ? 's' : ''}`}
+                    </div>
+                  </div>
+                )}
+
+                {/* Parti politique si on n'a que la somme concernée */}
+                {scandal.politicalParty && (scandal.moneyAmount ?? 0) > 0 && 
+                 !(scandal.fine ?? 0) && !(scandal.prisonYears ?? 0) && !(scandal.ineligibilityYears ?? 0) && (
+                  <div className="bg-white dark:bg-gray-700 p-3 rounded-xl shadow-sm">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Building2 className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+                      <span className="text-xs text-gray-600 dark:text-gray-300 font-semibold">Parti</span>
+                    </div>
+                    <div className="text-sm text-gray-800 dark:text-gray-100">
+                      <ClickableParty 
+                        party={scandal.politicalParty}
+                        data-tour="timeline"
+                        className="cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors hover:underline decoration-blue-400/50 dark:decoration-blue-600/50"
+                      >
+                        {scandal.politicalParty}
+                      </ClickableParty>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              // Description
+              <div className="col-span-2 statOrDesc bg-white dark:bg-gray-700 p-3 rounded-xl shadow-sm">
+                <div className="flex items-center gap-2 mb-2">
+                  <Tag className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                  <span className="text-xs text-gray-600 dark:text-gray-300 font-semibold">Description</span>
+                </div>
+                <div className="text-sm text-gray-800 dark:text-gray-100 line-clamp-3">
+                  {scandal.description}
+                </div>
+              </div>
+            )}
+
+            {/* Status Badge */}
+            <div className="col-span-2 flex justify-between items-center">
+              <ClickableStatus 
+                status={scandal.status}
+                data-tour="timeline"
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm cursor-pointer hover:scale-105 transition-transform active:scale-95 ${
+                  scandal.status === 'convicted' 
+                    ? 'bg-red-100 text-red-700 dark:bg-red-900/60 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800/60' 
+                    : scandal.status === 'acquitted'
+                    ? 'bg-green-100 text-green-700 dark:bg-green-900/60 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800/60'
+                    : 'bg-orange-100 text-orange-700 dark:bg-orange-900/60 dark:text-orange-300 hover:bg-orange-200 dark:hover:bg-orange-800/60'
+                }`}
+              >
+                {getStatusIcon()}
+                {scandal.status === 'convicted' ? 'Condamné' : 
+                 scandal.status === 'acquitted' ? 'Acquitté' : 
+                 scandal.status === 'ongoing' ? 'En cours' : 'Jugé'}
+              </ClickableStatus>
+              <ClickableType
+                type={getMainCategory(scandal.type)}
+                data-tour="timeline"
+                className="text-xs text-gray-500 dark:text-gray-400 font-medium hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+              >
+                {getCategoryLabel(getMainCategory(scandal.type))}
+              </ClickableType>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+
+      {/* PersonalityModal */}
+      {selectedPerson && (
+        <PersonalityModal
+          name={selectedPerson}
+          onClose={() => setSelectedPerson(null)}
+          scandals={allScandals}
+        />
+      )}
+    </>
   );
 };
 

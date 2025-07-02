@@ -1,4 +1,4 @@
-export const scandals2012_2013 = [
+export var scandals2012_2013 = [
     {
         "id": "cahuzac-ministere-budget-2012-01",
         "name": "Mensonges de Cahuzac à l'Assemblée",

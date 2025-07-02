@@ -18,7 +18,8 @@ declare global {
 }
 
 const App: React.FC = () => {
-  const [showSplash, setShowSplash] = useState(true);
+  // En développement, on n'affiche pas le splash screen
+  const [showSplash, setShowSplash] = useState(import.meta.env.PROD);
   const [splashClosedTime, setSplashClosedTime] = useState<number | null>(null);
 
   const handleSplashComplete = (wantsTutorial: boolean) => {

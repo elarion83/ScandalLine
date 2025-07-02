@@ -1,4 +1,4 @@
-export const mockScandals = [
+export var mockScandals = [
     {
         id: '1',
         name: 'Affaire Cahuzac',

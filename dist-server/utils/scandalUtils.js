@@ -1,5 +1,5 @@
 // Mapping des types détaillés vers les catégories principales
-export const scandalTypeCategories = {
+export var scandalTypeCategories = {
     // Corruption et Abus de Pouvoir - Indigo
     'corruption': 'corruption',
     'emploi-fictif': 'corruption',
@@ -113,7 +113,7 @@ export const scandalTypeCategories = {
     'scandale-moral': 'ethique'
 };
 // Couleurs pour chaque catégorie principale
-export const categoryColors = {
+export var categoryColors = {
     'corruption': {
         light: {
             gradient: 'bg-gradient-to-br from-indigo-400 via-indigo-500/90 to-indigo-600/80',
@@ -197,26 +197,26 @@ export const categoryColors = {
     }
 };
 // Fonction utilitaire pour obtenir la catégorie principale d'un type détaillé
-export const getMainCategory = (detailedType) => {
+export var getMainCategory = function (detailedType) {
     // Si le type est déjà une catégorie principale, la retourner directement
     if (detailedType in categoryColors) {
         return detailedType;
     }
     // Normaliser le type pour la comparaison
-    const normalizedType = detailedType?.toLowerCase().trim() || 'ethique';
+    var normalizedType = (detailedType === null || detailedType === void 0 ? void 0 : detailedType.toLowerCase().trim()) || 'ethique';
     // Chercher dans le mapping des types détaillés
-    const mainCategory = scandalTypeCategories[normalizedType];
+    var mainCategory = scandalTypeCategories[normalizedType];
     if (mainCategory) {
         return mainCategory;
     }
     // Si aucune correspondance n'est trouvée, retourner 'ethique' comme catégorie par défaut
-    console.warn(`Type détaillé non catégorisé (${detailedType}) -> normalisé en : ${normalizedType}`);
+    console.warn("Type d\u00E9taill\u00E9 non cat\u00E9goris\u00E9 (".concat(detailedType, ") -> normalis\u00E9 en : ").concat(normalizedType));
     return 'ethique';
 };
 // Fonction pour obtenir le label d'une catégorie
-export const getCategoryLabel = (detailedType) => {
+export var getCategoryLabel = function (detailedType) {
     // Labels pour les catégories principales
-    const categoryLabels = {
+    var categoryLabels = {
         'corruption': 'Corruption et Abus de Pouvoir',
         'fraude-financiere': 'Fraude Financière',
         'manipulation-marche': 'Manipulation de Marché',
@@ -228,15 +228,15 @@ export const getCategoryLabel = (detailedType) => {
         'ethique': 'Éthique et Déontologie'
     };
     // Normaliser le type
-    const normalizedType = (detailedType?.toLowerCase().trim() || 'ethique');
+    var normalizedType = ((detailedType === null || detailedType === void 0 ? void 0 : detailedType.toLowerCase().trim()) || 'ethique');
     // Obtenir la catégorie principale
-    const mainCategory = getMainCategory(normalizedType);
+    var mainCategory = getMainCategory(normalizedType);
     // Si c'est un type détaillé qui n'est pas une catégorie principale,
     // on le formate pour l'affichage
     if (!(normalizedType in categoryColors)) {
-        const formattedType = normalizedType
+        var formattedType = normalizedType
             .split('-')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .map(function (word) { return word.charAt(0).toUpperCase() + word.slice(1); })
             .join(' ');
         return formattedType;
     }
@@ -244,8 +244,8 @@ export const getCategoryLabel = (detailedType) => {
     return categoryLabels[mainCategory];
 };
 // Fonction utilitaire pour obtenir les couleurs d'une catégorie
-export const getCategoryColors = (detailedType) => {
-    const mainCategory = getMainCategory(detailedType);
+export var getCategoryColors = function (detailedType) {
+    var mainCategory = getMainCategory(detailedType);
     // Si le type n'est pas trouvé, retourner des couleurs par défaut (gris)
     if (!mainCategory) {
         return {
@@ -258,24 +258,26 @@ export const getCategoryColors = (detailedType) => {
     }
     return categoryColors[mainCategory].light;
 };
-export const filterScandals = (scandals, filters) => {
-    return scandals.filter(scandal => {
+export var filterScandals = function (scandals, filters) {
+    return scandals.filter(function (scandal) {
         // Type filter
         if (filters.types.length > 0) {
-            const mainCategory = getMainCategory(scandal.type);
+            var mainCategory = getMainCategory(scandal.type);
             if (!mainCategory || !filters.types.includes(mainCategory)) {
                 return false;
             }
         }
         // Date range filter
-        const scandalYear = new Date(scandal.startDate).getFullYear();
+        var scandalYear = new Date(scandal.startDate).getFullYear();
         if (scandalYear < filters.dateRange.start || scandalYear > filters.dateRange.end) {
             return false;
         }
         // Personalities filter
         if (filters.personalities.length > 0) {
-            const scandalPersonalities = scandal.personalities || [];
-            const hasPersonality = scandalPersonalities.some(p => filters.personalities.some(fp => p.toLowerCase().includes(fp.toLowerCase())));
+            var scandalPersonalities = scandal.personalities || [];
+            var hasPersonality = scandalPersonalities.some(function (p) {
+                return filters.personalities.some(function (fp) { return p.toLowerCase().includes(fp.toLowerCase()); });
+            });
             if (!hasPersonality)
                 return false;
         }
@@ -295,20 +297,20 @@ export const filterScandals = (scandals, filters) => {
         return true;
     });
 };
-export const calculateStats = (scandals) => {
-    const totalMoney = scandals.reduce((sum, s) => sum + (s.moneyAmount || 0), 0);
-    const totalPrisonYears = scandals.reduce((sum, s) => sum + (s.prisonYears || 0), 0);
-    const totalFines = scandals.reduce((sum, s) => sum + (s.fine || 0), 0);
-    const byDecade = scandals.reduce((acc, scandal) => {
-        const decade = Math.floor(new Date(scandal.startDate).getFullYear() / 10) * 10;
+export var calculateStats = function (scandals) {
+    var totalMoney = scandals.reduce(function (sum, s) { return sum + (s.moneyAmount || 0); }, 0);
+    var totalPrisonYears = scandals.reduce(function (sum, s) { return sum + (s.prisonYears || 0); }, 0);
+    var totalFines = scandals.reduce(function (sum, s) { return sum + (s.fine || 0); }, 0);
+    var byDecade = scandals.reduce(function (acc, scandal) {
+        var decade = Math.floor(new Date(scandal.startDate).getFullYear() / 10) * 10;
         acc[decade] = (acc[decade] || 0) + 1;
         return acc;
     }, {});
-    const byType = scandals.reduce((acc, scandal) => {
+    var byType = scandals.reduce(function (acc, scandal) {
         acc[scandal.type] = (acc[scandal.type] || 0) + 1;
         return acc;
     }, {});
-    const byParty = scandals.reduce((acc, scandal) => {
+    var byParty = scandals.reduce(function (acc, scandal) {
         if (scandal.politicalParty) {
             acc[scandal.politicalParty] = (acc[scandal.politicalParty] || 0) + 1;
         }
@@ -316,24 +318,24 @@ export const calculateStats = (scandals) => {
     }, {});
     return {
         total: scandals.length,
-        totalMoney,
-        totalPrisonYears,
-        totalFines,
-        byDecade,
-        byType,
-        byParty
+        totalMoney: totalMoney,
+        totalPrisonYears: totalPrisonYears,
+        totalFines: totalFines,
+        byDecade: byDecade,
+        byType: byType,
+        byParty: byParty
     };
 };
-export const formatLargeNumber = (num) => {
+export var formatLargeNumber = function (num) {
     if (num >= 1000000000)
-        return `${(num / 1000000000).toFixed(1)}Md€`;
+        return "".concat((num / 1000000000).toFixed(1), "Md\u20AC");
     if (num >= 1000000)
-        return `${(num / 1000000).toFixed(1)}M€`;
+        return "".concat((num / 1000000).toFixed(1), "M\u20AC");
     if (num >= 1000)
-        return `${(num / 1000).toFixed(0)}k€`;
+        return "".concat((num / 1000).toFixed(0), "k\u20AC");
     return formatCurrency(num);
 };
-export const formatCurrency = (amount) => {
+export var formatCurrency = function (amount) {
     return new Intl.NumberFormat('fr-FR', {
         style: 'currency',
         currency: 'EUR',
@@ -341,25 +343,29 @@ export const formatCurrency = (amount) => {
         maximumFractionDigits: 0
     }).format(amount);
 };
-export const formatDate = (dateString, format) => {
-    if (format === 'MMM yyyy') {
-        const date = new Date(dateString);
-        const month = date.toLocaleDateString('fr-FR', { month: 'short' });
-        const year = date.getFullYear();
-        return `${month.charAt(0).toUpperCase()}${month.slice(1)} ${year}`;
+export var formatDate = function (dateString, format) {
+    var date = new Date(dateString);
+    var month = date.toLocaleString('fr-FR', { month: 'short' });
+    // Si on demande un format spécifique, on le respecte
+    if (format) {
+        if (format === 'MMM yyyy') {
+            return "".concat(month, " ").concat(date.getFullYear());
+        }
+        return date.toLocaleString('fr-FR', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
     }
-    return new Date(dateString).toLocaleDateString('fr-FR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
+    // Par défaut, on ne retourne que le mois
+    return month.charAt(0).toUpperCase() + month.slice(1);
 };
 /**
  * Clean scandal name by removing content in parentheses
  * @param name - The original scandal name
  * @returns The cleaned name without parentheses content
  */
-export const cleanScandalName = (name) => {
+export var cleanScandalName = function (name) {
     // Remove content in parentheses (including the parentheses)
     return name.replace(/\s*\([^)]*\)/g, '').trim();
 };
