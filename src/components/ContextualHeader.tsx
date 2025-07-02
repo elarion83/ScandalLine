@@ -3,6 +3,7 @@ import { ArrowLeft, Users, Building, Scale, FileText, Copy, Check } from 'lucide
 import { ContextualFilter } from '../types/scandal';
 import { getContextualTitle, getContextualDescription } from '../utils/contextualFilters';
 import { nameToSlug } from '../utils/shareUtils';
+import { perso_Photos } from '../data/perso_photos';
 
 interface ContextualHeaderProps {
   contextualFilter: ContextualFilter;
@@ -55,6 +56,30 @@ const ContextualHeader: React.FC<ContextualHeaderProps> = ({
     }
   };
 
+  const getPersonalityPhoto = () => {
+    if (contextualFilter.type !== 'personality') return null;
+    
+    const slug = nameToSlug(contextualFilter.value.toString());
+    const photoData = perso_Photos[0]?.[slug];
+    
+    if (photoData?.url) {
+      return (
+        <img 
+          src={photoData.url} 
+          alt={contextualFilter.value.toString()}
+          className="w-6 h-6 rounded object-cover"
+          onError={(e) => {
+            // En cas d'erreur de chargement, remplacer par l'icône
+            e.currentTarget.style.display = 'none';
+            e.currentTarget.nextElementSibling?.classList.remove('hidden');
+          }}
+        />
+      );
+    }
+    
+    return null;
+  };
+
   const handleCopyUrl = async () => {
     try {
       // Générer l'URL au format /timeline/nom
@@ -92,8 +117,17 @@ const ContextualHeader: React.FC<ContextualHeaderProps> = ({
           <div className="w-px h-8 bg-white/20" />
 
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${getColorClasses()}`}>
-              {getIcon()}
+            <div className={`p-2 rounded-lg ${getColorClasses()} relative`}>
+              {contextualFilter.type === 'personality' ? (
+                <>
+                  {getPersonalityPhoto()}
+                  <div className="hidden">
+                    {getIcon()}
+                  </div>
+                </>
+              ) : (
+                getIcon()
+              )}
             </div>
             <div>
               <h1 className="text-xl font-bold">
