@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   build: {
     target: 'es2020', // force un target moderne => plus de 'var'
-    outDir: 'dist-server', // si tu veux préciser le dossier de sortie
+    outDir: 'dist', // changement vers dist
     sourcemap: true, // optionnel, utile pour le debug
   },
   optimizeDeps: {

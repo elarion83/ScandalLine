@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const dataDir = './dist-server/data';
+const dataDir = './dist/data';
 
 // Lire tous les fichiers .js dans le dossier data
 const files = fs.readdirSync(dataDir).filter(file => file.endsWith('.js'));

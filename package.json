@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build && npm run build:data",
-    "build:data": "tsc src/data/index.ts src/data/perso_photos.ts src/data/scandals2000-2001.ts src/data/scandals2002-2003.ts src/data/scandals2004-2005.ts src/data/scandals2006-2007.ts src/data/scandals2008-2009.ts src/data/scandals2010-2011.ts src/data/scandals2012-2013.ts src/data/scandals2014-2015.ts src/data/scandals2016-2017.ts src/data/scandals2018-2019.ts src/data/scandals2020-2021.ts src/data/scandals2022-2023.ts src/data/scandals2024-2025.ts src/data/mockScandals.ts --outDir dist-server/data --target ES2022 --module ESNext --moduleResolution node --esModuleInterop && npm run fix:data-structure && npm run fix:imports",
+    "build:data": "tsc src/data/index.ts src/data/perso_photos.ts src/data/scandals2000-2001.ts src/data/scandals2002-2003.ts src/data/scandals2004-2005.ts src/data/scandals2006-2007.ts src/data/scandals2008-2009.ts src/data/scandals2010-2011.ts src/data/scandals2012-2013.ts src/data/scandals2014-2015.ts src/data/scandals2016-2017.ts src/data/scandals2018-2019.ts src/data/scandals2020-2021.ts src/data/scandals2022-2023.ts src/data/scandals2024-2025.ts src/data/mockScandals.ts --outDir dist/data --target ES2022 --module ESNext --moduleResolution node --esModuleInterop && npm run fix:data-structure && npm run fix:imports",
     "fix:data-structure": "node fix-data-structure.js",
     "fix:imports": "node fix-imports.js",
     "lint": "eslint .",

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const dataDir = './dist-server/data';
+const dataDir = './dist/data';
 const nestedDataDir = path.join(dataDir, 'data');
 
 // Vérifier si le dossier data/data existe

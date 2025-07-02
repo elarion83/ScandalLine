@@ -98,10 +98,10 @@ const createHandler = async () => {
   console.log('Initialisation du handler...');
   
   // Charger les données une seule fois
-  const { allScandals } = await import('./dist-server/data/index.js');
+  const { allScandals } = await import('./dist/data/index.js');
   console.log('allScandals chargé avec succès');
   
-  const { perso_Photos } = await import('./dist-server/data/perso_photos.js');
+  const { perso_Photos } = await import('./dist/data/perso_photos.js');
   console.log('perso_Photos chargé avec succès:', typeof perso_Photos);
 
   // Retourner le handler configuré avec les données
@@ -198,89 +198,64 @@ const createHandler = async () => {
         console.log('Premier objet photos:', perso_Photos[0]);
         console.log('URL trouvée:', photoUrl);
 
-        // Injecter les méta tags
-        const html = indexHtml
-          .replace('</head>',
-            `<meta name="description" content="${description}" />
-            <meta property="og:title" content="${title}" />
-            <meta property="og:description" content="${description}" />
-            <meta property="og:type" content="website" />
-            <meta property="og:url" content="${domain}/timeline/${slug}" />
-            <meta property="og:image" content="${photoUrl}" />
-            <meta name="twitter:card" content="summary_large_image" />
-            <meta name="twitter:title" content="${title}" />
-            <meta name="twitter:description" content="${description}" />
-            <meta name="twitter:image" content="${photoUrl}" />
-            </head>`
-          )
-          .replace('</body>',
-            `<script>
-              window.__INITIAL_DATA__ = {
-                type: 'personality',
-                value: "${name}"
-              };
-            </script>
-            </body>`
-          );
+        // Remplacer les métadonnées dans le HTML
+        let modifiedHtml = indexHtml
+          .replace(/<title>.*?<\/title>/, `<title>${title}</title>`)
+          .replace(/<meta name="description" content=".*?"/, `<meta name="description" content="${description}"`)
+          .replace(/<meta property="og:title" content=".*?"/, `<meta property="og:title" content="${title}"`)
+          .replace(/<meta property="og:description" content=".*?"/, `<meta property="og:description" content="${description}"`)
+          .replace(/<meta property="og:url" content=".*?"/, `<meta property="og:url" content="${domain}/timeline/${slug}"`)
+          .replace(/<meta property="twitter:title" content=".*?"/, `<meta property="twitter:title" content="${title}"`)
+          .replace(/<meta property="twitter:description" content=".*?"/, `<meta property="twitter:description" content="${description}"`);
 
-        // Headers pour éviter le cache
-        res.writeHead(200, {
-          'Content-Type': 'text/html',
-          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0',
-          'Surrogate-Control': 'no-store'
-        });
-        res.end(html);
+        // Ajouter l'image si elle existe
+        if (photoUrl) {
+          modifiedHtml = modifiedHtml
+            .replace(/<meta property="og:image" content=".*?"/, `<meta property="og:image" content="${photoUrl}"`)
+            .replace(/<meta property="twitter:image" content=".*?"/, `<meta property="twitter:image" content="${photoUrl}"`);
+        }
+
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        res.end(modifiedHtml);
         return;
       }
 
-      // Route par défaut : servir index.html
-      try {
-        const indexHtml = fs.readFileSync(path.join(__dirname, 'dist', 'index.html'), 'utf-8');
-        res.writeHead(200, { 'Content-Type': 'text/html' });
-        res.end(indexHtml);
-      } catch (err) {
-        console.error('Error serving index.html:', err);
-        res.writeHead(500);
-        res.end('Server Error');
-      }
+      // Pour toutes les autres routes, servir index.html (SPA)
+      const indexHtml = fs.readFileSync(path.join(__dirname, 'dist', 'index.html'), 'utf-8');
+      res.writeHead(200, { 'Content-Type': 'text/html' });
+      res.end(indexHtml);
+
     } catch (error) {
-      console.error('Erreur lors du traitement de la requête:', error);
-      res.statusCode = 500;
-      res.end('Server Error');
+      console.error('Erreur dans le handler:', error);
+      res.writeHead(500, { 'Content-Type': 'text/plain' });
+      res.end('Internal Server Error');
     }
   };
 };
 
-// En développement : créer et démarrer le serveur
-if (process.env.NODE_ENV !== 'production') {
-  const startServer = async () => {
-    try {
-      const handler = await createHandler();
-      const server = http.createServer(handler);
-      const PORT = process.env.PORT || 3000;
-      
-      server.listen(PORT, () => {
-        console.log(`Serveur démarré sur le port ${PORT}`);
-      });
-    } catch (error) {
-      console.error('Erreur lors du démarrage du serveur:', error);
-      process.exit(1);
-    }
-  };
+// Démarrer le serveur
+const startServer = async () => {
+  try {
+    const handler = await createHandler();
+    
+    const server = http.createServer(handler);
+    const port = process.env.PORT || 3000;
+    
+    server.listen(port, () => {
+      console.log(`Serveur démarré sur le port ${port}`);
+    });
+  } catch (error) {
+    console.error('Erreur lors du démarrage du serveur:', error);
+  }
+};
 
+// Démarrer le serveur si ce fichier est exécuté directement
+if (import.meta.url === `file://${process.argv[1]}`) {
   startServer();
 }
 
-// Pour Vercel : exporter le handler
+// Export pour Vercel
 export default async function handler(req, res) {
-  try {
-    const requestHandler = await createHandler();
-    return requestHandler(req, res);
-  } catch (error) {
-    console.error('Erreur lors de la création du handler:', error);
-    res.statusCode = 500;
-    res.end('Server Error');
-  }
+  const serverHandler = await createHandler();
+  return serverHandler(req, res);
 }
