@@ -581,7 +581,7 @@ const Timeline: React.FC<TimelineProps> = ({
           </div>
 
           {/* Tooltip d'aide pour le drag */}
-          {!showDragHelp && (
+          {showDragHelp && (
             <div 
               className="absolute text-xs top-1 px-4 py-1 bg-gradient-to-r from-black/90 to-gray-900/90 backdrop-blur-sm rounded-xl shadow-xl text-white font-medium z-[49] border border-white/20 whitespace-nowrap pointer-events-none animate-bounce-subtle"
               style={{
