@@ -224,10 +224,19 @@ const createHandler = async () => {
             .replace(/<meta property="twitter:image" content=".*?"/, `<meta property="twitter:image" content="${photoUrl}"`);
         }
 
+        // Injecter les données initiales dans le HTML
+        const initialData = {
+          type: 'personality',
+          value: name,
+          scandals: personalityScandals
+        };
+        
+        const dataScript = `<script>window.__INITIAL_DATA__ = ${JSON.stringify(initialData)};</script>`;
+        modifiedHtml = modifiedHtml.replace('</head>', `${dataScript}\n</head>`);
+
         console.log(`[DEBUG] Envoi de la page pour ${name}`);
         res.writeHead(200, { 'Content-Type': 'text/html' });
-        // Temporairement, servir le HTML brut sans modification pour débugger
-        res.end(indexHtml);
+        res.end(modifiedHtml);
         return;
       }
 

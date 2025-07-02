@@ -45,27 +45,21 @@ const App: React.FC = () => {
   // Si pas de données initiales du serveur, parser l'URL pour détecter un slug
   const getInitialContext = () => {
     if (initialData) {
-      console.log('🔍 Utilisation des données initiales du serveur:', initialData);
       return { type: 'personality', value: initialData.value };
     }
 
     // Parser le slug depuis l'URL si on est sur /timeline/nom
     const path = window.location.pathname;
-    console.log('🔍 Pathname actuel:', path);
     
     if (path.startsWith('/timeline/') && path !== '/timeline/') {
       const slug = path.replace('/timeline/', '');
-      console.log('🔍 Slug extrait:', slug);
       
       if (slug) {
         const name = slugToName(slug);
-        console.log('🔍 Nom converti depuis le slug:', name);
-        console.log('🔍 Création du contexte pour:', { type: 'personality', value: name });
         return { type: 'personality', value: name };
       }
     }
 
-    console.log('🔍 Aucun contexte initial détecté');
     return undefined;
   };
 

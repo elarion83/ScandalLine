@@ -6,28 +6,13 @@ export const filterTimelineBy = (
 ): Scandal[] => {
   if (!contextualFilter) return scandals;
 
-  console.log('🔍 Filtrage contextuel avec:', contextualFilter);
-
   switch (contextualFilter.type) {
     case 'personality':
-      const filtered = scandals.filter(scandal => {
-        const hasMatch = scandal.personalities?.some(person => {
-          const matches = person === contextualFilter.value.toString();
-          if (matches) {
-            console.log('🔍 Correspondance trouvée:', person, '===', contextualFilter.value);
-          }
-          return matches;
-        }) ?? false;
-        
-        if (hasMatch) {
-          console.log('🔍 Scandale inclus:', scandal.name);
-        }
-        
-        return hasMatch;
-      });
-      
-      console.log('🔍 Scandales filtrés pour', contextualFilter.value, ':', filtered.length, 'sur', scandals.length);
-      return filtered;
+      return scandals.filter(scandal => 
+        scandal.personalities?.some(person => 
+          person === contextualFilter.value.toString()
+        ) ?? false
+      );
     
     case 'party':
       return scandals.filter(scandal => 
