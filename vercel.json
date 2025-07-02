@@ -20,8 +20,12 @@
       "dest": "/dist/assets/$1"
     },
     {
-      "src": "/(.*)",
+      "src": "/timeline/(.*)",
       "dest": "/server.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/dist/$1"
     }
   ]
 } 

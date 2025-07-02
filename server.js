@@ -250,7 +250,7 @@ const startServer = async () => {
 };
 
 // Démarrer le serveur si ce fichier est exécuté directement
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && process.argv[1].endsWith('server.js')) {
   startServer();
 }
 
