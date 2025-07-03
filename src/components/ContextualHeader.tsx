@@ -121,13 +121,11 @@ const ContextualHeader: React.FC<ContextualHeaderProps> = ({
           <div className="flex items-center gap-3">
             <div className={`p-2 rounded-lg ${getColorClasses()} relative`}>
               {contextualFilter.type === 'personality' ? (
-                <>
-                  {getPersonalityPhoto()}
-                  {/* Icône de fallback qui s'affiche si pas de photo ou en cas d'erreur */}
-                  <div>
-                    {getIcon()}
-                  </div>
-                </>
+                getPersonalityPhoto() ? (
+                  getPersonalityPhoto()
+                ) : (
+                  getIcon()
+                )
               ) : (
                 getIcon()
               )}
