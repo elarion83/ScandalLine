@@ -177,6 +177,9 @@ const createHandler = async () => {
           // Sinon, utiliser l'amende générale du scandale
           return sum + (scandal.fine || 0);
         }, 0);
+        const totalPrisonYears = personalityScandals.reduce((sum, scandal) => 
+          sum + (scandal.prisonYears || 0), 0
+        );
 
         const dateRange = {
           start: Math.min(...personalityScandals.map(s => new Date(s.startDate).getFullYear())),
@@ -189,13 +192,30 @@ const createHandler = async () => {
 
         const indexHtml = fs.readFileSync(path.join(__dirname, 'dist', 'index.html'), 'utf-8');
 
-        // Construire la description
-        let description = `${personalityScandals.length} scandales entre ${dateRange.start} et ${dateRange.end}`;
-        if (totalAmount > 0) {
-          description += `. Montant total concerné : ${formatEuros(totalAmount)}`;
+        // Construire la description selon le format demandé
+        let description;
+        if (dateRange.start === dateRange.end) {
+          // Même année : "X scandales en ANNEE"
+          description = `${personalityScandals.length} scandales en ${dateRange.start}`;
+        } else {
+          // Années différentes : "X scandales de ANNEEDEBUT à ANNEEFIN"
+          description = `${personalityScandals.length} scandales de ${dateRange.start} à ${dateRange.end}`;
         }
+        
+        // Ajouter le montant total
+        if (totalAmount > 0) {
+          description += `, pour un montant de ${formatEuros(totalAmount)}`;
+        }
+        
+        // Ajouter les amendes si > 0
         if (totalFines > 0) {
-          description += `. Amendes : ${formatEuros(totalFines)}`;
+          description += `. ${formatEuros(totalFines)} amendes`;
+        }
+        
+        // Ajouter les années de prison si > 0
+        if (totalPrisonYears > 0) {
+          const prisonText = totalPrisonYears === 1 ? '1 an de prison' : `${totalPrisonYears} ans de prison`;
+          description += ` et ${prisonText}`;
         }
 
         // Récupérer l'URL de l'image

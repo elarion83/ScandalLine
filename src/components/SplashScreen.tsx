@@ -568,8 +568,9 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
                                         y: { duration: 0.2 }
                                     }}
                                 >
-                                    <motion.span
-                                        className="text-lg font-medium text-gray-700 dark:text-gray-200"
+                                    <motion.button
+                                        className="text-lg font-medium text-gray-700 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400 transition-colors cursor-pointer"
+                                        onClick={handleStartClick}
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: isClosing ? 0 : 1 }}
                                         transition={{ 
@@ -577,7 +578,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
                                         }}
                                     >
                                         Commencer
-                                    </motion.span>
+                                    </motion.button>
                                     <motion.button
                                         className="cursor-pointer text-gray-700 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
                                         onClick={handleStartClick}

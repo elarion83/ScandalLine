@@ -142,7 +142,7 @@ const ContextualHeader: React.FC<ContextualHeaderProps> = ({
           <div className="w-px h-8 bg-white/20" />
 
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${getColorClasses()} relative`}>
+            <div className={`p-1 rounded-lg ${getColorClasses()} relative`}>
               {contextualFilter.type === 'personality' ? (
                 getPersonalityPhoto() ? (
                   getPersonalityPhoto()

@@ -47,7 +47,7 @@ export const ScandalTimeline: React.FC<ScandalTimelineProps> = ({ events }) => {
             <div key={index} className="flex flex-col items-center">
               <div className={`w-4 h-4 rounded-full ${style.dot} ring-4 mb-2`} />
               <div className="text-sm font-medium text-gray-900 dark:text-white">
-                {formatDate(event.date)}
+                {formatDate(event.date, 'MMM yyyy')}
               </div>
               <div className={`text-xs ${style.text}`}>
                 {event.label}

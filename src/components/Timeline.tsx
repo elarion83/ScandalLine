@@ -270,9 +270,8 @@ const Timeline: React.FC<TimelineProps> = ({
     const currentCenter = state.scrollPosition + state.viewportWidth / 2;
     const currentCenterRatio = currentCenter / timelineWidth;
     
-    // Facteur de zoom plus agressif pour permettre un zoom plus fin
-    const zoomFactor = state.zoomLevel < 15 ? 1.5 : state.zoomLevel < 75 ? 1.4 : 1.3;
-    const newZoomLevel = Math.min(300, state.zoomLevel * zoomFactor);
+    // Zoom de 10% à chaque clic
+    const newZoomLevel = Math.min(300, state.zoomLevel * 1.10);
     dispatch({ type: 'SET_ZOOM', payload: newZoomLevel });
     
     // Preserve center position after zoom
@@ -296,9 +295,8 @@ const Timeline: React.FC<TimelineProps> = ({
     const currentCenter = state.scrollPosition + state.viewportWidth / 2;
     const currentCenterRatio = currentCenter / timelineWidth;
     
-    // Facteur de dézoom plus agressif
-    const zoomFactor = state.zoomLevel > 75 ? 1.3 : state.zoomLevel > 15 ? 1.4 : 1.5;
-    const newZoomLevel = Math.max(1.5, state.zoomLevel / zoomFactor);
+    // Dézoom de 10% à chaque clic
+    const newZoomLevel = Math.max(1.5, state.zoomLevel / 1.10);
     dispatch({ type: 'SET_ZOOM', payload: newZoomLevel });
     
     // Preserve center position after zoom
@@ -621,6 +619,7 @@ const Timeline: React.FC<TimelineProps> = ({
               onFiltersChange={(filters) => dispatch({ type: 'SET_FILTERS', payload: filters })}
               scandals={contextuallyFilteredScandals}
               onClose={() => dispatch({ type: 'TOGGLE_FILTERS' })}
+              contextualFilter={state.contextualFilter}
             />
           )}
         </AnimatePresence>

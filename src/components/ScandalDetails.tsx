@@ -260,10 +260,18 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
                             <div className="font-medium text-gray-900 dark:text-white">
                               <button
                                 onClick={() => handlePersonClick(person)}
-                                className="hover:underline hover:text-slate-600 dark:hover:text-slate-400 transition-colors cursor-pointer"
+                                className="flex items-center gap-2 hover:text-purple-600 dark:hover:text-purple-400 transition-all duration-200 cursor-pointer group"
                                 title={`Voir les détails de ${person}`}
                               >
-                                {person}
+                                <span className="group-hover:underline">{person}</span>
+                                <svg 
+                                  className="w-4 h-4 opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-200" 
+                                  fill="none" 
+                                  stroke="currentColor" 
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
                               </button>
                             </div>
                             {scandal.positions[index] && (

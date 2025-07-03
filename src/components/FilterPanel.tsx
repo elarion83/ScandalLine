@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { X, ChevronDown, ChevronUp, FileText, Building2, Users, Filter } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { FilterOptions, Scandal } from '../types/scandal';
+import { FilterOptions, Scandal, ContextualFilter } from '../types/scandal';
 import { getMainCategory, getCategoryLabel } from '../utils/scandalUtils';
 
 interface FilterPanelProps {
@@ -9,6 +9,7 @@ interface FilterPanelProps {
   onFiltersChange: (filters: FilterOptions) => void;
   scandals: Scandal[];
   onClose: () => void;
+  contextualFilter?: ContextualFilter | null;
 }
 
 const ITEMS_PER_SECTION = 6;
@@ -17,7 +18,8 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
   filters, 
   onFiltersChange, 
   scandals, 
-  onClose 
+  onClose,
+  contextualFilter
 }) => {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     types: false,
@@ -32,7 +34,12 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
       return mainCategory || 'non-categorise';
     })));
     const parties = Array.from(new Set(scandals.filter(s => s.politicalParty).map(s => s.politicalParty!)));
-    const personalities = Array.from(new Set(scandals.flatMap(s => s.personalities || [])));
+    
+    // Exclure la personnalité actuellement sélectionnée dans le filtre contextuel
+    let personalities = Array.from(new Set(scandals.flatMap(s => s.personalities || [])));
+    if (contextualFilter && contextualFilter.type === 'personality') {
+      personalities = personalities.filter(person => person !== contextualFilter.value.toString());
+    }
     
     // For each filter option, calculate how many scandals would match if only that filter was applied
     const getCountForFilter = (filterType: string, filterValue: string) => {
