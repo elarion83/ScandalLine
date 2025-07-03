@@ -47,12 +47,12 @@ app.get('/timeline/personality/:name', async (req, res) => {
     // Injecter les méta tags
     const html = indexHtml
       .replace('</head>',
-        `<meta property="og:title" content="Page Skandalz de ${name}" />
+        `<meta property="og:title" content="Page Skandal de ${name}" />
         <meta property="og:description" content="Découvrez les ${filteredScandals.length} scandales impliquant ${name} entre ${dateRange.start} et ${dateRange.end}. Montant total : ${totalMoney.toLocaleString('fr-FR')}€" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://scandalline.fr/timeline/personality/${encodeURIComponent(name)}" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Page Skandalz de ${name}" />
+        <meta name="twitter:title" content="Page Skandal de ${name}" />
         <meta name="twitter:description" content="Découvrez les ${filteredScandals.length} scandales impliquant ${name} entre ${dateRange.start} et ${dateRange.end}. Montant total : ${totalMoney.toLocaleString('fr-FR')}€" />
         </head>`
       )

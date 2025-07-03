@@ -439,7 +439,7 @@ const Timeline: React.FC<TimelineProps> = ({
             <div className="flex items-center gap-4">
               <div>
                 <h1 className="text-xl font-bold">
-                  Skandalz : Timeline globale des données
+                  Skandal : Timeline globale des données
                 </h1>
                 <span className="text-sm text-gray-300">
                   25 années d'ffaires et de controverses du paysage politique français
@@ -448,10 +448,10 @@ const Timeline: React.FC<TimelineProps> = ({
             </div>
           </div>
           
-          {/* Mobile version - show only "Skandalz" centered */}
+          {/* Mobile version - show only "Skandal" centered */}
           <div className="md:hidden flex items-center justify-center">
             <h1 className="text-xl font-bold">
-              Skandalz
+              Skandal
             </h1>
           </div>
         </div>
