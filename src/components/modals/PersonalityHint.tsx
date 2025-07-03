@@ -159,9 +159,16 @@ const PersonalityHint: React.FC<PersonalityHintProps> = ({
         </div>
 
         {/* Message */}
-        <p className="text-gray-600 dark:text-gray-300 text-center text-sm">
-          Défilez et découvrez sa timeline !
-        </p>
+        <button 
+          className="w-full mt-4 px-6 py-3 bg-gradient-to-r from-violet-500 to-pink-500 hover:from-violet-600 hover:to-pink-600 text-white font-medium rounded-xl transition-all duration-200 transform hover:scale-105 hover:shadow-lg active:scale-95 cursor-pointer"
+        >
+          <div className="flex items-center justify-center gap-2">
+            <span>Défilez et découvrez sa timeline !</span>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
+        </button>
 
         {/* Effet de brillance */}
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shine pointer-events-none" />

@@ -194,9 +194,14 @@ const PersonalityModal: React.FC<PersonalityModalProps> = ({ name, onClose, onCl
             <div className="flex justify-center">
               <button
                 onClick={handleTimelineClick}
-                className="px-6 py-3 bg-gradient-to-r from-violet-500 to-pink-500 text-white font-medium rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 ease-out"
+                className="w-full px-6 py-3 bg-gradient-to-r from-violet-500 to-pink-500 hover:from-violet-600 hover:to-pink-600 text-white font-medium rounded-xl transition-all duration-200 transform hover:scale-105 hover:shadow-lg active:scale-95 cursor-pointer"
               >
-                Voir la timeline de {name}
+                <div className="flex items-center justify-center gap-2">
+                  <span>Voir la timeline de {name}</span>
+                  <svg className="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
               </button>
             </div>
           </div>

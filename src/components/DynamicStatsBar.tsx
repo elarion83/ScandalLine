@@ -124,7 +124,7 @@ const DynamicStatsBar: React.FC<DynamicStatsBarProps> = ({
       <div 
         className="absolute top-0 bottom-0 flex items-center transition-all duration-300 ease-out"
         style={{ 
-          left: `${scrollProgress * 100}%`,
+          left: `${Math.max(3, Math.min(97, scrollProgress * 100))}%`,
           transform: 'translateX(-50%)',
           transitionProperty: isDraggingRef.current ? 'none' : 'all'
         }}

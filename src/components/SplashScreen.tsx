@@ -23,13 +23,6 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
         return () => clearTimeout(stepTimeout);
     }, []);
 
-    const handleClose = () => {
-        setIsClosing(true);
-        setTimeout(() => {
-            onComplete(false);
-        }, 1200);
-    };
-
     const handleStartClick = () => {
         setIsClosingStep1(true);
         setIsClosing(true);
@@ -47,16 +40,6 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
                 onComplete(wantsTutorial);
             }, 800);  // Attendre que l'animation de sortie du background soit terminée
         }, 500);  // Attendre que l'animation de sortie du tutorial soit terminée
-    };
-
-    // Animation de la flèche qui rebondit doucement
-    const bounceAnimation = {
-        y: [0, -10, 0],
-        transition: {
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut"
-        }
     };
 
     return (
@@ -574,7 +557,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
                             {/* Flèche de fermeture */}
                             {step === 2 && (
                                 <motion.div 
-                                    className="fixed left-0 right-0 bottom-12 flex flex-col items-center gap-4"
+                                    className="fixed left-0 right-0 bottom-6 flex flex-col items-center gap-4"
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ 
                                         opacity: isClosing ? 0 : 1,
@@ -589,14 +572,6 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
                                         className="text-lg font-medium text-gray-700 dark:text-gray-200"
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: isClosing ? 0 : 1 }}
-                                        whileInView={{
-                                            y: [-2, -8, -2],
-                                            transition: {
-                                                duration: 2,
-                                                repeat: Infinity,
-                                                ease: "easeInOut"
-                                            }
-                                        }}
                                         transition={{ 
                                             opacity: { duration: 0.5, delay: 5 }
                                         }}
@@ -606,14 +581,6 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
                                     <motion.button
                                         className="cursor-pointer text-gray-700 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
                                         onClick={handleStartClick}
-                                        whileInView={{
-                                            y: [-2, -12, -2],
-                                            transition: {
-                                                duration: 2,
-                                                repeat: Infinity,
-                                                ease: "easeInOut"
-                                            }
-                                        }}
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: isClosing ? 0 : 1 }}
                                         transition={{ 
