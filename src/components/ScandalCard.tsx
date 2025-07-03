@@ -6,6 +6,8 @@ import { ClickablePerson, ClickableParty, ClickableStatus, ClickableType } from 
 import { useTimeline } from '../contexts/TimelineContext';
 import { motion } from 'framer-motion';
 import PersonalityModal from './modals/PersonalityModal';
+import { perso_Photos } from '../data/perso_photos';
+import { nameToSlug } from '../utils/shareUtils';
 
 interface ScandalCardProps {
   scandal: Scandal;
@@ -71,6 +73,33 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
       case 'acquitted': return <BadgeCheck className="w-4 h-4" />;
       default: return <Timer className="w-4 h-4" />;
     }
+  };
+
+  // Function to get personality photo or fallback to icon
+  const getPersonalityPhoto = (personName: string) => {
+    const slug = nameToSlug(personName);
+    const photoData = (perso_Photos[0] as any)?.[slug];
+    
+    // Debug: log pour voir ce qui se passe
+    console.log('Personality photo lookup:', { personName, slug, photoData });
+    
+    if (photoData?.url) {
+      return (
+        <img 
+          src={photoData.url} 
+          alt={personName}
+          className="w-4 h-4 rounded object-cover"
+          onError={(e) => {
+            // En cas d'erreur de chargement, remplacer par l'icône
+            console.log('Photo load error for:', personName);
+            e.currentTarget.style.display = 'none';
+            e.currentTarget.nextElementSibling?.classList.remove('hidden');
+          }}
+        />
+      );
+    }
+    
+    return null;
   };
   
   // Get color scheme based on scandal type
@@ -360,24 +389,32 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
                 <Users className="w-4 h-4 text-purple-500 dark:text-purple-400" />
                 <span className="text-xs text-gray-600 dark:text-gray-300 font-semibold">Impliqués</span>
               </div>
-              <div className="text-sm text-gray-800 dark:text-gray-100">
+              <div className="flex flex-wrap gap-2 text-sm text-gray-800 dark:text-gray-100">
                 {(scandal.personalities || []).slice(0, 2).map((person, index) => (
-                  <span key={person}>
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedPerson(person);
-                      }}
-                      className="inline-flex items-center px-2 py-1 rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-gray-700/50 dark:hover:bg-gray-600/50 text-gray-900 dark:text-gray-100 transition-colors cursor-pointer"
-                    >
-                      <Users className="w-3 h-3 mr-1 text-gray-500 dark:text-gray-400" />
-                      {person}
-                    </button>
-                    {index < Math.min((scandal.personalities || []).length - 1, 1) && " "}
-                  </span>
+                  <button 
+                    key={person}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedPerson(person);
+                    }}
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700/50 dark:hover:bg-gray-600/50 text-gray-900 dark:text-gray-100 transition-colors cursor-pointer shadow-sm hover:shadow-md"
+                  >
+                    {/* Photo de la personnalité ou icône de fallback */}
+                    {getPersonalityPhoto(person) ? (
+                      <>
+                        {getPersonalityPhoto(person)}
+                        <div className="hidden">
+                          <Users className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                        </div>
+                      </>
+                    ) : (
+                      <Users className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                    )}
+                    <span className="text-sm font-medium">{person}</span>
+                  </button>
                 ))}
                 {(scandal.personalities || []).length > 2 && (
-                  <span className="inline-flex items-center justify-center ml-1 px-1.5 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300 rounded">
+                  <span className="inline-flex items-center justify-center px-2 py-2 text-xs font-medium bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300 rounded-lg shadow-sm">
                     +{(scandal.personalities || []).length - 2}
                   </span>
                 )}

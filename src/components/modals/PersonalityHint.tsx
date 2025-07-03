@@ -47,7 +47,26 @@ const PersonalityHint: React.FC<PersonalityHintProps> = ({
     return photoData?.url || null;
   };
 
+  // Récupérer le dernier poste connu de la personne
+  const getCurrentPosition = (personName: string) => {
+    // Trier les scandales par date décroissante
+    const sortedScandals = [...allScandals].sort((a, b) => 
+      new Date(b.startDate) - new Date(a.startDate)
+    );
+
+    // Trouver le dernier scandale où la personne a un poste
+    for (const scandal of sortedScandals) {
+      const personIndex = scandal.personalities?.indexOf(personName);
+      if (personIndex !== -1 && scandal.positions && scandal.positions[personIndex]) {
+        return scandal.positions[personIndex];
+      }
+    }
+
+    return ''; // Retourner une chaîne vide si aucun poste trouvé
+  };
+
   const personPhoto = getPersonPhoto();
+  const currentPosition = getCurrentPosition(contextualFilter.value.toString());
 
   // Calculer les statistiques
   const personalityFilter = contextualFilter;
@@ -87,7 +106,7 @@ const PersonalityHint: React.FC<PersonalityHintProps> = ({
               {contextualFilter.value}
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Timeline personnalisée
+              {currentPosition || 'Timeline personnalisée'}
             </p>
           </div>
         </div>

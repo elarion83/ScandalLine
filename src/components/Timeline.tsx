@@ -47,7 +47,10 @@ const Timeline: React.FC<TimelineProps> = ({
   const dragStartRef = useRef({ x: 0, scrollLeft: 0 });
   const scrollTimeoutRef = useRef<NodeJS.Timeout>();
   const initialScrollDoneRef = useRef(false);
-  const [showDragHelp, setShowDragHelp] = useState(true);
+  const [showDragHelp, setShowDragHelp] = useState(() => {
+    // Vérifier si l'utilisateur a déjà vu la tooltip
+    return localStorage.getItem('hasSeenDragHelp') !== 'true';
+  });
   const [hasUsedDrag, setHasUsedDrag] = useState(false);
   const [showScrollHint, setShowScrollHint] = useState(true);
   const [hasScrolledHorizontally, setHasScrolledHorizontally] = useState(false);
@@ -104,10 +107,14 @@ const Timeline: React.FC<TimelineProps> = ({
 
   // Gérer l'affichage initial de la modal d'aide
   useEffect(() => {
-    if (hasUsedDrag) {
+    // Masquer la tooltip si l'utilisateur a utilisé le drag OU s'il a scrollé à plus de 20%
+    const scrollProgress = state.scrollPosition / (timelineWidth - state.viewportWidth);
+    if (hasUsedDrag || scrollProgress > 0.2) {
       setShowDragHelp(false);
+      // Sauvegarder dans le localStorage pour ne plus afficher la tooltip
+      localStorage.setItem('hasSeenDragHelp', 'true');
     }
-  }, [hasUsedDrag]);
+  }, [hasUsedDrag, state.scrollPosition, timelineWidth, state.viewportWidth]);
 
   // Scroll to top when timeline opens
   useEffect(() => {

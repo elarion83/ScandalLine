@@ -35,7 +35,26 @@ const PersonalityModal: React.FC<PersonalityModalProps> = ({ name, onClose, onCl
     return photoData?.url || null;
   };
 
+  // Récupérer le dernier poste connu de la personne
+  const getCurrentPosition = (personName: string) => {
+    // Trier les scandales par date décroissante
+    const sortedScandals = [...allScandals].sort((a, b) => 
+      new Date(b.startDate) - new Date(a.startDate)
+    );
+
+    // Trouver le dernier scandale où la personne a un poste
+    for (const scandal of sortedScandals) {
+      const personIndex = scandal.personalities?.indexOf(personName);
+      if (personIndex !== -1 && scandal.positions && scandal.positions[personIndex]) {
+        return scandal.positions[personIndex];
+      }
+    }
+
+    return ''; // Retourner une chaîne vide si aucun poste trouvé
+  };
+
   const personPhoto = getPersonPhoto();
+  const currentPosition = getCurrentPosition(name);
 
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
@@ -103,9 +122,16 @@ const PersonalityModal: React.FC<PersonalityModalProps> = ({ name, onClose, onCl
                   <Users className="w-8 h-8 text-gray-500 dark:text-gray-400" />
                 </div>
               )}
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                {name}
-              </h2>
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {name}
+                </h2>
+                {currentPosition && (
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    {currentPosition}
+                  </p>
+                )}
+              </div>
             </div>
             <button
               onClick={onClose}
