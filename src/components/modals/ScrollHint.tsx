@@ -44,24 +44,8 @@ const ScrollHint: React.FC<ScrollHintProps> = ({ show = true, scrollPosition = 0
         {/* Icône décorative */}
         <motion.div 
           className="w-12 h-12 rounded-full bg-gradient-to-r from-violet-500 to-pink-500 flex items-center justify-center mx-auto"
-          animate={{ 
-            scale: [1, 1.1, 1],
-          }}
-          transition={{ 
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
         >
           <motion.div
-            animate={{ 
-              x: [0, 8, 0],
-            }}
-            transition={{ 
-              duration: 1.5,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
             className="text-white text-2xl font-bold"
           >
             →

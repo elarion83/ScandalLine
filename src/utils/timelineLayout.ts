@@ -9,12 +9,7 @@ export interface ScandalPosition {
   date: Date;
 }
 
-export interface TimelineGap {
-  startYear: number;
-  endYear: number;
-  x: number;
-  width: number;
-}
+
 
 export const CARD_WIDTH = 280;
 export const CARD_HEIGHT = 180;
@@ -24,116 +19,39 @@ export const MIN_VERTICAL_SPACING = 40;
 export const MIN_HORIZONTAL_SPACING = 40;
 export const TRACK_HEIGHT = CARD_HEIGHT + MIN_VERTICAL_SPACING;
 export const BASE_PIXELS_PER_YEAR = 150;
-export const MIN_GAP_YEARS = 6; // Minimum years to show a gap
-export const GAP_VISUAL_WIDTH = 120; // Fixed width for gap visual element
+
 
 // Check if timeline needs scrolling (more than one affair)
 export const needsScrolling = (scandals: Scandal[]): boolean => {
   return scandals.length > 1;
 };
 
-// Detect significant gaps in timeline
-export const detectTimelineGaps = (scandals: Scandal[]): TimelineGap[] => {
-  if (scandals.length <= 1) return [];
 
-  const sortedScandals = [...scandals].sort((a, b) => 
-    new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
-  );
 
-  const gaps: TimelineGap[] = [];
-  
-  for (let i = 0; i < sortedScandals.length - 1; i++) {
-    const currentYear = new Date(sortedScandals[i].startDate).getFullYear();
-    const nextYear = new Date(sortedScandals[i + 1].startDate).getFullYear();
-    const yearDiff = nextYear - currentYear;
-    
-    if (yearDiff >= MIN_GAP_YEARS) {
-      gaps.push({
-        startYear: currentYear + 1,
-        endYear: nextYear - 1,
-        x: 0, // Will be calculated later
-        width: GAP_VISUAL_WIDTH
-      });
-    }
-  }
-  
-  return gaps;
-};
-
-// Calculate optimized timeline width considering gaps
+// Calculate optimized timeline width
 export const calculateOptimizedTimelineWidth = (
   scandals: Scandal[],
   startYear: number,
   endYear: number,
   zoomLevel: number
-): { width: number; gaps: TimelineGap[] } => {
+): { width: number } => {
   if (scandals.length === 0) {
     return { 
-      width: Math.max(800, window.innerWidth || 1200), 
-      gaps: [] 
+      width: Math.max(800, window.innerWidth || 1200)
     };
   }
 
   if (scandals.length === 1) {
     // Single affair - minimal width, no scrolling needed
     return { 
-      width: Math.max(800, window.innerWidth || 1200), 
-      gaps: [] 
+      width: Math.max(800, window.innerWidth || 1200)
     };
   }
 
-  const gaps = detectTimelineGaps(scandals);
-  
-  if (gaps.length === 0) {
-    // No significant gaps - use normal calculation
-    const yearSpan = endYear - startYear;
-    return { 
-      width: Math.max(1400, yearSpan * BASE_PIXELS_PER_YEAR * zoomLevel),
-      gaps: []
-    };
-  }
-
-  // Calculate compressed timeline width
-  let totalWidth = 0;
-  let currentX = 200; // Starting padding
-  const updatedGaps: TimelineGap[] = [];
-  
-  const sortedScandals = [...scandals].sort((a, b) => 
-    new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
-  );
-
-  for (let i = 0; i < sortedScandals.length; i++) {
-    const currentYear = new Date(sortedScandals[i].startDate).getFullYear();
-    
-    if (i > 0) {
-      const prevYear = new Date(sortedScandals[i - 1].startDate).getFullYear();
-      const yearDiff = currentYear - prevYear;
-      
-      if (yearDiff >= MIN_GAP_YEARS) {
-        // Add gap visual element
-        updatedGaps.push({
-          startYear: prevYear + 1,
-          endYear: currentYear - 1,
-          x: currentX,
-          width: GAP_VISUAL_WIDTH
-        });
-        currentX += GAP_VISUAL_WIDTH + MIN_HORIZONTAL_SPACING;
-      } else {
-        // Normal spacing for close years
-        currentX += Math.max(MIN_HORIZONTAL_SPACING * 2, yearDiff * 30);
-      }
-    }
-    
-    // Add space for the scandal card
-    currentX += CARD_WIDTH + MIN_HORIZONTAL_SPACING;
-  }
-  
-  // Add final padding
-  totalWidth = currentX + 200;
-  
+  // Use normal calculation
+  const yearSpan = endYear - startYear;
   return { 
-    width: Math.max(1400, totalWidth),
-    gaps: updatedGaps
+    width: Math.max(1400, yearSpan * BASE_PIXELS_PER_YEAR * zoomLevel)
   };
 };
 
@@ -159,10 +77,9 @@ export const getXPositionForDate = (
   return Math.max(CARD_WIDTH / 2, Math.min(timelineWidth - CARD_WIDTH / 2, yearProgress * timelineWidth));
 };
 
-// Calculate optimized positions considering gaps
+// Calculate optimized positions
 export const calculateOptimizedScandalPositions = (
-  scandals: Scandal[],
-  gaps: TimelineGap[]
+  scandals: Scandal[]
 ): ScandalPosition[] => {
   if (scandals.length === 0) return [];
   
@@ -200,13 +117,8 @@ export const calculateOptimizedScandalPositions = (
       const prevYear = new Date(sortedScandals[i - 1].startDate).getFullYear();
       const yearDiff = currentYear - prevYear;
       
-      if (yearDiff >= MIN_GAP_YEARS) {
-        // Jump over the gap
-        currentX += GAP_VISUAL_WIDTH + MIN_HORIZONTAL_SPACING;
-      } else {
-        // Normal spacing
-        currentX += Math.max(MIN_HORIZONTAL_SPACING * 2, yearDiff * 30);
-      }
+      // Normal spacing based on year difference
+      currentX += Math.max(MIN_HORIZONTAL_SPACING * 2, yearDiff * 30);
     }
     
     const x = currentX;

@@ -21,7 +21,7 @@ import {
 import { useTimeline } from '../contexts/TimelineContext';
 import ScandalCard from './ScandalCard';
 import TimelineAxis from './TimelineAxis';
-import TimelineGaps from './TimelineGaps';
+
 import FilterPanel from './FilterPanel';
 import StatsPanel from './StatsPanel';
 import ScandalDetails from './ScandalDetails';
@@ -73,17 +73,17 @@ const Timeline: React.FC<TimelineProps> = ({
   const shouldUseAdaptiveLayout = false;
   
   // Calculate timeline dimensions based on adaptive behavior
-  const { timelineWidth, gaps, scandalPositions } = useMemo(() => {
+  const { timelineWidth, scandalPositions } = useMemo(() => {
     if (shouldUseAdaptiveLayout) {
       // Single affair or no affairs - use optimized layout
-      const { width, gaps } = calculateOptimizedTimelineWidth(filteredScandals, startYear, endYear, state.zoomLevel);
-      const positions = calculateOptimizedScandalPositions(filteredScandals, gaps);
-      return { timelineWidth: width, gaps, scandalPositions: positions };
+      const { width } = calculateOptimizedTimelineWidth(filteredScandals, startYear, endYear, state.zoomLevel);
+      const positions = calculateOptimizedScandalPositions(filteredScandals, []);
+      return { timelineWidth: width, scandalPositions: positions };
     } else {
       // Multiple affairs - use standard layout
       const width = calculateTimelineWidth(startYear, endYear, state.zoomLevel);
       const positions = calculateScandalPositions(filteredScandals, startYear, endYear, width);
-      return { timelineWidth: width, gaps: [], scandalPositions: positions };
+      return { timelineWidth: width, scandalPositions: positions };
     }
   }, [filteredScandals, startYear, endYear, state.zoomLevel, shouldUseAdaptiveLayout]);
 
@@ -686,13 +686,7 @@ const Timeline: React.FC<TimelineProps> = ({
                 />
               </div>
 
-              {/* Timeline Gaps */}
-              {gaps.length > 0 && (
-                <TimelineGaps
-                  gaps={gaps}
-                  timelineY={TIMELINE_Y}
-                />
-              )}
+
 
               {/* Scandal Cards */}
               {visibleScandalPositions.map((position) => {
