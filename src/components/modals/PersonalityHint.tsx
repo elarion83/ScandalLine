@@ -85,8 +85,8 @@ const PersonalityHint: React.FC<PersonalityHintProps> = ({
       }}
     >
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 max-w-md mx-4 relative overflow-hidden">
-        {/* Photo et nom de la personne */}
-        <div className="flex items-center gap-4 mb-4">
+        {/* Photo et nom de la personne - masqués sur mobile */}
+        <div className="hidden md:flex items-center gap-4 mb-4">
           {personPhoto ? (
             <img 
               src={personPhoto} 

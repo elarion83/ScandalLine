@@ -82,6 +82,28 @@ const ContextualHeader: React.FC<ContextualHeaderProps> = ({
     return null;
   };
 
+  // Récupérer le dernier poste connu de la personne
+  const getCurrentPosition = (personName: string) => {
+    // Trier les scandales par date décroissante
+    const sortedScandals = [...filteredScandals].sort((a, b) => 
+      new Date(b.startDate) - new Date(a.startDate)
+    );
+
+    // Trouver le dernier scandale où la personne a un poste
+    for (const scandal of sortedScandals) {
+      const personIndex = scandal.personalities?.indexOf(personName);
+      if (personIndex !== -1 && scandal.positions && scandal.positions[personIndex]) {
+        return scandal.positions[personIndex];
+      }
+    }
+
+    return ''; // Retourner une chaîne vide si aucun poste trouvé
+  };
+
+  const currentPosition = contextualFilter.type === 'personality' 
+    ? getCurrentPosition(contextualFilter.value.toString())
+    : '';
+
   const handleCopyUrl = async () => {
     try {
       // Générer l'URL au format /timeline/nom
@@ -105,8 +127,9 @@ const ContextualHeader: React.FC<ContextualHeaderProps> = ({
   };
 
   return (
-    <div className="texture-overlay bg-gradient-to-r from-gray-800 to-gray-900 text-white px-6 py-4 border-b border-gray-700">
-      <div className="flex items-center justify-between">
+    <div className="texture-overlay bg-gradient-to-r from-gray-800 to-gray-900 text-white px-6 py-4 md:py-4 py-1 border-b border-gray-700">
+      {/* Desktop version */}
+      <div className="hidden md:flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button
             onClick={onBack}
@@ -158,6 +181,57 @@ const ContextualHeader: React.FC<ContextualHeaderProps> = ({
             </>
           )}
         </button>
+      </div>
+
+      {/* Mobile version - 3 colonnes */}
+      <div className="md:hidden grid grid-cols-[auto_1fr_auto] items-center gap-2">
+        {/* Colonne 1: Photo/Icone */}
+        <div className="flex justify-center">
+          <div className={`p-1.5 rounded-lg ${getColorClasses()} relative`}>
+            {contextualFilter.type === 'personality' ? (
+              getPersonalityPhoto() ? (
+                getPersonalityPhoto()
+              ) : (
+                getIcon()
+              )
+            ) : (
+              getIcon()
+            )}
+          </div>
+        </div>
+
+        {/* Colonne 2: Nom et dernier poste */}
+        <div className="flex flex-col items-start text-left px-2">
+          <h1 className="text-lg font-bold">
+            {getContextualTitle(contextualFilter)}
+          </h1>
+          <p className="text-sm text-gray-300">
+            {currentPosition || `${filteredCount} affaires • ${totalMoney.toLocaleString('fr-FR')}€`}
+          </p>
+        </div>
+
+        {/* Colonne 3: Boutons retour et partage */}
+        <div className="flex flex-col items-center gap-1">
+          <button
+            onClick={onBack}
+            className="w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
+            title="Retour"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </button>
+          
+          <button
+            onClick={handleCopyUrl}
+            className="w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
+            title="Copier l'URL"
+          >
+            {copied ? (
+              <Check className="w-4 h-4 text-green-400" />
+            ) : (
+              <Copy className="w-4 h-4" />
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -435,8 +435,9 @@ const Timeline: React.FC<TimelineProps> = ({
     <div className="flex flex-col h-full">
       {/* Main Header */}
       {!state.contextualFilter ? (
-        <div className="texture-overlay bg-gradient-to-r from-gray-800 to-gray-900 text-white px-6 py-4 border-b border-gray-700">
-          <div className="flex items-center justify-between">
+        <div className="texture-overlay bg-gradient-to-r from-gray-800 to-gray-900 text-white px-6 py-4 md:py-4 py-2 border-b border-gray-700">
+          {/* Desktop version - show full header */}
+          <div className="hidden md:flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div>
                 <h1 className="text-xl font-bold">
@@ -447,6 +448,13 @@ const Timeline: React.FC<TimelineProps> = ({
                 </span>
               </div>
             </div>
+          </div>
+          
+          {/* Mobile version - show only "Skandalz" centered */}
+          <div className="md:hidden flex items-center justify-center">
+            <h1 className="text-xl font-bold">
+              Skandalz
+            </h1>
           </div>
         </div>
       ) : (
