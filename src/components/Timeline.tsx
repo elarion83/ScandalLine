@@ -490,7 +490,7 @@ const Timeline: React.FC<TimelineProps> = ({
 
       <div className="flex flex-1 overflow-hidden relative">
           <div 
-            className={`timeline-controls ${state.showFilters ? 'filters-open' : ''} ${state.showStats ? 'stats-open' : ''} fixed bottom-0 left-1/2 transform -translate-x-1/2 mb-4`} 
+            className={`timeline-controls ${state.showFilters ? 'filters-open' : ''} ${state.showStats ? 'stats-open' : ''} fixed bottom-0 left-1/2 transform -translate-x-1/2 mb-8 md:mb-0`} 
             style={{ zIndex: 50 }}
           >
                 {/* Container principal */}
