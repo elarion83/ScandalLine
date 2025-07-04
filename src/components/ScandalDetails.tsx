@@ -69,33 +69,33 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
   return (
     <>
       <div 
-        className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4"
+        className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-2 md:p-4"
         onClick={handleOverlayClick}
         style={{zIndex: 60}}
       >
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-lg md:rounded-2xl shadow-2xl w-full max-w-4xl max-h-[95vh] md:max-h-[90vh] overflow-hidden">
           {/* Header Sticky */}
-          <div className={`sticky top-0 z-10 ${getCategoryColors(scandal.type).gradient} texture-overlay text-white p-4 border-b border-gray-200/50 dark:border-gray-700/50`}>
-            <div className="flex items-start justify-between gap-4">
+          <div className={`sticky top-0 z-10 ${getCategoryColors(scandal.type).gradient} texture-overlay text-white p-3 md:p-4 border-b border-gray-200/50 dark:border-gray-700/50`}>
+            <div className="flex items-start justify-between gap-3 md:gap-4">
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-3">
+                <div className="flex items-center gap-2 mb-2 md:mb-3">
                   {scandal.region && (
-                    <span className="flex items-center gap-1.5 ml-5 px-2 py-1 text-sm font-medium bg-white/20 rounded-md">
+                    <span className="flex items-center gap-1.5 ml-2 md:ml-5 px-2 py-1 text-xs md:text-sm font-medium bg-white/20 rounded-md">
                       <MapPin className="w-3 h-3" />
                       {scandal.region}
                     </span>
                   )}
                 </div>
 
-                <h2 className="text-2xl font-bold ml-5 text-white mb-3 mt-0">
+                <h2 className="text-lg md:text-2xl font-bold ml-2 md:ml-5 text-white mb-2 md:mb-3 mt-0">
                   {cleanScandalName(scandal.name)}
                 </h2>
 
-                <div className="flex flex-wrap items-center ml-5 gap-2">
+                <div className="flex flex-wrap items-center ml-2 md:ml-5 gap-2">
                   <ClickableType 
                     type={scandal.type}
                     onFilter={onClose}
-                    className="flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium shadow-sm bg-white/20"
+                    className="flex items-center gap-1.5 px-2 md:px-3 py-1 rounded-full text-xs md:text-sm font-medium shadow-sm bg-white/20"
                   >
                     <Tag className="w-3 h-3" />
                     {getCategoryLabel(scandal.type)}
@@ -107,25 +107,25 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
                 {/*<ShareMenu scandal={scandal} />*/}
                 <button
                   onClick={onClose}
-                    className="p-2 rounded-lg hover:bg-white/20 transition-colors"
+                    className="p-1.5 md:p-2 rounded-lg hover:bg-white/20 transition-colors"
                     title="Fermer (Échap)"
                 >
-                    <X className="w-8 h-8 text-white" />
+                    <X className="w-6 h-6 md:w-8 md:h-8 text-white" />
                 </button>
               </div>
             </div>
           </div>
 
           {/* Contenu Scrollable */}
-          <div className="overflow-y-auto max-h-[calc(90vh-12rem)]">
-            <div className="p-6 space-y-6">
+          <div className="overflow-y-auto max-h-[calc(95vh-8rem)] md:max-h-[calc(90vh-12rem)]">
+            <div className="p-3 md:p-6 space-y-3 md:space-y-6">
               {/* Description en premier */}
               <ScandalModalSection 
                 title="Description" 
                 icon={FileText}
-                className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-2 border-gray-300 dark:border-gray-700/50"
+                className="bg-white dark:bg-gray-800 p-3 md:p-6 rounded-lg md:rounded-xl border border-gray-200 dark:border-gray-700/50"
               >
-                <div className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+                <div className="text-base md:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
                   {scandal.description}
                 </div>
               </ScandalModalSection>
@@ -135,11 +135,11 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
                 <ScandalModalSection 
                   title="Faits & Sanctions" 
                   icon={Scale}
-                  className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-100 dark:border-gray-700/50"
+                  className="bg-white dark:bg-gray-800 p-3 md:p-6 rounded-lg md:rounded-xl border border-gray-100 dark:border-gray-700/50"
                 >
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                     {scandal.status && (
-                      <div className={`p-4 rounded-xl border ${
+                      <div className={`p-3 md:p-4 rounded-lg md:rounded-xl border ${
                         scandal.status === 'convicted' ? 'bg-red-50 dark:bg-red-900/20 border-red-100 dark:border-red-800/30' :
                         scandal.status === 'acquitted' ? 'bg-green-50 dark:bg-green-900/20 border-green-100 dark:border-green-800/30' :
                         'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-100 dark:border-yellow-800/30'
@@ -148,7 +148,7 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
                           {scandal.status === 'convicted' ? <AlertTriangle className="w-4 h-4 text-red-500 dark:text-red-400" /> :
                            scandal.status === 'acquitted' ? <BadgeCheck className="w-4 h-4 text-green-500 dark:text-green-400" /> :
                            <Timer className="w-4 h-4 text-yellow-500 dark:text-yellow-400" />}
-                          <span className={`text-sm ${
+                          <span className={`text-xs md:text-sm ${
                             scandal.status === 'convicted' ? 'text-red-600 dark:text-red-400' :
                             scandal.status === 'acquitted' ? 'text-green-600 dark:text-green-400' :
                             'text-yellow-600 dark:text-yellow-400'
@@ -156,7 +156,7 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
                             Statut
                           </span>
                         </div>
-                        <div className={`text-xl font-bold ${
+                        <div className={`text-lg md:text-xl font-bold ${
                           scandal.status === 'convicted' ? 'text-red-700 dark:text-red-300' :
                           scandal.status === 'acquitted' ? 'text-green-700 dark:text-green-300' :
                           'text-yellow-700 dark:text-yellow-300'
@@ -169,56 +169,56 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
                     )}
 
                     {(scandal.moneyAmount ?? 0) > 0 && (
-                      <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-xl border border-red-100 dark:border-red-800/30">
+                      <div className="bg-red-50 dark:bg-red-900/20 p-3 md:p-4 rounded-lg md:rounded-xl border border-red-100 dark:border-red-800/30">
                         <div className="flex items-center gap-2 mb-2">
                           <DollarSign className="w-4 h-4 text-red-500 dark:text-red-400" />
-                          <span className="text-sm text-red-600 dark:text-red-400">
+                          <span className="text-xs md:text-sm text-red-600 dark:text-red-400">
                             Montant concerné
                           </span>
                         </div>
-                        <div className="text-xl font-bold text-red-700 dark:text-red-300">
+                        <div className="text-lg md:text-xl font-bold text-red-700 dark:text-red-300">
                           {formatLargeNumber(scandal.moneyAmount ?? 0)}
                         </div>
                       </div>
                     )}
 
                     {(scandal.fine ?? 0) > 0 && (
-                      <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800/30">
+                      <div className="bg-blue-50 dark:bg-blue-900/20 p-3 md:p-4 rounded-lg md:rounded-xl border border-blue-100 dark:border-blue-800/30">
                         <div className="flex items-center gap-2 mb-2">
                           <DollarSign className="w-4 h-4 text-blue-500 dark:text-blue-400" />
-                          <span className="text-sm text-blue-600 dark:text-blue-400">
+                          <span className="text-xs md:text-sm text-blue-600 dark:text-blue-400">
                             Amende
                           </span>
                         </div>
-                        <div className="text-xl font-bold text-blue-700 dark:text-blue-300">
+                        <div className="text-lg md:text-xl font-bold text-blue-700 dark:text-blue-300">
                           {formatLargeNumber(scandal.fine ?? 0)}
                         </div>
                       </div>
                     )}
 
                     {(scandal.prisonYears ?? 0) > 0 && (
-                      <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-xl border border-orange-100 dark:border-orange-800/30">
+                      <div className="bg-orange-50 dark:bg-orange-900/20 p-3 md:p-4 rounded-lg md:rounded-xl border border-orange-100 dark:border-orange-800/30">
                         <div className="flex items-center gap-2 mb-2">
                           <Scale className="w-4 h-4 text-orange-500 dark:text-orange-400" />
-                          <span className="text-sm text-orange-600 dark:text-orange-400">
+                          <span className="text-xs md:text-sm text-orange-600 dark:text-orange-400">
                             Prison
                           </span>
                         </div>
-                        <div className="text-xl font-bold text-orange-700 dark:text-orange-300">
+                        <div className="text-lg md:text-xl font-bold text-orange-700 dark:text-orange-300">
                           {`${scandal.prisonYears ?? 0} an${(scandal.prisonYears ?? 0) > 1 ? 's' : ''}`}
                         </div>
                       </div>
                     )}
 
                     {(scandal.ineligibilityYears ?? 0) > 0 && (
-                      <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-xl border border-purple-100 dark:border-purple-800/30">
+                      <div className="bg-purple-50 dark:bg-purple-900/20 p-3 md:p-4 rounded-lg md:rounded-xl border border-purple-100 dark:border-purple-800/30">
                         <div className="flex items-center gap-2 mb-2">
                           <Ban className="w-4 h-4 text-purple-500 dark:text-purple-400" />
-                          <span className="text-sm text-purple-600 dark:text-purple-400">
+                          <span className="text-xs md:text-sm text-purple-600 dark:text-purple-400">
                             Inéligibilité
                           </span>
                         </div>
-                        <div className="text-xl font-bold text-purple-700 dark:text-purple-300">
+                        <div className="text-lg md:text-xl font-bold text-purple-700 dark:text-purple-300">
                           {`${scandal.ineligibilityYears ?? 0} an${(scandal.ineligibilityYears ?? 0) > 1 ? 's' : ''}`}
                         </div>
                       </div>
@@ -231,29 +231,29 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
               <ScandalModalSection 
                 title="Personnes impliquées" 
                 icon={Users}
-                className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-100 dark:border-gray-700/50"
+                className="bg-white dark:bg-gray-800 p-3 md:p-6 rounded-lg md:rounded-xl border border-gray-100 dark:border-gray-700/50"
               >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                   {scandal.personalities.map((person, index) => {
                     // Chercher si la personne a des sanctions
                     const sanction = scandal.sanctions?.find(s => s.person === person);
                     const personPhoto = getPersonPhoto(person);
                     
                     return (
-                      <div key={index} className="flex flex-col gap-2 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-200/50 dark:border-gray-600/50">
+                      <div key={index} className="flex flex-col gap-2 bg-gray-50 dark:bg-gray-800/50 p-3 md:p-4 rounded-lg md:rounded-xl border border-gray-200/50 dark:border-gray-600/50">
                         <div className="flex items-center gap-3">
                           {personPhoto ? (
                             <img 
                               src={personPhoto} 
                               alt={person}
-                              className="w-10 h-10 rounded object-cover"
+                              className="w-8 h-8 md:w-10 md:h-10 rounded object-cover"
                               onError={(e) => {
                                 e.currentTarget.style.display = 'none';
                               }}
                             />
                           ) : (
-                            <div className="w-10 h-10 rounded bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
-                              <Users className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                            <div className="w-8 h-8 md:w-10 md:h-10 rounded bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+                              <Users className="w-4 h-4 md:w-5 md:h-5 text-gray-500 dark:text-gray-400" />
                             </div>
                           )}
                           <div className="flex-1">
@@ -306,11 +306,11 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
                 <ScandalModalSection 
                   title="Institution concernée" 
                   icon={Building2}
-                  className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-100 dark:border-gray-700/50"
+                  className="bg-white dark:bg-gray-800 p-3 md:p-6 rounded-lg md:rounded-xl border border-gray-100 dark:border-gray-700/50"
                 >
                   <div className="space-y-4">
                     {scandal.politicalParty && (
-                      <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-200/50 dark:border-gray-600/50">
+                      <div className="bg-gray-50 dark:bg-gray-800/50 p-3 md:p-4 rounded-lg md:rounded-xl border border-gray-200/50 dark:border-gray-600/50">
                         <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
                           Parti politique
                         </div>
@@ -320,7 +320,7 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
                       </div>
                     )}
                     {scandal.institution && (
-                      <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-200/50 dark:border-gray-600/50">
+                      <div className="bg-gray-50 dark:bg-gray-800/50 p-3 md:p-4 rounded-lg md:rounded-xl border border-gray-200/50 dark:border-gray-600/50">
                         <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
                           Institution
                         </div>
@@ -337,7 +337,7 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
               <ScandalModalSection 
                 title="Chronologie" 
                 icon={Calendar}
-                className="bg-white dark:bg-gray-800 p-6 pb-0 rounded-xl border border-gray-100 dark:border-gray-700/50"
+                className="bg-white dark:bg-gray-800 p-3 md:p-6 pb-0 rounded-lg md:rounded-xl border border-gray-100 dark:border-gray-700/50"
               >
                 <ScandalTimeline events={timelineEvents} />
               </ScandalModalSection>
@@ -347,7 +347,7 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
                 <ScandalModalSection 
                   title="Tags et connexions" 
                   icon={Tag}
-                  className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-100 dark:border-gray-700/50"
+                  className="bg-white dark:bg-gray-800 p-3 md:p-6 rounded-lg md:rounded-xl border border-gray-100 dark:border-gray-700/50"
                 >
                   {scandal.tags && scandal.tags.length > 0 && (
                     <div className="mb-4">
@@ -395,7 +395,7 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
                 <ScandalModalSection 
                   title="Sources" 
                   icon={FileText}
-                  className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-100 dark:border-gray-700/50"
+                  className="bg-white dark:bg-gray-800 p-3 md:p-6 rounded-lg md:rounded-xl border border-gray-100 dark:border-gray-700/50"
                 >
                   <div className="space-y-2">
                     {scandal.sources.map((source, index) => (
