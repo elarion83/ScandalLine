@@ -127,7 +127,7 @@ const ContextualHeader: React.FC<ContextualHeaderProps> = ({
   };
 
   return (
-    <div className="texture-overlay bg-gradient-to-r from-gray-800 to-gray-900 text-white px-6 py-4 md:py-4 py-1 border-b border-gray-700">
+    <div className="texture-overlay bg-gradient-to-r from-gray-800 to-gray-900 text-white px-4 py-2 md:px-6 md:py-4 border-b border-gray-700">
       {/* Desktop version */}
       <div className="hidden md:flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -183,55 +183,52 @@ const ContextualHeader: React.FC<ContextualHeaderProps> = ({
         </button>
       </div>
 
-      {/* Mobile version - 3 colonnes */}
-      <div className="md:hidden grid grid-cols-[auto_1fr_auto] items-center gap-2">
-        {/* Colonne 1: Photo/Icone */}
-        <div className="flex justify-center">
-          <div className={`p-1.5 rounded-lg ${getColorClasses()} relative`}>
-            {contextualFilter.type === 'personality' ? (
-              getPersonalityPhoto() ? (
-                getPersonalityPhoto()
-              ) : (
-                getIcon()
-              )
+      {/* Mobile version - Layout compact avec bouton retour à gauche */}
+      <div className="md:hidden flex items-center gap-3">
+        {/* Bouton retour à gauche */}
+        <button
+          onClick={onBack}
+          className="w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-lg transition-colors flex-shrink-0"
+          title="Retour"
+        >
+          <ArrowLeft className="w-4 h-4" />
+        </button>
+
+        {/* Photo/Icone */}
+        <div className={`p-1 rounded-lg ${getColorClasses()} relative flex-shrink-0`}>
+          {contextualFilter.type === 'personality' ? (
+            getPersonalityPhoto() ? (
+              getPersonalityPhoto()
             ) : (
               getIcon()
-            )}
-          </div>
+            )
+          ) : (
+            getIcon()
+          )}
         </div>
 
-        {/* Colonne 2: Nom et dernier poste */}
-        <div className="flex flex-col items-start text-left px-2">
-          <h1 className="text-lg font-bold">
+        {/* Nom et informations */}
+        <div className="flex-1 min-w-0">
+          <h1 className="text-base font-bold truncate">
             {getContextualTitle(contextualFilter)}
           </h1>
-          <p className="text-sm text-gray-300">
+          <p className="text-xs text-gray-300 truncate">
             {currentPosition || `${filteredCount} affaires • ${totalMoney.toLocaleString('fr-FR')}€`}
           </p>
         </div>
 
-        {/* Colonne 3: Boutons retour et partage */}
-        <div className="flex flex-col items-center gap-1">
-          <button
-            onClick={onBack}
-            className="w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
-            title="Retour"
-          >
-            <ArrowLeft className="w-4 h-4" />
-          </button>
-          
-          <button
-            onClick={handleCopyUrl}
-            className="w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
-            title="Copier l'URL"
-          >
-            {copied ? (
-              <Check className="w-4 h-4 text-green-400" />
-            ) : (
-              <Copy className="w-4 h-4" />
-            )}
-          </button>
-        </div>
+        {/* Bouton partage */}
+        <button
+          onClick={handleCopyUrl}
+          className="w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-lg transition-colors flex-shrink-0"
+          title="Copier l'URL"
+        >
+          {copied ? (
+            <Check className="w-4 h-4 text-green-400" />
+          ) : (
+            <Copy className="w-4 h-4" />
+          )}
+        </button>
       </div>
     </div>
   );
