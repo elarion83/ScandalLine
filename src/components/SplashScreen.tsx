@@ -80,7 +80,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
                 >
                     {/* Fond de lignes animées - Pas de délai initial */}
                     <div className="absolute inset-0 overflow-hidden opacity-100">
-                        {/* Première couche de lignes - Mouvement vers le centre */}
+                        {/* Première couche de lignes - Mouvement vers le centre (visible sur mobile et desktop) */}
                         <motion.div
                             className="absolute inset-0"
                             initial={{ opacity: 0.5 }}
@@ -127,9 +127,9 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
                             }}
                         />
 
-                        {/* Deuxième couche - Lignes plus fines avec rotation */}
+                        {/* Deuxième couche - Lignes plus fines avec rotation (masquée sur mobile) */}
                         <motion.div
-                            className="absolute inset-0"
+                            className="absolute inset-0 hidden md:block"
                             initial={{ opacity: 0.6 }}
                             style={{
                                 background: `repeating-linear-gradient(
@@ -152,7 +152,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
                             }}
                         />
                         <motion.div
-                            className="absolute inset-0"
+                            className="absolute inset-0 hidden md:block"
                             initial={{ opacity: 0.6 }}
                             style={{
                                 background: `repeating-linear-gradient(
@@ -175,9 +175,9 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
                             }}
                         />
 
-                        {/* Troisième couche - Lignes diagonales dynamiques */}
+                        {/* Troisième couche - Lignes diagonales dynamiques (masquée sur mobile) */}
                         <motion.div
-                            className="absolute inset-0"
+                            className="absolute inset-0 hidden md:block"
                             initial={{ opacity: 0.4 }}
                             style={{
                                 background: `repeating-linear-gradient(
@@ -200,7 +200,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
                             }}
                         />
                         <motion.div
-                            className="absolute inset-0"
+                            className="absolute inset-0 hidden md:block"
                             initial={{ opacity: 0.4 }}
                             style={{
                                 background: `repeating-linear-gradient(
@@ -228,9 +228,9 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
                         <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-white/50 dark:to-gray-900/50" />
                     </div>
 
-                    {/* Overlay pour ajouter de la profondeur */}
+                    {/* Overlay pour ajouter de la profondeur (masqué sur mobile) */}
                     <motion.div 
-                        className="absolute inset-0 bg-gradient-to-br from-purple-500/[0.05] to-pink-500/[0.05] dark:from-purple-500/[0.03] dark:to-pink-500/[0.03] mix-blend-overlay"
+                        className="absolute inset-0 bg-gradient-to-br from-purple-500/[0.05] to-pink-500/[0.05] dark:from-purple-500/[0.03] dark:to-pink-500/[0.03] mix-blend-overlay hidden md:block"
                         initial={{ opacity: 0.6 }}
                         animate={{
                             opacity: [0.6, 0.9, 0.6]
@@ -242,9 +242,9 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
                         }}
                     />
 
-                    {/* Texture animée */}
+                    {/* Texture animée (masquée sur mobile) */}
                     <motion.div
-                        className="absolute inset-0 opacity-[0.07] dark:opacity-[0.09] pointer-events-none mix-blend-overlay"
+                        className="absolute inset-0 opacity-[0.07] dark:opacity-[0.09] pointer-events-none mix-blend-overlay hidden md:block"
                         style={{
                             backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
                             backgroundSize: '600px 600px'
@@ -262,9 +262,9 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
                         }}
                     />
 
-                    {/* Overlay gradient principal */}
+                    {/* Overlay gradient principal (masqué sur mobile) */}
                     <motion.div 
-                        className="absolute inset-0 bg-gradient-to-br from-transparent via-purple-50/[0.08] to-pink-50/[0.08] dark:via-purple-900/[0.08] dark:to-pink-900/[0.08] pointer-events-none mix-blend-soft-light"
+                        className="absolute inset-0 bg-gradient-to-br from-transparent via-purple-50/[0.08] to-pink-50/[0.08] dark:via-purple-900/[0.08] dark:to-pink-900/[0.08] pointer-events-none mix-blend-soft-light hidden md:block"
                         animate={{
                             opacity: [0.6, 0.9, 0.6]
                         }}
@@ -275,9 +275,9 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
                         }}
                     />
 
-                    {/* Second gradient pour la profondeur */}
+                    {/* Second gradient pour la profondeur (masqué sur mobile) */}
                     <motion.div 
-                        className="absolute inset-0 bg-gradient-to-tr from-transparent via-purple-50/[0.05] to-pink-50/[0.05] dark:via-purple-900/[0.05] dark:to-pink-900/[0.05] pointer-events-none mix-blend-overlay"
+                        className="absolute inset-0 bg-gradient-to-tr from-transparent via-purple-50/[0.05] to-pink-50/[0.05] dark:via-purple-900/[0.05] dark:to-pink-900/[0.05] pointer-events-none mix-blend-overlay hidden md:block"
                         animate={{
                             opacity: [0.4, 0.7, 0.4]
                         }}
@@ -289,9 +289,9 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
                         }}
                     />
 
-                    {/* Troisième gradient pour plus de dynamisme */}
+                    {/* Troisième gradient pour plus de dynamisme (masqué sur mobile) */}
                     <motion.div 
-                        className="absolute inset-0 bg-gradient-to-bl from-transparent via-purple-50/[0.03] to-pink-50/[0.03] dark:via-purple-900/[0.03] dark:to-pink-900/[0.03] pointer-events-none mix-blend-overlay"
+                        className="absolute inset-0 bg-gradient-to-bl from-transparent via-purple-50/[0.03] to-pink-50/[0.03] dark:via-purple-900/[0.03] dark:to-pink-900/[0.03] pointer-events-none mix-blend-overlay hidden md:block"
                         animate={{
                             opacity: [0.3, 0.6, 0.3],
                             scale: [1, 1.1, 1]
