@@ -1,8 +1,9 @@
 import React, { useMemo, useState } from 'react';
-import { X, ChevronDown, ChevronUp, FileText, Building2, Users, Filter } from 'lucide-react';
+import { X, ChevronDown, ChevronUp, FileText, Building2, Users, Filter, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { FilterOptions, Scandal, ContextualFilter } from '../types/scandal';
 import { getMainCategory, getCategoryLabel } from '../utils/scandalUtils';
+import PersonalityModal from './modals/PersonalityModal';
 
 interface FilterPanelProps {
   filters: FilterOptions;
@@ -26,6 +27,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
     parties: false,
     personalities: false
   });
+  const [selectedPerson, setSelectedPerson] = useState<string | null>(null);
 
   // Calculate counts for each filter option based on current filters
   const filterCounts = useMemo(() => {
@@ -146,6 +148,12 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
       ...prev,
       [section]: !prev[section]
     }));
+  };
+
+  const handlePersonalityClick = (person: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setSelectedPerson(person);
   };
 
   return (
@@ -356,9 +364,17 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
                     </div>
                     <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">{person}</span>
                   </div>
-                  <span className="text-xs font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-2.5 py-1 rounded-full">
-                    {count}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={(e) => handlePersonalityClick(person, e)}
+                      className="p-1 text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                    >
+                      <ArrowRight className="w-3 h-3" />
+                    </button>
+                    <span className="text-xs font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-2.5 py-1 rounded-full">
+                      {count}
+                    </span>
+                  </div>
                 </label>
               ))}
             {Object.keys(filterCounts.personalities).length > ITEMS_PER_SECTION && (
@@ -393,6 +409,15 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
             Réinitialiser les filtres
           </button>
         </div>
+      )}
+
+      {/* PersonalityModal */}
+      {selectedPerson && (
+        <PersonalityModal
+          name={selectedPerson}
+          onClose={() => setSelectedPerson(null)}
+          scandals={scandals}
+        />
       )}
     </motion.div>
   );

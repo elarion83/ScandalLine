@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { Scandal } from '../types/scandal';
 import { formatLargeNumber, formatDate, cleanScandalName, getCategoryColors, getCategoryLabel } from '../utils/scandalUtils';
-import { ClickablePerson, ClickableParty, ClickableStatus, ClickableType } from './ClickableElements';
+import { ClickableType } from './ClickableElements';
 import { ScandalModalSection } from './modals/ScandalModalSection';
 import { ScandalTimeline } from './modals/ScandalTimeline';
 import PersonalityModal from './modals/PersonalityModal';
