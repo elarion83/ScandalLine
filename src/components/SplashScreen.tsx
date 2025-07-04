@@ -7,10 +7,11 @@ interface SplashScreenProps {
 }
 
 export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
-    const [step, setStep] = useState<1 | 2>(1);
+    const [step, setStep] = useState<1 | 2 | 3>(1);
     const [isClosingStep1, setIsClosingStep1] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
     const [showTutorialPrompt, setShowTutorialPrompt] = useState(false);
+    const [showFeatures, setShowFeatures] = useState(false);
 
     useEffect(() => {
         // Passer à l'étape 2 après 7 secondes
@@ -33,13 +34,31 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
     };
 
     const handleTutorialChoice = (wantsTutorial: boolean) => {
-        setShowTutorialPrompt(false);  // Déclenche l'animation de sortie du tutorial
-        setTimeout(() => {
-            setIsClosing(true);  // Déclenche l'animation de sortie du background
+        if (wantsTutorial) {
+            // Si l'utilisateur veut le tutoriel rapide, passer à l'étape 3
+            setShowTutorialPrompt(false);
+            setShowFeatures(true);
+            setStep(3);
+        } else {
+            // Si l'utilisateur ne veut pas de tutoriel, fermer directement
+            setShowTutorialPrompt(false);
             setTimeout(() => {
-                onComplete(wantsTutorial);
-            }, 800);  // Attendre que l'animation de sortie du background soit terminée
-        }, 500);  // Attendre que l'animation de sortie du tutorial soit terminée
+                setIsClosing(true);
+                setTimeout(() => {
+                    onComplete(false);
+                }, 800);
+            }, 500);
+        }
+    };
+
+    const handleFeaturesComplete = () => {
+        setShowFeatures(false);
+        setTimeout(() => {
+            setIsClosing(true);
+            setTimeout(() => {
+                onComplete(true);
+            }, 800);
+        }, 500);
     };
 
     return (
@@ -303,7 +322,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
                                 }}
                             >
                                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600">
-                                    SKANDALZ
+                                    SKANDAL
                                 </span>
                             </motion.div>
 
@@ -554,8 +573,122 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
                                 </motion.div>
                             )}
 
+                            {/* Troisième étape : Liste des fonctionnalités */}
+                            {step === 3 && showFeatures && (
+                                <motion.div
+                                    className="relative max-w-2xl text-center px-6"
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ 
+                                        opacity: { duration: 0.8 },
+                                        y: { duration: 0.8 }
+                                    }}
+                                >
+                                    <motion.h2 
+                                        className="text-3xl text-gray-800 dark:text-gray-100 font-bold mb-6"
+                                        initial={{ opacity: 0, y: 30 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ 
+                                            duration: 1.2,
+                                            delay: 0.3,
+                                            type: "spring",
+                                            bounce: 0.2
+                                        }}
+                                    >
+                                        Découvrez Skandal
+                                    </motion.h2>
+
+                                    <motion.p
+                                        className="text-xl text-gray-700 dark:text-gray-200 mb-8 leading-relaxed"
+                                        initial={{ opacity: 0, y: 30 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ 
+                                            duration: 1.2,
+                                            delay: 0.6,
+                                            type: "spring",
+                                            bounce: 0.2
+                                        }}
+                                    >
+                                        Une plateforme qui{' '}
+                                        <motion.span
+                                            className="relative px-3 py-1 font-bold text-white"
+                                            initial={{ opacity: 0, rotate: -2, scale: 0.95 }}
+                                            animate={{ opacity: 1, rotate: -2, scale: 1 }}
+                                            transition={{
+                                                duration: 0.8,
+                                                delay: 0.9,
+                                            }}
+                                            style={{
+                                                background: "linear-gradient(to right, rgb(139, 92, 246), rgb(236, 72, 153))",
+                                                borderRadius: "6px",
+                                                display: "inline-block",
+                                                transform: "rotate(-2deg)",
+                                            }}
+                                        >
+                                            démocratise
+                                        </motion.span>
+                                        {' '}l'accès aux scandales politiques.
+                                    </motion.p>
+                                    
+                                    <motion.div
+                                        className="text-left space-y-4 mb-10 max-w-lg mx-auto"
+                                        initial={{ opacity: 0, y: 30 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ 
+                                            duration: 1.2,
+                                            delay: 1.8,
+                                            type: "spring",
+                                            bounce: 0.2
+                                        }}
+                                    >
+                                        <motion.div 
+                                            className="flex items-start gap-3 text-lg text-gray-700 dark:text-gray-200"
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ duration: 0.6, delay: 2.1 }}
+                                        >
+                                            <span className="text-purple-500 dark:text-purple-400 font-bold mt-1">•</span>
+                                            <span>Explorez une <strong>timeline interactive</strong> avec zoom fluide et navigation intuitive</span>
+                                        </motion.div>
+                                        <motion.div 
+                                            className="flex items-start gap-3 text-lg text-gray-700 dark:text-gray-200"
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ duration: 0.6, delay: 2.3 }}
+                                        >
+                                            <span className="text-purple-500 dark:text-purple-400 font-bold mt-1">•</span>
+                                            <span>Filtrez par <strong>type de scandale</strong> et <strong>statut juridique</strong> pour trouver ce qui vous intéresse</span>
+                                        </motion.div>
+                                        <motion.div 
+                                            className="flex items-start gap-3 text-lg text-gray-700 dark:text-gray-200"
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ duration: 0.6, delay: 2.5 }}
+                                        >
+                                            <span className="text-purple-500 dark:text-purple-400 font-bold mt-1">•</span>
+                                            <span>Découvrez les <strong>profils détaillés</strong> des personnalités impliquées</span>
+                                        </motion.div>
+                                    </motion.div>
+
+                                    <motion.button
+                                        className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-lg rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                                        onClick={handleFeaturesComplete}
+                                        initial={{ opacity: 0, y: 30 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ 
+                                            duration: 1.2,
+                                            delay: 3.2,
+                                            type: "spring",
+                                            bounce: 0.2
+                                        }}
+                                    >
+                                        J'ai compris !
+                                    </motion.button>
+                                </motion.div>
+                            )}
+
                             {/* Flèche de fermeture */}
-                            {step === 2 && (
+                            {step === 2 && !showFeatures && (
                                 <motion.div 
                                     className="fixed left-0 right-0 bottom-6 flex flex-col items-center gap-4"
                                     initial={{ opacity: 0, y: 20 }}

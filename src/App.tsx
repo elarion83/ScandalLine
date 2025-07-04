@@ -22,12 +22,20 @@ const App: React.FC = () => {
   // Ou si on arrive directement sur une route avec un slug
   const [showSplash, setShowSplash] = useState(() => {
     // Ne pas afficher le splash screen en développement
-    if (!import.meta.env.PROD) return false;
+    if (!import.meta.env.PROD) return true;
     
     // Ne pas afficher le splash screen si on arrive directement sur une route avec un slug
     const path = window.location.pathname;
     if (path.startsWith('/timeline/') && path !== '/timeline/') {
       return false;
+    }
+    
+    // Vérifier si le splash screen a déjà été vu aujourd'hui
+    const lastSplashDate = localStorage.getItem('splashScreenLastSeen');
+    const today = new Date().toDateString();
+    
+    if (lastSplashDate === today) {
+      return false; // Déjà vu aujourd'hui
     }
     
     return true;
@@ -37,6 +45,10 @@ const App: React.FC = () => {
   const handleSplashComplete = (wantsTutorial: boolean) => {
     setShowSplash(false);
     setSplashClosedTime(Date.now());
+    
+    // Sauvegarder la date de fermeture du splash screen
+    const today = new Date().toDateString();
+    localStorage.setItem('splashScreenLastSeen', today);
   };
 
   // Utiliser les données initiales du serveur si elles existent

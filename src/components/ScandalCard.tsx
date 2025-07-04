@@ -384,7 +384,7 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
           {/* Content Grid */}
           <div className="p-4 grid grid-cols-2 gap-3 bg-gray-50/50 dark:bg-gray-800/50">
             {/* Personalities */}
-            <div className="col-span-2 bg-white dark:bg-gray-700 p-3 pt-0 rounded-xl shadow-sm">
+            <div className="col-span-2 bg-white dark:bg-gray-700 p-0 pt-0 rounded-xl">
               <div className="flex items-center gap-2 mb-2">
                 <Users className="w-4 h-4 text-purple-500 dark:text-purple-400" />
                 <span className="text-xs text-gray-600 dark:text-gray-300 font-semibold">Impliqués</span>
@@ -415,12 +415,15 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
                   </button>
                 ))}
                 {(scandal.personalities || []).length > 2 && (
-                  <span className="inline-flex items-center justify-center px-2 py-2 text-xs font-medium bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300 rounded-lg shadow-sm">
-                    +{(scandal.personalities || []).length - 2}
+                  <span className="text-xs text-blue-600 dark:text-blue-400 font-medium underline decoration-blue-400/50 dark:decoration-blue-600/50">
+                    Voir {(scandal.personalities || []).length - 2} de plus
                   </span>
                 )}
               </div>
             </div>
+
+            {/* Séparateur discret */}
+            <div className="col-span-2 h-px bg-gray-200 dark:bg-gray-600"></div>
 
             {/* Stats or Description */}
             {hasSanctions ? (
