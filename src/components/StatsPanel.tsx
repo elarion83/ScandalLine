@@ -38,6 +38,7 @@ const StatsPanel: React.FC<StatsPanelProps> = ({ stats, scandals, onClose }) => 
       exit={{ x: '100%' }}
       transition={{ type: 'tween', duration: 0.2 }}
       className="w-80 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 flex flex-col h-full shadow-2xl"
+      style={{ zIndex: 50 }}
     >
       {/* Header */}
       <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-gray-100 dark:bg-gray-800">

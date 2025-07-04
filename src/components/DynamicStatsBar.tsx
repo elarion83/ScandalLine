@@ -93,6 +93,50 @@ const DynamicStatsBar: React.FC<DynamicStatsBarProps> = ({
     document.addEventListener('mouseup', handleMouseUp);
   };
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!containerRef.current || !onScrollChange) return;
+    
+    // Empêcher le scroll par défaut
+    e.preventDefault();
+    
+    // Notifier le parent que l'utilisateur a touché
+    onDragClick?.();
+    
+    isDraggingRef.current = true;
+    containerRef.current.classList.add('dragging');
+    
+    const rect = containerRef.current.getBoundingClientRect();
+    const touch = e.touches[0];
+    const clickPositionRatio = (touch.clientX - rect.left) / rect.width;
+    const newScrollPosition = (clickPositionRatio * timelineWidth) - (viewportWidth / 2);
+    onScrollChange(Math.max(0, Math.min(timelineWidth - viewportWidth, newScrollPosition)));
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!containerRef.current || !isDraggingRef.current) return;
+      
+      // Empêcher le scroll par défaut
+      e.preventDefault();
+      
+      const rect = containerRef.current.getBoundingClientRect();
+      const touch = e.touches[0];
+      const positionRatio = (touch.clientX - rect.left) / rect.width;
+      const newScrollPosition = (positionRatio * timelineWidth) - (viewportWidth / 2);
+      onScrollChange(Math.max(0, Math.min(timelineWidth - viewportWidth, newScrollPosition)));
+    };
+
+    const handleTouchEnd = () => {
+      isDraggingRef.current = false;
+      if (containerRef.current) {
+        containerRef.current.classList.remove('dragging');
+      }
+      document.removeEventListener('touchmove', handleTouchMove, { passive: false });
+      document.removeEventListener('touchend', handleTouchEnd);
+    };
+
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchend', handleTouchEnd);
+  };
+
   return (
     <>
       {/* Mobile Stats - Position fixe en haut à gauche */}
@@ -137,8 +181,9 @@ const DynamicStatsBar: React.FC<DynamicStatsBarProps> = ({
       {/* Stats Bar - Affichage avec barre de progression (mobile + desktop) */}
       <div 
         ref={containerRef}
-        className="relative w-full bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm cursor-grab active:cursor-grabbing [&.dragging_.transition-all]:transition-none"
+        className="relative w-full bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm cursor-grab active:cursor-grabbing [&.dragging_.transition-all]:transition-none touch-none"
         onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
         style={{
           overflowX: 'hidden',
           minHeight: '40px'

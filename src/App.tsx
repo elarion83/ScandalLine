@@ -22,7 +22,7 @@ const App: React.FC = () => {
   // Ou si on arrive directement sur une route avec un slug
   const [showSplash, setShowSplash] = useState(() => {
     // Ne pas afficher le splash screen en développement
-    if (!import.meta.env.PROD) return true;
+    if (!import.meta.env.PROD) return false;
     
     // Ne pas afficher le splash screen si on arrive directement sur une route avec un slug
     const path = window.location.pathname;
