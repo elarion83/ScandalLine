@@ -94,95 +94,139 @@ const DynamicStatsBar: React.FC<DynamicStatsBarProps> = ({
   };
 
   return (
-    <div 
-      ref={containerRef}
-      className="relative w-full bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm cursor-grab active:cursor-grabbing [&.dragging_.transition-all]:transition-none"
-      onMouseDown={handleMouseDown}
-      style={{
-        overflowX: 'hidden'}}
-    >
-      
-      {/* Progress bar background */}
-      <div 
-        className="absolute inset-0 bg-gradient-to-r from-blue-500 via-blue-400 to-blue-500 dark:from-blue-600 dark:via-blue-500 dark:to-blue-600 opacity-20 dark:opacity-30 transition-all duration-300 ease-out"
-        style={{ 
-          width: `${scrollProgress * 100}%`,
-          transitionProperty: isDraggingRef.current ? 'none' : 'all'
-        }}
-      />
-      
-      {/* Progress bar shine effect */}
-      <div 
-        className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20 dark:opacity-10 transition-all duration-300 ease-out animate-pulse"
-        style={{ 
-          width: `${scrollProgress * 100}%`,
-          transitionProperty: isDraggingRef.current ? 'none' : 'all'
-        }}
-      />
-
-      {/* Current year at progress bar end */}
-      <div 
-        className="absolute top-0 bottom-0 flex items-center transition-all duration-300 ease-out"
-        style={{ 
-          left: `${Math.max(3, Math.min(97, scrollProgress * 100))}%`,
-          transform: 'translateX(-50%)',
-          transitionProperty: isDraggingRef.current ? 'none' : 'all'
-        }}
-      >
-        <div className="flex texture-overlay items-center gap-1 bg-gradient-to-r from-violet-500 to-pink-500 text-white px-2 py-1 mt-1 rounded-full text-sm font-medium shadow-md hover:scale-105 transition-transform">
-          <ArrowLeft className="w-4 h-4 animate-pulse" />
-          {currentYear}
-          <ArrowRight className="w-4 h-4 animate-pulse" />
-        </div>
-      </div>
-      
-      {/* Stats content */}
-      <div className="relative flex items-center justify-between px-4 py-2">
-        <div className={`flex items-center gap-4 transition-all duration-300 ${scrollProgress < 0.5 ? 'ml-auto' : ''}`}>
+    <>
+      {/* Mobile Stats - Position fixe en haut à gauche */}
+      <div className="fixed top-[105px] opacity-80 left-[5px] z-40 md:hidden">
+        <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-3 space-y-2">
           {/* Visible scandals count */}
-          <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-lg">
-            <TrendingUp className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-            <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
-              {visibleStats.count}
-            </span>
-            <span className="text-xs text-blue-600 dark:text-blue-400">
-              / {totalScandals} affaires
+          <div className="flex items-center gap-2">
+            <TrendingUp className="w-3 h-3 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+            <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+              {visibleStats.count}/{totalScandals}
             </span>
           </div>
 
           {/* Money detourned */}
-          <div className="flex items-center gap-2 bg-red-50 dark:bg-red-900/20 px-3 py-1.5 rounded-lg">
-            <DollarSign className="w-4 h-4 text-red-600 dark:text-red-400" />
-            <span className="text-sm font-bold text-red-700 dark:text-red-300">
+          <div className="flex items-center gap-2">
+            <DollarSign className="w-3 h-3 text-red-600 dark:text-red-400 flex-shrink-0" />
+            <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
               {formatLargeNumber(visibleStats.totalMoney)}
             </span>
-            <span className="text-xs text-red-600 dark:text-red-400">concernés</span>
           </div>
 
           {/* Total fines */}
           {visibleStats.totalFines > 0 && (
-            <div className="flex items-center gap-2 bg-orange-50 dark:bg-orange-900/20 px-3 py-1.5 rounded-lg">
-              <Award className="w-4 h-4 text-orange-600 dark:text-orange-400" />
-              <span className="text-sm font-bold text-orange-700 dark:text-orange-300">
+            <div className="flex items-center gap-2">
+              <Award className="w-3 h-3 text-orange-600 dark:text-orange-400 flex-shrink-0" />
+              <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
                 {formatLargeNumber(visibleStats.totalFines)}
               </span>
-              <span className="text-xs text-orange-600 dark:text-orange-400">d'amendes</span>
             </div>
           )}
 
           {/* Prison years */}
-          <div className="flex items-center gap-2 bg-purple-50 dark:bg-purple-900/20 px-3 py-1.5 rounded-lg">
-            <Scale className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-            <span className="text-sm font-bold text-purple-700 dark:text-purple-300">
-              {visibleStats.totalPrison}
-            </span>
-            <span className="text-xs text-purple-600 dark:text-purple-400">
-              an{visibleStats.totalPrison > 1 ? 's' : ''} prison
+          <div className="flex items-center gap-2">
+            <Scale className="w-3 h-3 text-purple-600 dark:text-purple-400 flex-shrink-0" />
+            <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+              {visibleStats.totalPrison} an{visibleStats.totalPrison > 1 ? 's' : ''}
             </span>
           </div>
         </div>
       </div>
-    </div>
+
+      {/* Stats Bar - Affichage avec barre de progression (mobile + desktop) */}
+      <div 
+        ref={containerRef}
+        className="relative w-full bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm cursor-grab active:cursor-grabbing [&.dragging_.transition-all]:transition-none"
+        onMouseDown={handleMouseDown}
+        style={{
+          overflowX: 'hidden',
+          minHeight: '40px'
+        }}
+      >
+        
+        {/* Progress bar background */}
+        <div 
+          className="absolute inset-0 bg-gradient-to-r from-blue-500 via-blue-400 to-blue-500 dark:from-blue-600 dark:via-blue-500 dark:to-blue-600 opacity-20 dark:opacity-30 transition-all duration-300 ease-out"
+          style={{ 
+            width: `${scrollProgress * 100}%`,
+            transitionProperty: isDraggingRef.current ? 'none' : 'all'
+          }}
+        />
+        
+        {/* Progress bar shine effect */}
+        <div 
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20 dark:opacity-10 transition-all duration-300 ease-out animate-pulse"
+          style={{ 
+            width: `${scrollProgress * 100}%`,
+            transitionProperty: isDraggingRef.current ? 'none' : 'all'
+          }}
+        />
+
+        {/* Current year at progress bar end */}
+        <div 
+          className="absolute top-0 bottom-0 flex items-center transition-all duration-300 ease-out"
+          style={{ 
+            left: `${Math.max(3, Math.min(97, scrollProgress * 100))}%`,
+            transform: 'translateX(-50%)',
+            transitionProperty: isDraggingRef.current ? 'none' : 'all'
+          }}
+        >
+          <div className="flex texture-overlay items-center gap-1 bg-gradient-to-r from-violet-500 to-pink-500 text-white px-2 py-1 mt-1 rounded-full text-sm font-medium shadow-md hover:scale-105 transition-transform">
+            <ArrowLeft className="w-4 h-4 animate-pulse" />
+            {currentYear}
+            <ArrowRight className="w-4 h-4 animate-pulse" />
+          </div>
+        </div>
+        
+        {/* Stats content - Masqué sur mobile, visible sur desktop */}
+        <div className="relative flex items-center justify-between px-4 py-2 hidden md:flex">
+          <div className={`flex items-center gap-4 transition-all duration-300 ${scrollProgress < 0.5 ? 'ml-auto' : ''}`}>
+            {/* Visible scandals count */}
+            <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-lg">
+              <TrendingUp className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                {visibleStats.count}
+              </span>
+              <span className="text-xs text-blue-600 dark:text-blue-400">
+                / {totalScandals} affaires
+              </span>
+            </div>
+
+            {/* Money detourned */}
+            <div className="flex items-center gap-2 bg-red-50 dark:bg-red-900/20 px-3 py-1.5 rounded-lg">
+              <DollarSign className="w-4 h-4 text-red-600 dark:text-red-400" />
+              <span className="text-sm font-bold text-red-700 dark:text-red-300">
+                {formatLargeNumber(visibleStats.totalMoney)}
+              </span>
+              <span className="text-xs text-red-600 dark:text-red-400">concernés</span>
+            </div>
+
+            {/* Total fines */}
+            {visibleStats.totalFines > 0 && (
+              <div className="flex items-center gap-2 bg-orange-50 dark:bg-orange-900/20 px-3 py-1.5 rounded-lg">
+                <Award className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                <span className="text-sm font-bold text-orange-700 dark:text-orange-300">
+                  {formatLargeNumber(visibleStats.totalFines)}
+                </span>
+                <span className="text-xs text-orange-600 dark:text-orange-400">d'amendes</span>
+              </div>
+            )}
+
+            {/* Prison years */}
+            <div className="flex items-center gap-2 bg-purple-50 dark:bg-purple-900/20 px-3 py-1.5 rounded-lg">
+              <Scale className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+              <span className="text-sm font-bold text-purple-700 dark:text-purple-300">
+                {visibleStats.totalPrison}
+              </span>
+              <span className="text-xs text-purple-600 dark:text-purple-400">
+                an{visibleStats.totalPrison > 1 ? 's' : ''} prison
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 };
 
