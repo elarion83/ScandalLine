@@ -21,7 +21,7 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
   viewportWidth
 }) => {
   const yearMarkers = generateYearMarkers(startYear, endYear, timelineWidth, zoomLevel);
-  
+
   // Calculer la position de la grosse année en fond (centre de l'écran)
   const currentYearPosition = scrollPosition + viewportWidth / 2;
   
@@ -54,60 +54,60 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
         const opacity = getOpacity(x);
         
         return (
-          <div key={year} className="absolute" style={{ left: x, top: timelineY }}>
-            {isMainMarker ? (
-              <div 
+        <div key={year} className="absolute" style={{ left: x, top: timelineY }}>
+          {isMainMarker ? (
+            <div 
                 className="absolute writing-mode-vertical text-4xl font-black whitespace-nowrap transition-opacity duration-200"
-                style={{
-                  writingMode: 'vertical-rl',
-                  transform: 'translateX(-50%) rotate(180deg)',
+              style={{
+                writingMode: 'vertical-rl',
+                transform: 'translateX(-50%) rotate(180deg)',
                   top: '-80px',
                   opacity: opacity
-                }}
-              >
-                <div className="relative">
-                  {/* Conteneur avec effet glassmorphism */}
-                  <div 
-                    className="relative px-3 py-4 rounded-2x border border-white/30 dark:border-white/10 pb-0"
-                  >
-                    <span className="relative z-10 text-grey dark:text-white tracking-wide inline-block"
-                       style={{ transform: 'rotate(0deg) translateY(25px)',
-                        fontSize: '1em', opacity: 0.1 }}>
-                      {year}
-                    </span>
-                  </div>
+              }}
+            >
+              <div className="relative">
+                {/* Conteneur avec effet glassmorphism */}
+                <div 
+                  className="relative px-3 py-4 rounded-2x border border-white/30 dark:border-white/10 pb-0"
+                >
+                  <span className="relative z-10 text-grey dark:text-white tracking-wide inline-block"
+                     style={{ transform: 'rotate(0deg) translateY(25px)',
+                      fontSize: '1em', opacity: 0.1 }}>
+                    {year}
+                  </span>
                 </div>
               </div>
-            ) : (
-              <div 
+            </div>
+          ) : (
+            <div 
                 className="absolute writing-mode-vertical text-sm whitespace-nowrap transition-opacity duration-200"
-                style={{
-                  writingMode: 'vertical-rl',
-                  transform: 'translateX(-50%) rotate(180deg)',
+              style={{
+                writingMode: 'vertical-rl',
+                transform: 'translateX(-50%) rotate(180deg)',
                   top: '-50px',
                   opacity: opacity
-                }}
-              >
-                <div className="relative">
-                  {/* Motif quadrillé plus petit */}
-                  <div className="absolute inset-0 opacity-5" style={{
-                    backgroundImage: `
-                        linear-gradient(to right, rgb(139, 92, 246) 1px, transparent 1px),
-                        linear-gradient(to bottom, rgb(139, 92, 246) 1px, transparent 1px)
-                      `,
-                    backgroundSize: '6px 6px'
-                  }}/>
-                  
-                  {/* Conteneur avec effet glassmorphism plus léger */}
-                  <div className="relative px-2 py-3 rounded-xl bg-white/10 dark:bg-gray-900/10 backdrop-blur-[1px] border border-white/20 dark:border-white/5" style={{ transform: 'rotate(90deg)' }}>
-                    <span className="relative z-10 text-black/60 dark:text-gray-300 tracking-wide inline-block">
-                      {year}
-                    </span>
-                  </div>
+              }}
+            >
+              <div className="relative">
+                {/* Motif quadrillé plus petit */}
+                <div className="absolute inset-0 opacity-5" style={{
+                  backgroundImage: `
+                      linear-gradient(to right, rgb(139, 92, 246) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgb(139, 92, 246) 1px, transparent 1px)
+                    `,
+                  backgroundSize: '6px 6px'
+                }}/>
+                
+                {/* Conteneur avec effet glassmorphism plus léger */}
+                <div className="relative px-2 py-3 rounded-xl bg-white/10 dark:bg-gray-900/10 backdrop-blur-[1px] border border-white/20 dark:border-white/5" style={{ transform: 'rotate(90deg)' }}>
+                  <span className="relative z-10 text-black/60 dark:text-gray-300 tracking-wide inline-block">
+                    {year}
+                  </span>
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
+        </div>
         );
       })}
     </div>

@@ -49,7 +49,7 @@ export const calculateOptimizedTimelineWidth = (
   }
 
   // Use normal calculation
-  const yearSpan = endYear - startYear;
+    const yearSpan = endYear - startYear;
   return { 
     width: Math.max(1400, yearSpan * BASE_PIXELS_PER_YEAR * zoomLevel)
   };
@@ -118,7 +118,7 @@ export const calculateOptimizedScandalPositions = (
       const yearDiff = currentYear - prevYear;
       
       // Normal spacing based on year difference
-      currentX += Math.max(MIN_HORIZONTAL_SPACING * 2, yearDiff * 30);
+        currentX += Math.max(MIN_HORIZONTAL_SPACING * 2, yearDiff * 30);
     }
     
     const x = currentX;

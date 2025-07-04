@@ -215,6 +215,8 @@
   transform: translateX(-50%);
   height: 80px;
   padding: 15px 20px;
+  /* Add safe area support for mobile devices */
+  padding-bottom: calc(15px + env(safe-area-inset-bottom, 16px));
   display: flex;
   gap: 20px;
   border-bottom: none;
