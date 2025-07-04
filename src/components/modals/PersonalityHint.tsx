@@ -21,6 +21,21 @@ const PersonalityHint: React.FC<PersonalityHintProps> = ({
 }) => {
   const [shouldRender, setShouldRender] = useState(show);
   const [opacity, setOpacity] = useState(1);
+  const [previousPersonality, setPreviousPersonality] = useState<string | null>(null);
+
+  // Reset l'état quand le contextualFilter change (nouvelle personnalité)
+  useEffect(() => {
+    const currentPersonality = contextualFilter?.value?.toString();
+    
+    // Seulement si on a déjà eu une personnalité précédente ET que c'est une nouvelle personnalité
+    if (previousPersonality && currentPersonality && previousPersonality !== currentPersonality) {
+      setShouldRender(true);
+      setOpacity(1);
+    }
+    
+    // Mettre à jour la personnalité précédente
+    setPreviousPersonality(currentPersonality || null);
+  }, [contextualFilter?.value, previousPersonality]);
 
   // Calculer l'opacité basée sur le scroll (1% de moins tous les 5px)
   useEffect(() => {
