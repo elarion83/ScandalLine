@@ -91,7 +91,19 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
                   {cleanScandalName(scandal.name)}
                 </h2>
 
-                <div className="flex flex-wrap items-center ml-2 md:ml-5 gap-2">
+                {/* Date du scandale et tag sur la même ligne */}
+                <div className="flex items-center gap-4 ml-2 md:ml-5 mb-2 md:mb-3">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-white/80" />
+                    <span className="text-sm md:text-base text-white/90 font-medium">
+                      {new Date(scandal.startDate).toLocaleDateString('fr-FR', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </span>
+                  </div>
+
                   <ClickableType 
                     type={scandal.type}
                     onFilter={onClose}

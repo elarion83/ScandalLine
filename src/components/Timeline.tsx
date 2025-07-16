@@ -16,10 +16,13 @@ import {
   calculateOptimizedScandalPositions,
   calculateDynamicDateRange,
   generateYearMarkers,
-  findNearestYearMarker
+  findNearestYearMarker,
+  calculateScandalPointPositions,
+  ScandalPointPosition
 } from '../utils/timelineLayout';
 import { useTimeline } from '../contexts/TimelineContext';
 import ScandalCard from './ScandalCard';
+import ScandalPoint from './ScandalPoint';
 import TimelineAxis from './TimelineAxis';
 
 import FilterPanel from './FilterPanel';
@@ -72,18 +75,39 @@ const Timeline: React.FC<TimelineProps> = ({
   // Determine if we need adaptive layout
   const shouldUseAdaptiveLayout = false;
   
+  // Auto-switch to points mode when zoomed out significantly (zoom < 50%)
+  const shouldUsePointsMode = state.zoomLevel < 7.5; // 50% of default zoom level
+  
+  // Debug: log current values
+  console.log('🔍 Debug mode points:', {
+    zoomLevel: state.zoomLevel,
+    shouldUsePointsMode,
+    currentDisplayMode: state.displayMode,
+    zoomPercentage: (state.zoomLevel / 15) * 100
+  });
+  
+  // Update display mode based on zoom level
+  useEffect(() => {
+    const newDisplayMode = shouldUsePointsMode ? 'points' : 'cards';
+    if (state.displayMode !== newDisplayMode) {
+      console.log('🔄 Switching display mode:', { from: state.displayMode, to: newDisplayMode });
+      dispatch({ type: 'SET_DISPLAY_MODE', payload: newDisplayMode });
+    }
+  }, [shouldUsePointsMode, state.displayMode, dispatch]);
+
   // Calculate timeline dimensions based on adaptive behavior
-  const { timelineWidth, scandalPositions } = useMemo(() => {
+  const { timelineWidth, scandalPositions, scandalPointPositions } = useMemo(() => {
     if (shouldUseAdaptiveLayout) {
       // Single affair or no affairs - use optimized layout
       const { width } = calculateOptimizedTimelineWidth(filteredScandals, startYear, endYear, state.zoomLevel);
       const positions = calculateOptimizedScandalPositions(filteredScandals, []);
-      return { timelineWidth: width, scandalPositions: positions };
+      return { timelineWidth: width, scandalPositions: positions, scandalPointPositions: [] };
     } else {
       // Multiple affairs - use standard layout
       const width = calculateTimelineWidth(startYear, endYear, state.zoomLevel);
       const positions = calculateScandalPositions(filteredScandals, startYear, endYear, width);
-      return { timelineWidth: width, scandalPositions: positions };
+      const pointPositions = calculateScandalPointPositions(filteredScandals, startYear, endYear, width);
+      return { timelineWidth: width, scandalPositions: positions, scandalPointPositions: pointPositions };
     }
   }, [filteredScandals, startYear, endYear, state.zoomLevel, shouldUseAdaptiveLayout]);
 
@@ -590,6 +614,27 @@ const Timeline: React.FC<TimelineProps> = ({
                         >
                           <BarChart3 className={`w-6 h-6 text-white transition-transform ${state.showStats ? 'scale-110' : ''}`} />
                         </button>
+                        
+                        {/* Button to switch between cards and points mode by adjusting zoom */}
+                        <button
+                          onClick={() => {
+                            if (state.displayMode === 'points') {
+                              // Switch to cards mode: zoom in to 100% (default zoom level)
+                              dispatch({ type: 'SET_ZOOM', payload: 15 });
+                            } else {
+                              // Switch to points mode: zoom out to 30% of default
+                              dispatch({ type: 'SET_ZOOM', payload: 4.5 });
+                            }
+                          }}
+                          className={`w-10 h-10 ml-1 rounded-full flex items-center justify-center transition-all ${
+                            state.displayMode === 'points'
+                              ? 'bg-green-500/30 ring-2 ring-green-500/50' 
+                              : 'bg-black/10 hover:bg-black/20 active:bg-black/30'
+                          }`}
+                          title={`Passer au mode ${state.displayMode === 'points' ? 'cartes' : 'points'}`}
+                        >
+                          <div className={`w-3 h-3 rounded-full ${state.displayMode === 'points' ? 'bg-green-400' : 'bg-white'}`} />
+                        </button>
                     </div>
                 </div>
           </div>
@@ -673,6 +718,7 @@ const Timeline: React.FC<TimelineProps> = ({
                   timelineWidth={timelineWidth}
                   scrollPosition={state.scrollPosition}
                   viewportWidth={state.viewportWidth}
+                  displayMode={state.displayMode}
                 />
 
                 <TimelineAxis
@@ -683,28 +729,48 @@ const Timeline: React.FC<TimelineProps> = ({
                   timelineY={TIMELINE_Y}
                   scrollPosition={state.scrollPosition}
                   viewportWidth={state.viewportWidth}
+                  displayMode={state.displayMode}
                 />
               </div>
 
 
 
-              {/* Scandal Cards */}
-              {visibleScandalPositions.map((position) => {
-                const scandal = filteredScandals.find(s => s.id === position.id);
-                if (!scandal) return null;
-                
-                return (
-                  <ScandalCard
-                    key={scandal.id}
-                    scandal={scandal}
-                    onClick={() => dispatch({ type: 'SELECT_SCANDAL', payload: scandal.id })}
-                    isSelected={state.selectedScandalId === scandal.id}
-                    position={position}
-                    timelineY={TIMELINE_Y}
-                    allScandals={scandals}
-                  />
-                );
-              })}
+              {/* Scandal Cards or Points based on display mode */}
+              {state.displayMode === 'cards' ? (
+                // Render cards in normal mode
+                visibleScandalPositions.map((position) => {
+                  const scandal = filteredScandals.find(s => s.id === position.id);
+                  if (!scandal) return null;
+                  
+                  return (
+                    <ScandalCard
+                      key={scandal.id}
+                      scandal={scandal}
+                      onClick={() => dispatch({ type: 'SELECT_SCANDAL', payload: scandal.id })}
+                      isSelected={state.selectedScandalId === scandal.id}
+                      position={position}
+                      timelineY={TIMELINE_Y}
+                      allScandals={scandals}
+                    />
+                  );
+                })
+              ) : (
+                // Render points in zoomed out mode
+                scandalPointPositions.map((position) => {
+                  const scandal = filteredScandals.find(s => s.id === position.id);
+                  if (!scandal) return null;
+                  
+                  return (
+                    <ScandalPoint
+                      key={scandal.id}
+                      scandal={scandal}
+                      onClick={() => dispatch({ type: 'SELECT_SCANDAL', payload: scandal.id })}
+                      isSelected={state.selectedScandalId === scandal.id}
+                      position={position}
+                    />
+                  );
+                })
+              )}
 
               {/* No scandals message */}
               {filteredScandals.length === 0 && (

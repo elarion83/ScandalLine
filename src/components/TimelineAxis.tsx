@@ -1,5 +1,5 @@
 import React from 'react';
-import { generateYearMarkers } from '../utils/timelineLayout';
+import { generateYearMarkers, generateMonthMarkers } from '../utils/timelineLayout';
 
 interface TimelineAxisProps {
   startYear: number;
@@ -9,6 +9,7 @@ interface TimelineAxisProps {
   timelineY: number;
   scrollPosition: number;
   viewportWidth: number;
+  displayMode?: 'cards' | 'points';
 }
 
 const TimelineAxis: React.FC<TimelineAxisProps> = ({
@@ -18,9 +19,11 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
   zoomLevel,
   timelineY,
   scrollPosition,
-  viewportWidth
+  viewportWidth,
+  displayMode = 'cards'
 }) => {
   const yearMarkers = generateYearMarkers(startYear, endYear, timelineWidth, zoomLevel);
+  const monthMarkers = displayMode === 'points' ? generateMonthMarkers(startYear, endYear, timelineWidth) : [];
 
   // Calculer la position de la grosse année en fond (centre de l'écran)
   const currentYearPosition = scrollPosition + viewportWidth / 2;
@@ -110,6 +113,37 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
         </div>
         );
       })}
+
+      {/* Month markers for points mode */}
+      {displayMode === 'points' && monthMarkers.map(({ year, month, x, monthName }) => (
+        <div key={`${year}-${month}`} className="absolute" style={{ left: x, top: timelineY }}>
+          {/* Vertical line for month */}
+          <div 
+            className="absolute bg-gray-300/30 dark:bg-gray-600/30"
+            style={{
+              left: '50%',
+              top: '-20px',
+              width: '1px',
+              opacity: '0.8',
+              height: '40px',
+              transform: 'translateX(-50%)'
+            }}
+          />
+          
+          {/* Month label */}
+          <div 
+            className="absolute text-xs text-gray-500 dark:text-gray-400 font-medium whitespace-nowrap transition-opacity duration-200"
+            style={{
+              left: '50%',
+              top: '-45px',
+              transform: 'translateX(-50%)',
+              opacity: 0.4
+            }}
+          >
+            {monthName}
+          </div>
+        </div>
+      ))}
     </div>
   );
 };

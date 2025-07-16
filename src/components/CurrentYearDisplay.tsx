@@ -8,6 +8,7 @@ interface CurrentYearDisplayProps {
   timelineWidth: number;
   scrollPosition: number;
   viewportWidth: number;
+  displayMode?: 'cards' | 'points';
 }
 
 const CurrentYearDisplay: React.FC<CurrentYearDisplayProps> = ({
@@ -15,7 +16,8 @@ const CurrentYearDisplay: React.FC<CurrentYearDisplayProps> = ({
   endYear,
   timelineWidth,
   scrollPosition,
-  viewportWidth
+  viewportWidth,
+  displayMode = 'cards'
 }) => {
   const [hasBeenVisible, setHasBeenVisible] = useState(false);
   
@@ -33,7 +35,8 @@ const CurrentYearDisplay: React.FC<CurrentYearDisplayProps> = ({
   }, [currentScrollCenter, yearMarkers]);
 
   // Si on n'a pas dépassé le second marqueur et qu'on n'a jamais été visible, on ne rend rien
-  if (yearMarkers.length < 2 && !hasBeenVisible) {
+  // Ou si on est en mode points, on ne rend rien
+  if (yearMarkers.length < 2 && !hasBeenVisible || displayMode === 'points') {
     return null;
   }
 

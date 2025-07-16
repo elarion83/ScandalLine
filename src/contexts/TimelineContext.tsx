@@ -13,6 +13,7 @@ export interface TimelineState {
   isDragging: boolean;
   contextualFilter: ContextualFilter | null;
   isTransitioning: boolean;
+  displayMode: 'cards' | 'points'; // New display mode for zoomed out view
 }
 
 export type TimelineAction =
@@ -25,7 +26,8 @@ export type TimelineAction =
   | { type: 'SET_VIEWPORT_WIDTH'; payload: number }
   | { type: 'SET_DRAGGING'; payload: boolean }
   | { type: 'SET_CONTEXTUAL_FILTER'; payload: ContextualFilter | null }
-  | { type: 'SET_TRANSITIONING'; payload: boolean };
+  | { type: 'SET_TRANSITIONING'; payload: boolean }
+  | { type: 'SET_DISPLAY_MODE'; payload: 'cards' | 'points' };
 
 const initialState: TimelineState = {
   zoomLevel: 15,
@@ -42,7 +44,8 @@ const initialState: TimelineState = {
   viewportWidth: 1200,
   isDragging: false,
   contextualFilter: null,
-  isTransitioning: false
+  isTransitioning: false,
+  displayMode: 'cards' // Default to cards mode
 };
 
 const timelineReducer = (state: TimelineState, action: TimelineAction): TimelineState => {
@@ -68,6 +71,8 @@ const timelineReducer = (state: TimelineState, action: TimelineAction): Timeline
       return { ...state, contextualFilter: action.payload };
     case 'SET_TRANSITIONING':
       return { ...state, isTransitioning: action.payload };
+    case 'SET_DISPLAY_MODE':
+      return { ...state, displayMode: action.payload };
     default:
       return state;
   }

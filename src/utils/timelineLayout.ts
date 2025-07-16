@@ -9,6 +9,15 @@ export interface ScandalPosition {
   date: Date;
 }
 
+export interface ScandalPointPosition {
+  id: string;
+  x: number;
+  y: number;
+  date: Date;
+  month: number;
+  year: number;
+}
+
 
 
 export const CARD_WIDTH = 280;
@@ -19,6 +28,9 @@ export const MIN_VERTICAL_SPACING = 40;
 export const MIN_HORIZONTAL_SPACING = 40;
 export const TRACK_HEIGHT = CARD_HEIGHT + MIN_VERTICAL_SPACING;
 export const BASE_PIXELS_PER_YEAR = 150;
+export const POINT_SIZE = 24; // Size of points in pixels (increased from 16)
+export const POINT_SPACING = 35; // Vertical spacing between points in same month (increased from 20)
+export const MONTH_SPACING = 20; // Horizontal spacing between months
 
 
 // Check if timeline needs scrolling (more than one affair)
@@ -280,6 +292,39 @@ export const generateYearMarkers = (
   return markers;
 };
 
+// Generate month markers for points mode
+export const generateMonthMarkers = (
+  startYear: number,
+  endYear: number,
+  timelineWidth: number
+): Array<{ year: number; month: number; x: number; monthName: string }> => {
+  const markers: Array<{ year: number; month: number; x: number; monthName: string }> = [];
+  const yearSpan = endYear - startYear;
+  const monthNames = [
+    'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin',
+    'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'
+  ];
+
+  // Generate markers for each month in the date range
+  for (let year = startYear; year <= endYear; year++) {
+    for (let month = 0; month < 12; month++) {
+      const monthProgress = (year + month / 12 - startYear) / yearSpan;
+      const x = monthProgress * timelineWidth;
+      
+      if (x >= 0 && x <= timelineWidth) {
+        markers.push({
+          year,
+          month,
+          x,
+          monthName: monthNames[month]
+        });
+      }
+    }
+  }
+
+  return markers;
+};
+
 // Calculate visible scandals for rendering optimization (only what's on screen)
 export const getVisibleScandals = (
   positions: ScandalPosition[],
@@ -378,4 +423,66 @@ export const findNearestYearMarker = (
     const firstMarkerToRight = yearMarkers[0];
     return firstMarkerToRight ? firstMarkerToRight.year - 1 : new Date().getFullYear();
   }
+};
+
+// Calculate positions for points in zoomed out mode
+export const calculateScandalPointPositions = (
+  scandals: Scandal[],
+  startYear: number,
+  endYear: number,
+  timelineWidth: number
+): ScandalPointPosition[] => {
+  if (scandals.length === 0) return [];
+
+  // Sort scandals by date
+  const sortedScandals = [...scandals].sort((a, b) => 
+    new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+  );
+
+  const positions: ScandalPointPosition[] = [];
+  const monthGroups: { [key: string]: Scandal[] } = {};
+
+  // Group scandals by year-month
+  sortedScandals.forEach(scandal => {
+    const date = new Date(scandal.startDate);
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const key = `${year}-${month}`;
+    
+    if (!monthGroups[key]) {
+      monthGroups[key] = [];
+    }
+    monthGroups[key].push(scandal);
+  });
+
+  // Calculate positions for each month group
+  Object.entries(monthGroups).forEach(([key, monthScandals]) => {
+    const [year, month] = key.split('-').map(Number);
+    
+    // Calculate X position for the month
+    const monthProgress = (year + month / 12 - startYear) / (endYear - startYear);
+    const monthX = monthProgress * timelineWidth;
+    
+    // Sort scandals within the month by day
+    monthScandals.sort((a, b) => 
+      new Date(a.startDate).getDate() - new Date(b.startDate).getDate()
+    );
+    
+    // Calculate Y positions for each scandal in the month
+    monthScandals.forEach((scandal, index) => {
+      const date = new Date(scandal.startDate);
+      const y = TIMELINE_Y + 50 + (index * POINT_SPACING);
+      
+      positions.push({
+        id: scandal.id,
+        x: monthX,
+        y: y,
+        date: date,
+        month: month,
+        year: year
+      });
+    });
+  });
+
+  return positions;
 };
