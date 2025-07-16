@@ -44,9 +44,22 @@ const PersonalityModal: React.FC<PersonalityModalProps> = ({ name, onClose, onCl
 
     // Trouver le dernier scandale où la personne a un poste
     for (const scandal of sortedScandals) {
-      const personIndex = scandal.personalities?.indexOf(personName);
-      if (personIndex !== -1 && scandal.positions && scandal.positions[personIndex]) {
-        return scandal.positions[personIndex];
+      if (scandal.personalities) {
+        // Handle both old format (object) and new format (string)
+        for (const personData of scandal.personalities) {
+          const personalityName = typeof personData === 'string' ? personData : personData.personality;
+          if (personalityName === personName) {
+            // For new format, we need to check positions array
+            if (typeof personData === 'string' && scandal.positions) {
+              const personIndex = scandal.personalities.indexOf(personData);
+              if (personIndex >= 0 && personIndex < scandal.positions.length) {
+                return scandal.positions[personIndex];
+              }
+            } else if (typeof personData === 'object' && personData.position) {
+              return personData.position;
+            }
+          }
+        }
       }
     }
 

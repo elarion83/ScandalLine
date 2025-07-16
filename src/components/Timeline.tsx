@@ -1,9 +1,10 @@
 import React, { useRef, useEffect, useCallback, useMemo, useState } from 'react';
-import { ZoomIn, ZoomOut, Filter, BarChart3, FileText, Building2, Users, ArrowRight } from 'lucide-react';
+import { ZoomIn, ZoomOut, Filter, BarChart3, FileText, Building2, Users, ArrowRight, TrendingUp } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Scandal } from '../types/scandal';
 import { filterScandals, calculateStats, getCategoryLabel } from '../utils/scandalUtils';
 import { filterTimelineBy } from '../utils/contextualFilters';
+import { nameToSlug } from '../utils/shareUtils';
 import { 
   calculateTimelineWidth, 
   calculateScandalPositions, 
@@ -33,6 +34,7 @@ import ContextualHeader from './ContextualHeader';
 import ShareTimeline from './ShareTimeline';
 import ScrollHint from './modals/ScrollHint';
 import PersonalityHint from './modals/PersonalityHint';
+import ContextualTimelinePanel from './modals/ContextualTimelinePanel';
 import CurrentYearDisplay from './CurrentYearDisplay';
 import TimelineGrid from './TimelineGrid';
 
@@ -57,6 +59,7 @@ const Timeline: React.FC<TimelineProps> = ({
   const [hasUsedDrag, setHasUsedDrag] = useState(false);
   const [showScrollHint, setShowScrollHint] = useState(true);
   const [hasScrolledHorizontally, setHasScrolledHorizontally] = useState(false);
+  const [showContextualPanel, setShowContextualPanel] = useState(false);
 
   // Apply contextual filter first, then regular filters
   const contextuallyFilteredScandals = state.contextualFilter 
@@ -75,25 +78,49 @@ const Timeline: React.FC<TimelineProps> = ({
   // Determine if we need adaptive layout
   const shouldUseAdaptiveLayout = false;
   
-  // Auto-switch to points mode when zoomed out significantly (zoom < 50%)
-  const shouldUsePointsMode = state.zoomLevel < 7.5; // 50% of default zoom level
+  // Detect if we're on mobile
+  const isMobile = state.viewportWidth < 768; // Standard mobile breakpoint
+  
+  // Force mobile behavior: 43% zoom and points mode
+  const mobileZoomLevel = 6.45; // 43% of default zoom (15 * 0.43)
+  
+  // Auto-switch to points mode when zoomed out significantly (zoom < 40%) or on mobile
+  const shouldUsePointsMode = state.zoomLevel < 6 || isMobile; // 40% of default zoom level or mobile
+  
+  // Force mobile zoom and mode
+  useEffect(() => {
+    if (isMobile) {
+      // Force zoom to 43% on mobile
+      if (state.zoomLevel !== mobileZoomLevel) {
+        dispatch({ type: 'SET_ZOOM', payload: mobileZoomLevel });
+      }
+      // Force points mode on mobile
+      if (state.displayMode !== 'points') {
+        dispatch({ type: 'SET_DISPLAY_MODE', payload: 'points' });
+      }
+    }
+  }, [isMobile, state.zoomLevel, state.displayMode, dispatch]);
   
   // Debug: log current values
   console.log('🔍 Debug mode points:', {
     zoomLevel: state.zoomLevel,
     shouldUsePointsMode,
     currentDisplayMode: state.displayMode,
-    zoomPercentage: (state.zoomLevel / 15) * 100
+    zoomPercentage: (state.zoomLevel / 15) * 100,
+    isMobile,
+    viewportWidth: state.viewportWidth
   });
   
-  // Update display mode based on zoom level
+  // Update display mode based on zoom level and mobile detection (desktop only)
   useEffect(() => {
-    const newDisplayMode = shouldUsePointsMode ? 'points' : 'cards';
-    if (state.displayMode !== newDisplayMode) {
-      console.log('🔄 Switching display mode:', { from: state.displayMode, to: newDisplayMode });
-      dispatch({ type: 'SET_DISPLAY_MODE', payload: newDisplayMode });
+    if (!isMobile) {
+      const newDisplayMode = shouldUsePointsMode ? 'points' : 'cards';
+      if (state.displayMode !== newDisplayMode) {
+        console.log('🔄 Switching display mode:', { from: state.displayMode, to: newDisplayMode, isMobile });
+        dispatch({ type: 'SET_DISPLAY_MODE', payload: newDisplayMode });
+      }
     }
-  }, [shouldUsePointsMode, state.displayMode, dispatch]);
+  }, [shouldUsePointsMode, state.displayMode, dispatch, isMobile]);
 
   // Calculate timeline dimensions based on adaptive behavior
   const { timelineWidth, scandalPositions, scandalPointPositions } = useMemo(() => {
@@ -271,6 +298,53 @@ const Timeline: React.FC<TimelineProps> = ({
     }, 150);
   }, [dispatch, scandals, state.filters, handleInitialScroll]);
 
+  // Handle contextual timeline selection
+  const handleSelectContextualTimeline = useCallback((type: 'personality' | 'party', value: string, label: string) => {
+    dispatch({ type: 'SET_TRANSITIONING', payload: true });
+    
+    // Mettre à jour l'URL avec le slug pour les personnalités
+    if (type === 'personality') {
+      const slug = nameToSlug(value);
+      const newUrl = `/timeline/${slug}`;
+      window.history.pushState({}, '', newUrl);
+    }
+    
+    setTimeout(() => {
+      // Reset du flag avant de changer de contexte
+      initialScrollDoneRef.current = false;
+      
+      // Create contextual filter
+      const contextualFilter = {
+        type,
+        value,
+        label
+      };
+      
+      // Set contextual filter
+      dispatch({ type: 'SET_CONTEXTUAL_FILTER', payload: contextualFilter });
+      
+      // Get filtered scandals
+      const filteredContextScandals = filterTimelineBy(scandals, contextualFilter);
+      
+      // Calculate new date range based on filtered scandals
+      const { start, end } = calculateDynamicDateRange(filteredContextScandals);
+      
+      // Update filters with new date range
+      dispatch({ 
+        type: 'SET_FILTERS', 
+        payload: { 
+          ...state.filters,
+          dateRange: { start, end }
+        } 
+      });
+      
+      dispatch({ type: 'SET_TRANSITIONING', payload: false });
+      
+      // Utiliser la méthode commune pour le scroll initial
+      handleInitialScroll();
+    }, 150);
+  }, [dispatch, scandals, state.filters, handleInitialScroll]);
+
   // Handle viewport width changes
   useEffect(() => {
     const handleResize = () => {
@@ -286,7 +360,7 @@ const Timeline: React.FC<TimelineProps> = ({
 
   // Handle zoom with center preservation (disabled for adaptive layout)
   const handleZoomIn = useCallback(() => {
-    if (state.zoomLevel >= 300 || shouldUseAdaptiveLayout) return;
+    if (state.zoomLevel >= 500 || shouldUseAdaptiveLayout) return;
     
     const container = containerRef.current;
     if (!container) return;
@@ -294,8 +368,8 @@ const Timeline: React.FC<TimelineProps> = ({
     const currentCenter = state.scrollPosition + state.viewportWidth / 2;
     const currentCenterRatio = currentCenter / timelineWidth;
     
-    // Zoom de 10% à chaque clic
-    const newZoomLevel = Math.min(300, state.zoomLevel * 1.10);
+    // Zoom de 20% à chaque clic (plus marqué)
+    const newZoomLevel = Math.min(500, state.zoomLevel * 1.20);
     dispatch({ type: 'SET_ZOOM', payload: newZoomLevel });
     
     // Preserve center position after zoom
@@ -311,7 +385,7 @@ const Timeline: React.FC<TimelineProps> = ({
   }, [dispatch, state.zoomLevel, state.scrollPosition, state.viewportWidth, timelineWidth, startYear, endYear, shouldUseAdaptiveLayout]);
 
   const handleZoomOut = useCallback(() => {
-    if (state.zoomLevel <= 1.5 || shouldUseAdaptiveLayout) return;
+    if (state.zoomLevel <= 1 || shouldUseAdaptiveLayout) return;
     
     const container = containerRef.current;
     if (!container) return;
@@ -319,8 +393,8 @@ const Timeline: React.FC<TimelineProps> = ({
     const currentCenter = state.scrollPosition + state.viewportWidth / 2;
     const currentCenterRatio = currentCenter / timelineWidth;
     
-    // Dézoom de 10% à chaque clic
-    const newZoomLevel = Math.max(1.5, state.zoomLevel / 1.10);
+    // Dézoom de 20% à chaque clic (plus marqué)
+    const newZoomLevel = Math.max(1, state.zoomLevel / 1.20);
     dispatch({ type: 'SET_ZOOM', payload: newZoomLevel });
     
     // Preserve center position after zoom
@@ -523,33 +597,37 @@ const Timeline: React.FC<TimelineProps> = ({
                   style={{ transformOrigin: 'center' }}
                 >
 
-                    {/* Groupe de zoom */}
-                    <div className="flex items-center">
-                        <button
-                          onClick={handleZoomOut}
-                          className="w-10 h-10 rounded-full flex items-center justify-center bg-black/10 hover:bg-black/20 active:bg-black/30 disabled:opacity-50 disabled:hover:bg-black/10 transition-all"
-                          title="Dézoomer"
-                          disabled={state.zoomLevel <= 5}
-                        >
-                          <ZoomOut className="w-6 h-6 text-white" />
-                        </button>
-                        
-                        <span className="w-12 text-center text-sm font-bold text-white">
-                            {Math.round((state.zoomLevel / 15) * 100)}%
-                        </span>
-                        
-                        <button
-                          onClick={handleZoomIn}
-                          className="w-10 h-10 rounded-full flex items-center justify-center bg-black/10 hover:bg-black/20 active:bg-black/30 disabled:opacity-50 disabled:hover:bg-black/10 transition-all"
-                          title="Zoomer"
-                          disabled={state.zoomLevel >= 300}
-                        >
-                          <ZoomIn className="w-6 h-6 text-white" />
-                        </button>
-                    </div>
+                    {/* Groupe de zoom - masqué sur mobile */}
+                    {!isMobile && (
+                      <>
+                        <div className="flex items-center">
+                            <button
+                              onClick={handleZoomOut}
+                              className="w-10 h-10 rounded-full flex items-center justify-center bg-black/10 hover:bg-black/20 active:bg-black/30 disabled:opacity-50 disabled:hover:bg-black/10 transition-all"
+                              title="Dézoomer"
+                              disabled={state.zoomLevel <= 1}
+                            >
+                              <ZoomOut className="w-6 h-6 text-white" />
+                            </button>
+                            
+                            <span className="w-12 text-center text-sm font-bold text-white">
+                                {Math.round((state.zoomLevel / 15) * 100)}%
+                            </span>
+                            
+                            <button
+                              onClick={handleZoomIn}
+                              className="w-10 h-10 rounded-full flex items-center justify-center bg-black/10 hover:bg-black/20 active:bg-black/30 disabled:opacity-50 disabled:hover:bg-black/10 transition-all"
+                              title="Zoomer"
+                              disabled={state.zoomLevel >= 500}
+                            >
+                              <ZoomIn className="w-6 h-6 text-white" />
+                            </button>
+                        </div>
 
-                    {/* Séparateur invisible pour l'espacement */}
-                    <div className="w-[25px]"></div>
+                        {/* Séparateur invisible pour l'espacement */}
+                        <div className="w-[25px]"></div>
+                      </>
+                    )}
                     
                     {/* Groupe des boutons filtres et stats */}
                     <div className="flex items-center">
@@ -603,6 +681,23 @@ const Timeline: React.FC<TimelineProps> = ({
                           )}
                         </button>
                         
+                        {/* Button to open contextual timelines panel - plus gros et entre filtres et stats */}
+                        <button
+                          onClick={() => setShowContextualPanel(true)}
+                          className={`w-12 h-12 ml-2 rounded-full flex items-center justify-center transition-all ${
+                            state.contextualFilter
+                              ? 'bg-violet-500/40 ring-2 ring-violet-500/60 animate-pulse' 
+                              : 'bg-black/10 hover:bg-black/20 active:bg-black/30'
+                          }`}
+                          title="Timelines contextualisées"
+                        >
+                          <div className="flex items-center justify-center w-6 h-6 relative">
+                            <span className="text-white font-bold text-sm tracking-tight drop-shadow-sm">Sk</span>
+                            {/* Petit point décoratif pour rendre l'icône plus distinctive */}
+                            <div className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-violet-400 rounded-full opacity-80"></div>
+                          </div>
+                        </button>
+                        
                         <button
                           onClick={() => dispatch({ type: 'TOGGLE_STATS' })}
                           className={`w-10 h-10 ml-1 rounded-full flex items-center justify-center transition-all ${
@@ -615,26 +710,28 @@ const Timeline: React.FC<TimelineProps> = ({
                           <BarChart3 className={`w-6 h-6 text-white transition-transform ${state.showStats ? 'scale-110' : ''}`} />
                         </button>
                         
-                        {/* Button to switch between cards and points mode by adjusting zoom */}
-                        <button
-                          onClick={() => {
-                            if (state.displayMode === 'points') {
-                              // Switch to cards mode: zoom in to 100% (default zoom level)
-                              dispatch({ type: 'SET_ZOOM', payload: 15 });
-                            } else {
-                              // Switch to points mode: zoom out to 30% of default
-                              dispatch({ type: 'SET_ZOOM', payload: 4.5 });
-                            }
-                          }}
-                          className={`w-10 h-10 ml-1 rounded-full flex items-center justify-center transition-all ${
-                            state.displayMode === 'points'
-                              ? 'bg-green-500/30 ring-2 ring-green-500/50' 
-                              : 'bg-black/10 hover:bg-black/20 active:bg-black/30'
-                          }`}
-                          title={`Passer au mode ${state.displayMode === 'points' ? 'cartes' : 'points'}`}
-                        >
-                          <div className={`w-3 h-3 rounded-full ${state.displayMode === 'points' ? 'bg-green-400' : 'bg-white'}`} />
-                        </button>
+                        {/* Button to switch between cards and points mode by adjusting zoom - masqué sur mobile */}
+                        {!isMobile && (
+                          <button
+                            onClick={() => {
+                              if (state.displayMode === 'points') {
+                                // Switch to cards mode: zoom in to 100% (default zoom level)
+                                dispatch({ type: 'SET_ZOOM', payload: 15 });
+                              } else {
+                                // Switch to points mode: zoom out to 30% of default
+                                dispatch({ type: 'SET_ZOOM', payload: 4.5 });
+                              }
+                            }}
+                            className={`w-10 h-10 ml-1 rounded-full flex items-center justify-center transition-all ${
+                              state.displayMode === 'points'
+                                ? 'bg-green-500/30 ring-2 ring-green-500/50' 
+                                : 'bg-black/10 hover:bg-black/20 active:bg-black/30'
+                            }`}
+                            title={`Passer au mode ${state.displayMode === 'points' ? 'cartes' : 'points'}`}
+                          >
+                            <div className={`w-3 h-3 rounded-full ${state.displayMode === 'points' ? 'bg-green-400' : 'bg-white'}`} />
+                          </button>
+                        )}
                     </div>
                 </div>
           </div>
@@ -804,6 +901,14 @@ const Timeline: React.FC<TimelineProps> = ({
           onClose={() => dispatch({ type: 'SELECT_SCANDAL', payload: null })}
         />
       )}
+
+      {/* Contextual Timeline Panel */}
+      <ContextualTimelinePanel
+        isOpen={showContextualPanel}
+        onClose={() => setShowContextualPanel(false)}
+        scandals={scandals}
+        onSelectTimeline={handleSelectContextualTimeline}
+      />
     </div>
   );
 };

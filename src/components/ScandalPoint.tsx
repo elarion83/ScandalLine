@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Scandal } from '../types/scandal';
 import { getMainCategory, cleanScandalName, formatCurrency, getCategoryLabel } from '../utils/scandalUtils';
 import { useTimeline } from '../contexts/TimelineContext';
+import { ExternalLink } from 'lucide-react';
 
 interface ScandalPointProps {
   scandal: Scandal;
@@ -23,6 +24,46 @@ const ScandalPoint: React.FC<ScandalPointProps> = ({
 }) => {
   const { state } = useTimeline();
   const [isHovered, setIsHovered] = useState(false);
+  const [isMobileTooltipOpen, setIsMobileTooltipOpen] = useState(false);
+  
+  // Detect if we're on mobile
+  const isMobile = state.viewportWidth < 768;
+  const isPointsMode = state.displayMode === 'points';
+  
+  // Handle click based on device and mode
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent event bubbling
+    
+    if (isMobile && isPointsMode) {
+      // On mobile in points mode: toggle tooltip instead of opening modal
+      setIsMobileTooltipOpen(!isMobileTooltipOpen);
+    } else {
+      // On desktop or in cards mode: open modal directly
+      onClick();
+    }
+  };
+  
+  // Close mobile tooltip when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isMobileTooltipOpen && isMobile && isPointsMode) {
+        // Close tooltip if clicking outside
+        setIsMobileTooltipOpen(false);
+      }
+    };
+    
+    if (isMobileTooltipOpen) {
+      // Use a small delay to prevent immediate closure
+      const timeoutId = setTimeout(() => {
+        document.addEventListener('click', handleClickOutside);
+      }, 100);
+      
+      return () => {
+        clearTimeout(timeoutId);
+        document.removeEventListener('click', handleClickOutside);
+      };
+    }
+  }, [isMobileTooltipOpen, isMobile, isPointsMode]);
 
   // Get color based on scandal type
   const getPointColor = () => {
@@ -108,9 +149,9 @@ const ScandalPoint: React.FC<ScandalPointProps> = ({
           transform: 'translate(-50%, -50%)', // Center the point on its position
           ...style
         }}
-        onClick={onClick}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        onClick={handleClick}
+        onMouseEnter={() => !isMobile && setIsHovered(true)}
+        onMouseLeave={() => !isMobile && setIsHovered(false)}
         whileHover={{ scale: 1.3 }}
         whileTap={{ scale: 0.9 }}
         initial={{ scale: 0, opacity: 0 }}
@@ -118,8 +159,8 @@ const ScandalPoint: React.FC<ScandalPointProps> = ({
         transition={{ duration: 0.2 }}
       />
       
-      {/* Tooltip */}
-      {isHovered && (
+      {/* Desktop Tooltip (hover only) */}
+      {isHovered && !isMobile && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -147,7 +188,7 @@ const ScandalPoint: React.FC<ScandalPointProps> = ({
               <div className="mb-2">
                 <div className="text-gray-400 text-xs font-medium mb-1">Personnes :</div>
                 <div className="text-gray-300 text-xs">
-                  {scandal.personalities.slice(0, 3).join(', ')}
+                  {scandal.personalities.slice(0, 3).map(p => typeof p === 'string' ? p : p.personality).join(', ')}
                   {scandal.personalities.length > 3 && '...'}
                 </div>
               </div>
@@ -173,6 +214,80 @@ const ScandalPoint: React.FC<ScandalPointProps> = ({
                 </div>
               </div>
             )}
+          </div>
+        </motion.div>
+      )}
+      
+      {/* Mobile Tooltip (click to open) */}
+      {isMobileTooltipOpen && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 10 }}
+          transition={{ duration: 0.2 }}
+          className="absolute z-50"
+          style={{
+            left: position.x + 20, // Position à droite du point
+            top: position.y - 80, // Au-dessus du point
+            transform: 'translateY(-50%)' // Centre verticalement
+          }}
+        >
+          <div className="bg-gray-900/95 backdrop-blur-sm text-white text-xs px-4 py-3 rounded-lg shadow-xl border border-gray-700/50 max-w-xs">
+            <div className="font-medium mb-2 text-sm">{cleanScandalName(scandal.name)}</div>
+            <div className="text-gray-300 text-xs mb-3">
+              {new Date(scandal.startDate).toLocaleDateString('fr-FR', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+              })}
+            </div>
+            
+            {/* Personnes concernées */}
+            {scandal.personalities && scandal.personalities.length > 0 && (
+              <div className="mb-3">
+                <div className="text-gray-400 text-xs font-medium mb-1">Personnes :</div>
+                <div className="text-gray-300 text-xs">
+                  {scandal.personalities.slice(0, 3).map(p => typeof p === 'string' ? p : p.personality).join(', ')}
+                  {scandal.personalities.length > 3 && '...'}
+                </div>
+              </div>
+            )}
+            
+            {/* Sanctions */}
+            {(scandal.moneyAmount || scandal.fine || scandal.prisonYears || scandal.ineligibilityYears) && (
+              <div className="mb-3">
+                <div className="text-gray-400 text-xs font-medium mb-1">Sanctions :</div>
+                <div className="text-gray-300 text-xs space-y-1">
+                  {scandal.moneyAmount && (
+                    <div>💰 {formatCurrency(scandal.moneyAmount)}</div>
+                  )}
+                  {scandal.fine && (
+                    <div>💸 Amende : {formatCurrency(scandal.fine)}</div>
+                  )}
+                  {scandal.prisonYears && (
+                    <div>🔒 Prison : {scandal.prisonYears} an{scandal.prisonYears > 1 ? 's' : ''}</div>
+                  )}
+                  {scandal.ineligibilityYears && (
+                    <div>🚫 Inéligibilité : {scandal.ineligibilityYears} an{scandal.ineligibilityYears > 1 ? 's' : ''}</div>
+                  )}
+                </div>
+              </div>
+            )}
+            
+            {/* Bouton pour ouvrir la modal */}
+            <div className="flex justify-center pt-2 border-t border-gray-700/50">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsMobileTooltipOpen(false);
+                  onClick();
+                }}
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-xs font-medium transition-colors"
+              >
+                <ExternalLink className="w-3 h-3" />
+                Voir les détails
+              </button>
+            </div>
           </div>
         </motion.div>
       )}

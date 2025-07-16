@@ -4,6 +4,7 @@ import { Scandal } from '../types/scandal';
 import { formatCurrency, formatLargeNumber } from '../utils/scandalUtils';
 import { generateYearMarkers, findNearestYearMarker } from '../utils/timelineLayout';
 import { motion, AnimatePresence } from 'framer-motion';
+import AnimatedCounter from './AnimatedCounter';
 
 interface DynamicStatsBarProps {
   visibleScandals: Scandal[];
@@ -143,38 +144,52 @@ const DynamicStatsBar: React.FC<DynamicStatsBarProps> = ({
       <div className="fixed top-[105px] opacity-80 left-[5px] z-40 md:hidden">
         <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-3 space-y-2">
           {/* Visible scandals count */}
-          <div className="flex items-center gap-2">
-            <TrendingUp className="w-3 h-3 text-blue-600 dark:text-blue-400 flex-shrink-0" />
-            <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
-              {visibleStats.count}/{totalScandals}
-            </span>
-          </div>
+          {visibleStats.count > 0 && (
+            <AnimatedCounter
+              value={visibleStats.count}
+              icon={<TrendingUp className="w-3 h-3 text-blue-600 dark:text-blue-400 flex-shrink-0" />}
+              suffix={`/${totalScandals}`}
+              bgColor="bg-blue-50 dark:bg-blue-900/20"
+              textColor="text-blue-700 dark:text-blue-300"
+              className="text-xs"
+            />
+          )}
 
           {/* Money detourned */}
-          <div className="flex items-center gap-2">
-            <DollarSign className="w-3 h-3 text-red-600 dark:text-red-400 flex-shrink-0" />
-            <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
-              {formatLargeNumber(visibleStats.totalMoney)}
-            </span>
-          </div>
+          {visibleStats.totalMoney > 0 && (
+            <AnimatedCounter
+              value={visibleStats.totalMoney}
+              icon={<DollarSign className="w-3 h-3 text-red-600 dark:text-red-400 flex-shrink-0" />}
+              formatValue={formatLargeNumber}
+              bgColor="bg-red-50 dark:bg-red-900/20"
+              textColor="text-red-700 dark:text-red-300"
+              className="text-xs"
+            />
+          )}
 
           {/* Total fines */}
           {visibleStats.totalFines > 0 && (
-            <div className="flex items-center gap-2">
-              <Award className="w-3 h-3 text-orange-600 dark:text-orange-400 flex-shrink-0" />
-              <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
-                {formatLargeNumber(visibleStats.totalFines)}
-              </span>
-            </div>
+            <AnimatedCounter
+              value={visibleStats.totalFines}
+              icon={<Award className="w-3 h-3 text-orange-600 dark:text-orange-400 flex-shrink-0" />}
+              formatValue={formatLargeNumber}
+              bgColor="bg-orange-50 dark:bg-orange-900/20"
+              textColor="text-orange-700 dark:text-orange-300"
+              className="text-xs"
+            />
           )}
 
           {/* Prison years */}
-          <div className="flex items-center gap-2">
-            <Scale className="w-3 h-3 text-purple-600 dark:text-purple-400 flex-shrink-0" />
-            <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
-              {visibleStats.totalPrison} an{visibleStats.totalPrison > 1 ? 's' : ''}
-            </span>
-          </div>
+          {visibleStats.totalPrison > 0 && (
+            <AnimatedCounter
+              value={visibleStats.totalPrison}
+              icon={<Scale className="w-3 h-3 text-purple-600 dark:text-purple-400 flex-shrink-0" />}
+              suffix={` an${visibleStats.totalPrison > 1 ? 's' : ''}`}
+              bgColor="bg-purple-50 dark:bg-purple-900/20"
+              textColor="text-purple-700 dark:text-purple-300"
+              className="text-xs"
+            />
+          )}
         </div>
       </div>
 
@@ -228,46 +243,50 @@ const DynamicStatsBar: React.FC<DynamicStatsBarProps> = ({
         <div className="relative flex items-center justify-between px-4 py-2 hidden md:flex">
           <div className={`flex items-center gap-4 transition-all duration-300 ${scrollProgress < 0.5 ? 'ml-auto' : ''}`}>
             {/* Visible scandals count */}
-            <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-lg">
-              <TrendingUp className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-              <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
-                {visibleStats.count}
-              </span>
-              <span className="text-xs text-blue-600 dark:text-blue-400">
-                / {totalScandals} affaires
-              </span>
-            </div>
+            {visibleStats.count > 0 && (
+              <AnimatedCounter
+                value={visibleStats.count}
+                icon={<TrendingUp className="w-4 h-4 text-blue-600 dark:text-blue-400" />}
+                suffix={`/ ${totalScandals} affaires`}
+                bgColor="bg-blue-50 dark:bg-blue-900/20"
+                textColor="text-blue-700 dark:text-blue-300"
+              />
+            )}
 
             {/* Money detourned */}
-            <div className="flex items-center gap-2 bg-red-50 dark:bg-red-900/20 px-3 py-1.5 rounded-lg">
-              <DollarSign className="w-4 h-4 text-red-600 dark:text-red-400" />
-              <span className="text-sm font-bold text-red-700 dark:text-red-300">
-                {formatLargeNumber(visibleStats.totalMoney)}
-              </span>
-              <span className="text-xs text-red-600 dark:text-red-400">concernés</span>
-            </div>
+            {visibleStats.totalMoney > 0 && (
+              <AnimatedCounter
+                value={visibleStats.totalMoney}
+                icon={<DollarSign className="w-4 h-4 text-red-600 dark:text-red-400" />}
+                formatValue={formatLargeNumber}
+                label="concernés"
+                bgColor="bg-red-50 dark:bg-red-900/20"
+                textColor="text-red-700 dark:text-red-300"
+              />
+            )}
 
             {/* Total fines */}
             {visibleStats.totalFines > 0 && (
-              <div className="flex items-center gap-2 bg-orange-50 dark:bg-orange-900/20 px-3 py-1.5 rounded-lg">
-                <Award className="w-4 h-4 text-orange-600 dark:text-orange-400" />
-                <span className="text-sm font-bold text-orange-700 dark:text-orange-300">
-                  {formatLargeNumber(visibleStats.totalFines)}
-                </span>
-                <span className="text-xs text-orange-600 dark:text-orange-400">d'amendes</span>
-              </div>
+              <AnimatedCounter
+                value={visibleStats.totalFines}
+                icon={<Award className="w-4 h-4 text-orange-600 dark:text-orange-400" />}
+                formatValue={formatLargeNumber}
+                label="d'amendes"
+                bgColor="bg-orange-50 dark:bg-orange-900/20"
+                textColor="text-orange-700 dark:text-orange-300"
+              />
             )}
 
             {/* Prison years */}
-            <div className="flex items-center gap-2 bg-purple-50 dark:bg-purple-900/20 px-3 py-1.5 rounded-lg">
-              <Scale className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-              <span className="text-sm font-bold text-purple-700 dark:text-purple-300">
-                {visibleStats.totalPrison}
-              </span>
-              <span className="text-xs text-purple-600 dark:text-purple-400">
-                an{visibleStats.totalPrison > 1 ? 's' : ''} prison
-              </span>
-            </div>
+            {visibleStats.totalPrison > 0 && (
+              <AnimatedCounter
+                value={visibleStats.totalPrison}
+                icon={<Scale className="w-4 h-4 text-purple-600 dark:text-purple-400" />}
+                suffix={` an${visibleStats.totalPrison > 1 ? 's' : ''} prison`}
+                bgColor="bg-purple-50 dark:bg-purple-900/20"
+                textColor="text-purple-700 dark:text-purple-300"
+              />
+            )}
           </div>
         </div>
       </div>

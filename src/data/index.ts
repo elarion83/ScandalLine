@@ -45,32 +45,32 @@ allScandals.forEach(scandal => {
 });
 
 // Export individual year arrays for specific access
-export const scandals2000 = scandalsByYear.get(2000) || [];
-export const scandals2001 = scandalsByYear.get(2001) || [];
-export const scandals2002 = scandalsByYear.get(2002) || [];
-export const scandals2003 = scandalsByYear.get(2003) || [];
-export const scandals2004 = scandalsByYear.get(2004) || [];
-export const scandals2005 = scandalsByYear.get(2005) || [];
-export const scandals2006 = scandalsByYear.get(2006) || [];
-export const scandals2007 = scandalsByYear.get(2007) || [];
-export const scandals2008 = scandalsByYear.get(2008) || [];
-export const scandals2009 = scandalsByYear.get(2009) || [];
-export const scandals2010 = scandalsByYear.get(2010) || [];
-export const scandals2011 = scandalsByYear.get(2011) || [];
-export const scandals2012 = scandalsByYear.get(2012) || [];
-export const scandals2013 = scandalsByYear.get(2013) || [];
-export const scandals2014 = scandalsByYear.get(2014) || [];
-export const scandals2015 = scandalsByYear.get(2015) || [];
-export const scandals2016 = scandalsByYear.get(2016) || [];
-export const scandals2017 = scandalsByYear.get(2017) || [];
-export const scandals2018 = scandalsByYear.get(2018) || [];
-export const scandals2019 = scandalsByYear.get(2019) || [];
-export const scandals2020 = scandalsByYear.get(2020) || [];
-export const scandals2021 = scandalsByYear.get(2021) || [];
-export const scandals2022 = scandalsByYear.get(2022) || [];
-export const scandals2023 = scandalsByYear.get(2023) || [];
-export const scandals2024 = scandalsByYear.get(2024) || [];
-export const scandals2025 = scandalsByYear.get(2025) || [];
+export const scandalsByYear2000 = scandalsByYear.get(2000) || [];
+export const scandalsByYear2001 = scandalsByYear.get(2001) || [];
+export const scandalsByYear2002 = scandalsByYear.get(2002) || [];
+export const scandalsByYear2003 = scandalsByYear.get(2003) || [];
+export const scandalsByYear2004 = scandalsByYear.get(2004) || [];
+export const scandalsByYear2005 = scandalsByYear.get(2005) || [];
+export const scandalsByYear2006 = scandalsByYear.get(2006) || [];
+export const scandalsByYear2007 = scandalsByYear.get(2007) || [];
+export const scandalsByYear2008 = scandalsByYear.get(2008) || [];
+export const scandalsByYear2009 = scandalsByYear.get(2009) || [];
+export const scandalsByYear2010 = scandalsByYear.get(2010) || [];
+export const scandalsByYear2011 = scandalsByYear.get(2011) || [];
+export const scandalsByYear2012 = scandalsByYear.get(2012) || [];
+export const scandalsByYear2013 = scandalsByYear.get(2013) || [];
+export const scandalsByYear2014 = scandalsByYear.get(2014) || [];
+export const scandalsByYear2015 = scandalsByYear.get(2015) || [];
+export const scandalsByYear2016 = scandalsByYear.get(2016) || [];
+export const scandalsByYear2017 = scandalsByYear.get(2017) || [];
+export const scandalsByYear2018 = scandalsByYear.get(2018) || [];
+export const scandalsByYear2019 = scandalsByYear.get(2019) || [];
+export const scandalsByYear2020 = scandalsByYear.get(2020) || [];
+export const scandalsByYear2021 = scandalsByYear.get(2021) || [];
+export const scandalsByYear2022 = scandalsByYear.get(2022) || [];
+export const scandalsByYear2023 = scandalsByYear.get(2023) || [];
+export const scandalsByYear2024 = scandalsByYear.get(2024) || [];
+export const scandalsByYear2025 = scandalsByYear.get(2025) || [];
 
 // Helper function to get scandals by year range
 export const getScandalsByYearRange = (startYear: number, endYear: number): Scandal[] => {

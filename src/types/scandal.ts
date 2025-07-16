@@ -2,8 +2,10 @@ export interface Scandal {
   id: string;
   name: string;
   description: string;
-  personalities: string[];
-  positions: string[];
+  personalities: Array<{
+    personality: string;
+    position: string;
+  }>;
   startDate: string;
   country?: string;
   judgmentDate?: string;
@@ -13,8 +15,9 @@ export interface Scandal {
   fine?: number;
   ineligibilityYears?: number;
   type: string;
+  otherTypes?: string[];
   politicalParty?: string;
-  status: 'ongoing' | 'judged' | 'convicted' | 'acquitted';
+  status: 'ongoing' | 'judged' | 'convicted' | 'acquitted' | 'closed';
   investigationDate?: string;
   region?: string;
   institution?: string;
@@ -23,12 +26,17 @@ export interface Scandal {
   sources?: {
     name: string;
     url: string;
+    favicon?: string;
   }[];
   sanctions?: {
     person: string;
     penalty: string;
+    details?: string;
     fine: number;
+    sentenceDate?: string;
+    positionAtSanction?: string;
   }[];
+  duration?: string;
 }
 
 export interface FilterOptions {

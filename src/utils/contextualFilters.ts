@@ -9,9 +9,10 @@ export const filterTimelineBy = (
   switch (contextualFilter.type) {
     case 'personality':
       return scandals.filter(scandal => 
-        scandal.personalities?.some(person => 
-          person === contextualFilter.value.toString()
-        ) ?? false
+        scandal.personalities?.some(personData => {
+          const personalityName = typeof personData === 'string' ? personData : personData.personality;
+          return personalityName === contextualFilter.value.toString();
+        }) ?? false
       );
     
     case 'party':

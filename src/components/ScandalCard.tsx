@@ -41,8 +41,8 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
   const [intersectionRatio, setIntersectionRatio] = useState(0);
   const [selectedPerson, setSelectedPerson] = useState<string | null>(null);
 
-  // Check if content should be collapsed (zoom < 67%)
-  const isContentCollapsed = (state.zoomLevel / 15) * 100 < 67;
+  // Check if content should be collapsed (zoom < 50%)
+  const isContentCollapsed = (state.zoomLevel / 15) * 100 < 50;
 
   // Check if there are any sanctions
   const hasSanctions = (scandal.moneyAmount ?? 0) > 0 || 
@@ -390,30 +390,34 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
                 <span className="text-xs text-gray-600 dark:text-gray-300 font-semibold">Impliqués</span>
               </div>
               <div className="grid grid-cols-2 gap-2 text-sm text-gray-800 dark:text-gray-100">
-                {(scandal.personalities || []).slice(0, 2).map((person, index) => (
-                  <button 
-                    key={person}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedPerson(person);
-                    }}
-                    className="inline-flex items-center gap-2 px-2 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700/50 dark:hover:bg-gray-600/50 text-gray-900 dark:text-gray-100 transition-colors cursor-pointer shadow-sm hover:shadow-md min-w-0"
-                  >
-                    {/* Photo de la personnalité ou icône de fallback */}
-                    {getPersonalityPhoto(person) ? (
-                      <>
-                        {getPersonalityPhoto(person)}
-                        <div className="hidden">
-                          <Users className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                        </div>
-                      </>
-                    ) : (
-                      <Users className="w-4 h-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
-                    )}
-                    <span className="text-sm font-medium truncate">{person}</span>
-                    <ArrowRight className="w-3 h-3 text-gray-400 dark:text-gray-500 flex-shrink-0" />
-                  </button>
-                ))}
+                {(scandal.personalities || []).slice(0, 2).map((personData, index) => {
+                  // Handle both old format (object) and new format (string)
+                  const person = typeof personData === 'string' ? personData : personData.personality;
+                  return (
+                    <button 
+                      key={person}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedPerson(person);
+                      }}
+                      className="inline-flex items-center gap-2 px-2 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700/50 dark:hover:bg-gray-600/50 text-gray-900 dark:text-gray-100 transition-colors cursor-pointer shadow-sm hover:shadow-md min-w-0"
+                    >
+                      {/* Photo de la personnalité ou icône de fallback */}
+                      {getPersonalityPhoto(person) ? (
+                        <>
+                          {getPersonalityPhoto(person)}
+                          <div className="hidden">
+                            <Users className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                          </div>
+                        </>
+                      ) : (
+                        <Users className="w-4 h-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
+                      )}
+                      <span className="text-sm font-medium truncate">{person}</span>
+                      <ArrowRight className="w-3 h-3 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+                    </button>
+                  );
+                })}
                 {(scandal.personalities || []).length > 2 && (
                   <span className="text-xs text-blue-600 dark:text-blue-400 font-medium underline decoration-blue-400/50 dark:decoration-blue-600/50">
                     Voir {(scandal.personalities || []).length - 2} de plus

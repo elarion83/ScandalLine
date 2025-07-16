@@ -2,6 +2,7 @@ import React from 'react';
 import { X, TrendingUp, Users, DollarSign, Scale, Calendar, FileText, Building2, BarChart2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { formatCurrency, formatLargeNumber, getCategoryLabel, getMainCategory, getCategoryColors } from '../utils/scandalUtils';
+import AnimatedCounter from './AnimatedCounter';
 
 interface StatsData {
   total: number;
@@ -63,9 +64,12 @@ const StatsPanel: React.FC<StatsPanelProps> = ({ stats, scandals, onClose }) => 
               <TrendingUp className="w-4 h-4 text-blue-600 dark:text-blue-400" />
               <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">Total</span>
             </div>
-            <div className="text-2xl font-bold text-blue-700 dark:text-blue-300">
-              {stats.total}
-            </div>
+            <AnimatedCounter
+              value={stats.total}
+              className="text-2xl"
+              bgColor="bg-transparent"
+              textColor="text-blue-700 dark:text-blue-300"
+            />
             <div className="text-xs text-blue-600 dark:text-blue-400">affaires</div>
           </div>
 
@@ -74,9 +78,13 @@ const StatsPanel: React.FC<StatsPanelProps> = ({ stats, scandals, onClose }) => 
               <DollarSign className="w-4 h-4 text-red-600 dark:text-red-400" />
               <span className="text-xs text-red-600 dark:text-red-400 font-medium">Concernés</span>
             </div>
-            <div className="text-lg font-bold text-red-700 dark:text-red-300">
-              {formatLargeNumber(stats.totalMoney)}
-            </div>
+            <AnimatedCounter
+              value={stats.totalMoney}
+              formatValue={formatLargeNumber}
+              className="text-lg"
+              bgColor="bg-transparent"
+              textColor="text-red-700 dark:text-red-300"
+            />
             <div className="text-xs text-red-600 dark:text-red-400">au total</div>
           </div>
 
@@ -85,9 +93,12 @@ const StatsPanel: React.FC<StatsPanelProps> = ({ stats, scandals, onClose }) => 
               <Scale className="w-4 h-4 text-purple-600 dark:text-purple-400" />
               <span className="text-xs text-purple-600 dark:text-purple-400 font-medium">Prison</span>
             </div>
-            <div className="text-2xl font-bold text-purple-700 dark:text-purple-300">
-              {stats.totalPrisonYears}
-            </div>
+            <AnimatedCounter
+              value={stats.totalPrisonYears}
+              className="text-2xl"
+              bgColor="bg-transparent"
+              textColor="text-purple-700 dark:text-purple-300"
+            />
             <div className="text-xs text-purple-600 dark:text-purple-400">années</div>
           </div>
 
@@ -96,9 +107,13 @@ const StatsPanel: React.FC<StatsPanelProps> = ({ stats, scandals, onClose }) => 
               <Users className="w-4 h-4 text-green-600 dark:text-green-400" />
               <span className="text-xs text-green-600 dark:text-green-400 font-medium">Amendes</span>
             </div>
-            <div className="text-lg font-bold text-green-700 dark:text-green-300">
-              {formatLargeNumber(stats.totalFines)}
-            </div>
+            <AnimatedCounter
+              value={stats.totalFines}
+              formatValue={formatLargeNumber}
+              className="text-lg"
+              bgColor="bg-transparent"
+              textColor="text-green-700 dark:text-green-300"
+            />
             <div className="text-xs text-green-600 dark:text-green-400">cumulées</div>
           </div>
         </div>

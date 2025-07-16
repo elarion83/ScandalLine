@@ -27,10 +27,10 @@ export const TIMELINE_Y = 120;
 export const MIN_VERTICAL_SPACING = 40;
 export const MIN_HORIZONTAL_SPACING = 40;
 export const TRACK_HEIGHT = CARD_HEIGHT + MIN_VERTICAL_SPACING;
-export const BASE_PIXELS_PER_YEAR = 150;
-export const POINT_SIZE = 24; // Size of points in pixels (increased from 16)
-export const POINT_SPACING = 35; // Vertical spacing between points in same month (increased from 20)
-export const MONTH_SPACING = 20; // Horizontal spacing between months
+export const BASE_PIXELS_PER_YEAR = 200; // Increased for better spacing
+export const POINT_SIZE = 28; // Size of points in pixels (increased for better visibility)
+export const POINT_SPACING = 40; // Vertical spacing between points in same month (increased)
+export const MONTH_SPACING = 25; // Horizontal spacing between months (increased)
 
 
 // Check if timeline needs scrolling (more than one affair)
@@ -273,9 +273,9 @@ export const generateYearMarkers = (
   let interval = 1;
   const pixelsPerYear = timelineWidth / yearSpan;
   
-  if (pixelsPerYear < 30) interval = 10;
-  else if (pixelsPerYear < 60) interval = 5;
-  else if (pixelsPerYear < 120) interval = 2;
+  if (pixelsPerYear < 50) interval = 10;
+  else if (pixelsPerYear < 100) interval = 5;
+  else if (pixelsPerYear < 200) interval = 2;
   else interval = 1;
 
   // Generate markers

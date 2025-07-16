@@ -38,7 +38,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
     const parties = Array.from(new Set(scandals.filter(s => s.politicalParty).map(s => s.politicalParty!)));
     
     // Exclure la personnalité actuellement sélectionnée dans le filtre contextuel
-    let personalities = Array.from(new Set(scandals.flatMap(s => s.personalities || [])));
+    let personalities = Array.from(new Set(scandals.flatMap(s => s.personalities || []).map(p => typeof p === 'string' ? p : p.personality)));
     if (contextualFilter && contextualFilter.type === 'personality') {
       personalities = personalities.filter(person => person !== contextualFilter.value.toString());
     }
@@ -75,9 +75,10 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
 
         if (tempFilters.personalities.length > 0) {
           const scandalPersonalities = scandal.personalities || [];
-          const hasPersonality = scandalPersonalities.some(p => 
-            tempFilters.personalities.some(fp => p.toLowerCase().includes(fp.toLowerCase()))
-          );
+          const hasPersonality = scandalPersonalities.some(p => {
+            const personalityName = typeof p === 'string' ? p : p.personality;
+            return tempFilters.personalities.some(fp => personalityName.toLowerCase().includes(fp.toLowerCase()));
+          });
           if (!hasPersonality) return false;
         }
         

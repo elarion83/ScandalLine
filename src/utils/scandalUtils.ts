@@ -300,14 +300,15 @@ export const filterScandals = (scandals: Scandal[], filters: FilterOptions): Sca
       return false;
     }
 
-    // Personalities filter
-    if (filters.personalities.length > 0) {
-      const scandalPersonalities = scandal.personalities || [];
-      const hasPersonality = scandalPersonalities.some(p => 
-        filters.personalities.some(fp => p.toLowerCase().includes(fp.toLowerCase()))
-      );
-      if (!hasPersonality) return false;
-    }
+      // Personalities filter
+  if (filters.personalities.length > 0) {
+    const scandalPersonalities = scandal.personalities || [];
+    const hasPersonality = scandalPersonalities.some(personData => {
+      const personalityName = typeof personData === 'string' ? personData : personData.personality;
+      return filters.personalities.some(fp => personalityName.toLowerCase().includes(fp.toLowerCase()));
+    });
+    if (!hasPersonality) return false;
+  }
 
     // Party filter
     if (filters.parties.length > 0) {

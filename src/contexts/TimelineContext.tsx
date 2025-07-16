@@ -51,8 +51,8 @@ const initialState: TimelineState = {
 const timelineReducer = (state: TimelineState, action: TimelineAction): TimelineState => {
   switch (action.type) {
     case 'SET_ZOOM':
-      // Limites de zoom étendues : de 1.5x (10%) à 300x (2000%)
-      return { ...state, zoomLevel: Math.max(1.5, Math.min(300, action.payload)) };
+      // Limites de zoom étendues : de 1x (7%) à 500x (3300%)
+      return { ...state, zoomLevel: Math.max(1, Math.min(500, action.payload)) };
     case 'SET_SCROLL_POSITION':
       return { ...state, scrollPosition: action.payload };
     case 'SELECT_SCANDAL':

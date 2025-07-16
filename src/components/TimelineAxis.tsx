@@ -54,7 +54,8 @@ const TimelineAxis: React.FC<TimelineAxisProps> = ({
 
       {/* Year markers and labels */}
       {yearMarkers.map(({ year, x, isMainMarker }) => {
-        const opacity = getOpacity(x);
+        // En mode points, on garde une opacité fixe pour les marqueurs d'années
+        const opacity = displayMode === 'points' ? 0.8 : getOpacity(x);
         
         return (
         <div key={year} className="absolute" style={{ left: x, top: timelineY }}>
