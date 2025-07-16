@@ -4,6 +4,7 @@ import { X, Users, Building2, TrendingUp, Star, Search, FileText, DollarSign, Aw
 import { Scandal } from '../../types/scandal';
 import { perso_Photos } from '../../data/perso_photos';
 import { formatLargeNumber } from '../../utils/scandalUtils';
+import { allScandals } from '../../data';
 
 interface ContextualTimelinePanelProps {
   isOpen: boolean;
@@ -80,12 +81,13 @@ const ContextualTimelinePanel: React.FC<ContextualTimelinePanelProps> = ({
     return photoData?.url || null;
   };
 
-  // Extract all unique personalities and parties from scandals with detailed stats
+  // Extract all unique personalities and parties from ALL scandals with detailed stats
   const timelineOptions = React.useMemo(() => {
     const personalities = new Map<string, { count: number; scandals: Scandal[] }>();
     const parties = new Map<string, { count: number; scandals: Scandal[] }>();
 
-    scandals.forEach(scandal => {
+    // Use allScandals instead of filtered scandals to show all possible entries
+    allScandals.forEach(scandal => {
       // Count personalities - handle both old and new format
       if (scandal.personalities) {
         scandal.personalities.forEach(p => {
