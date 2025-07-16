@@ -121,7 +121,7 @@ const Timeline: React.FC<TimelineProps> = ({
       }
     }
   }, [shouldUsePointsMode, state.displayMode, dispatch, isMobile]);
-
+  
   // Calculate timeline dimensions based on adaptive behavior
   const { timelineWidth, scandalPositions, scandalPointPositions } = useMemo(() => {
     if (shouldUseAdaptiveLayout) {
@@ -358,9 +358,28 @@ const Timeline: React.FC<TimelineProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, [dispatch]);
 
+  // Niveaux de zoom spécifiques (en pourcentage du zoom par défaut)
+  const zoomLevels = [20, 40, 60, 100, 150, 200, 250, 300];
+  const defaultZoomLevel = 15; // 100% = 15
+
+  // Fonction pour obtenir le niveau de zoom suivant
+  const getNextZoomLevel = (currentZoom: number) => {
+    const currentPercentage = (currentZoom / defaultZoomLevel) * 100;
+    const nextLevel = zoomLevels.find(level => level > currentPercentage);
+    return nextLevel ? (nextLevel / 100) * defaultZoomLevel : currentZoom;
+  };
+
+  // Fonction pour obtenir le niveau de zoom précédent
+  const getPreviousZoomLevel = (currentZoom: number) => {
+    const currentPercentage = (currentZoom / defaultZoomLevel) * 100;
+    const previousLevel = zoomLevels.reverse().find(level => level < currentPercentage);
+    zoomLevels.reverse(); // Remettre dans l'ordre
+    return previousLevel ? (previousLevel / 100) * defaultZoomLevel : currentZoom;
+  };
+
   // Handle zoom with center preservation (disabled for adaptive layout)
   const handleZoomIn = useCallback(() => {
-    if (state.zoomLevel >= 500 || shouldUseAdaptiveLayout) return;
+    if (shouldUseAdaptiveLayout) return;
     
     const container = containerRef.current;
     if (!container) return;
@@ -368,8 +387,10 @@ const Timeline: React.FC<TimelineProps> = ({
     const currentCenter = state.scrollPosition + state.viewportWidth / 2;
     const currentCenterRatio = currentCenter / timelineWidth;
     
-    // Zoom de 20% à chaque clic (plus marqué)
-    const newZoomLevel = Math.min(500, state.zoomLevel * 1.20);
+    // Utiliser le niveau de zoom suivant
+    const newZoomLevel = getNextZoomLevel(state.zoomLevel);
+    if (newZoomLevel === state.zoomLevel) return; // Déjà au maximum
+    
     dispatch({ type: 'SET_ZOOM', payload: newZoomLevel });
     
     // Preserve center position after zoom
@@ -385,7 +406,7 @@ const Timeline: React.FC<TimelineProps> = ({
   }, [dispatch, state.zoomLevel, state.scrollPosition, state.viewportWidth, timelineWidth, startYear, endYear, shouldUseAdaptiveLayout]);
 
   const handleZoomOut = useCallback(() => {
-    if (state.zoomLevel <= 1 || shouldUseAdaptiveLayout) return;
+    if (shouldUseAdaptiveLayout) return;
     
     const container = containerRef.current;
     if (!container) return;
@@ -393,8 +414,10 @@ const Timeline: React.FC<TimelineProps> = ({
     const currentCenter = state.scrollPosition + state.viewportWidth / 2;
     const currentCenterRatio = currentCenter / timelineWidth;
     
-    // Dézoom de 20% à chaque clic (plus marqué)
-    const newZoomLevel = Math.max(1, state.zoomLevel / 1.20);
+    // Utiliser le niveau de zoom précédent
+    const newZoomLevel = getPreviousZoomLevel(state.zoomLevel);
+    if (newZoomLevel === state.zoomLevel) return; // Déjà au minimum
+    
     dispatch({ type: 'SET_ZOOM', payload: newZoomLevel });
     
     // Preserve center position after zoom
@@ -419,12 +442,13 @@ const Timeline: React.FC<TimelineProps> = ({
     const currentCenter = state.scrollPosition + state.viewportWidth / 2;
     const currentCenterRatio = currentCenter / timelineWidth;
     
-    dispatch({ type: 'SET_ZOOM', payload: 15 });
+    // Utiliser le niveau 100% (15)
+    dispatch({ type: 'SET_ZOOM', payload: defaultZoomLevel });
     
     // Preserve center position after reset
     setTimeout(() => {
       if (container) {
-        const newTimelineWidth = calculateTimelineWidth(startYear, endYear, 15);
+        const newTimelineWidth = calculateTimelineWidth(startYear, endYear, defaultZoomLevel);
         const newCenter = currentCenterRatio * newTimelineWidth;
         const newScrollLeft = newCenter - state.viewportWidth / 2;
         container.scrollLeft = Math.max(0, newScrollLeft);
@@ -613,32 +637,32 @@ const Timeline: React.FC<TimelineProps> = ({
                     {/* Groupe de zoom - masqué sur mobile */}
                     {!isMobile && (
                       <>
-                        <div className="flex items-center">
-                            <button
-                              onClick={handleZoomOut}
-                              className="w-10 h-10 rounded-full flex items-center justify-center bg-black/10 hover:bg-black/20 active:bg-black/30 disabled:opacity-50 disabled:hover:bg-black/10 transition-all"
-                              title="Dézoomer"
-                              disabled={state.zoomLevel <= 1}
-                            >
-                              <ZoomOut className="w-6 h-6 text-white" />
-                            </button>
-                            
-                            <span className="w-12 text-center text-sm font-bold text-white">
-                                {Math.round((state.zoomLevel / 15) * 100)}%
-                            </span>
-                            
-                            <button
-                              onClick={handleZoomIn}
-                              className="w-10 h-10 rounded-full flex items-center justify-center bg-black/10 hover:bg-black/20 active:bg-black/30 disabled:opacity-50 disabled:hover:bg-black/10 transition-all"
-                              title="Zoomer"
-                              disabled={state.zoomLevel >= 500}
-                            >
-                              <ZoomIn className="w-6 h-6 text-white" />
-                            </button>
-                        </div>
+                    <div className="flex items-center">
+                        <button
+                          onClick={handleZoomOut}
+                          className="w-10 h-10 rounded-full flex items-center justify-center bg-black/10 hover:bg-black/20 active:bg-black/30 disabled:opacity-50 disabled:hover:bg-black/10 transition-all"
+                          title="Dézoomer"
+                              disabled={state.zoomLevel <= 3}
+                        >
+                          <ZoomOut className="w-6 h-6 text-white" />
+                        </button>
+                        
+                        <span className="w-12 text-center text-sm font-bold text-white">
+                            {Math.round((state.zoomLevel / 15) * 100)}%
+                        </span>
+                        
+                        <button
+                          onClick={handleZoomIn}
+                          className="w-10 h-10 rounded-full flex items-center justify-center bg-black/10 hover:bg-black/20 active:bg-black/30 disabled:opacity-50 disabled:hover:bg-black/10 transition-all"
+                          title="Zoomer"
+                              disabled={state.zoomLevel >= 45}
+                        >
+                          <ZoomIn className="w-6 h-6 text-white" />
+                        </button>
+                    </div>
 
-                        {/* Séparateur invisible pour l'espacement */}
-                        <div className="w-[25px]"></div>
+                    {/* Séparateur invisible pour l'espacement */}
+                    <div className="w-[25px]"></div>
                       </>
                     )}
                     
@@ -836,20 +860,20 @@ const Timeline: React.FC<TimelineProps> = ({
               {state.displayMode === 'cards' ? (
                 // Render cards in normal mode
                 visibleScandalPositions.map((position) => {
-                  const scandal = filteredScandals.find(s => s.id === position.id);
-                  if (!scandal) return null;
-                  
-                  return (
-                    <ScandalCard
-                      key={scandal.id}
-                      scandal={scandal}
-                      onClick={() => dispatch({ type: 'SELECT_SCANDAL', payload: scandal.id })}
-                      isSelected={state.selectedScandalId === scandal.id}
-                      position={position}
-                      timelineY={TIMELINE_Y}
-                      allScandals={scandals}
-                    />
-                  );
+                const scandal = filteredScandals.find(s => s.id === position.id);
+                if (!scandal) return null;
+                
+                return (
+                  <ScandalCard
+                    key={scandal.id}
+                    scandal={scandal}
+                    onClick={() => dispatch({ type: 'SELECT_SCANDAL', payload: scandal.id })}
+                    isSelected={state.selectedScandalId === scandal.id}
+                    position={position}
+                    timelineY={TIMELINE_Y}
+                    allScandals={scandals}
+                  />
+                );
                 })
               ) : (
                 // Render points in zoomed out mode

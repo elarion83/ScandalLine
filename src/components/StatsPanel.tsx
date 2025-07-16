@@ -42,10 +42,10 @@ const StatsPanel: React.FC<StatsPanelProps> = ({ stats, scandals, onClose }) => 
       style={{ zIndex: 50 }}
     >
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-gray-100 dark:bg-gray-800">
+      <div className="texture-overlay bg-gradient-to-r from-gray-800 to-gray-900 text-white p-4 border-b border-gray-700 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <BarChart2 className="w-5 h-5 text-gray-900 dark:text-white" />
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Statistiques</h2>
+          <BarChart2 className="w-5 h-5 text-white" />
+          <h2 className="text-lg font-semibold text-white">Statistiques</h2>
         </div>
         <button
           onClick={onClose}

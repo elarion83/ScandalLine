@@ -167,10 +167,10 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
       className="w-80 md:w-80 w-full bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col h-full absolute top-0 left-0 shadow-2xl"
     >
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-gray-100 dark:bg-gray-800">
+      <div className="texture-overlay bg-gradient-to-r from-gray-800 to-gray-900 text-white p-4 border-b border-gray-700 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Filter className="w-5 h-5 text-gray-900 dark:text-white" />
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Filtres</h2>
+          <Filter className="w-5 h-5 text-white" />
+          <h2 className="text-lg font-semibold text-white">Filtres</h2>
         </div>
         <button
           onClick={onClose}

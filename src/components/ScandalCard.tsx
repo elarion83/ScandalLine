@@ -394,28 +394,28 @@ const ScandalCard: React.FC<ScandalCardProps> = ({
                   // Handle both old format (object) and new format (string)
                   const person = typeof personData === 'string' ? personData : personData.personality;
                   return (
-                    <button 
-                      key={person}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedPerson(person);
-                      }}
-                      className="inline-flex items-center gap-2 px-2 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700/50 dark:hover:bg-gray-600/50 text-gray-900 dark:text-gray-100 transition-colors cursor-pointer shadow-sm hover:shadow-md min-w-0"
-                    >
-                      {/* Photo de la personnalité ou icône de fallback */}
-                      {getPersonalityPhoto(person) ? (
-                        <>
-                          {getPersonalityPhoto(person)}
-                          <div className="hidden">
-                            <Users className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                          </div>
-                        </>
-                      ) : (
-                        <Users className="w-4 h-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
-                      )}
-                      <span className="text-sm font-medium truncate">{person}</span>
-                      <ArrowRight className="w-3 h-3 text-gray-400 dark:text-gray-500 flex-shrink-0" />
-                    </button>
+                  <button 
+                    key={person}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedPerson(person);
+                    }}
+                    className="inline-flex items-center gap-2 px-2 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700/50 dark:hover:bg-gray-600/50 text-gray-900 dark:text-gray-100 transition-colors cursor-pointer shadow-sm hover:shadow-md min-w-0"
+                  >
+                    {/* Photo de la personnalité ou icône de fallback */}
+                    {getPersonalityPhoto(person) ? (
+                      <>
+                        {getPersonalityPhoto(person)}
+                        <div className="hidden">
+                          <Users className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                        </div>
+                      </>
+                    ) : (
+                      <Users className="w-4 h-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
+                    )}
+                    <span className="text-sm font-medium truncate">{person}</span>
+                    <ArrowRight className="w-3 h-3 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+                  </button>
                   );
                 })}
                 {(scandal.personalities || []).length > 2 && (

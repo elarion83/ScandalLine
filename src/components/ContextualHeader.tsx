@@ -105,7 +105,7 @@ const ContextualHeader: React.FC<ContextualHeaderProps> = ({
           }
           // Si c'est l'ancien format (chaînes), utiliser le tableau positions
           else if (scandal.positions && scandal.positions[personIndex]) {
-            return scandal.positions[personIndex];
+        return scandal.positions[personIndex];
           }
         }
       }
