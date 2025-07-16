@@ -197,10 +197,9 @@ const ScandalPoint: React.FC<ScandalPointProps> = ({
             {/* Sanctions */}
             {(scandal.moneyAmount || scandal.fine || scandal.prisonYears || scandal.ineligibilityYears) && (
               <div>
-                <div className="text-gray-400 text-xs font-medium mb-1">Sanctions :</div>
                 <div className="text-gray-300 text-xs space-y-1">
                   {scandal.moneyAmount && (
-                    <div>💰 {formatCurrency(scandal.moneyAmount)}</div>
+                    <div>💰 Montant : {formatCurrency(scandal.moneyAmount)}</div>
                   )}
                   {scandal.fine && (
                     <div>💸 Amende : {formatCurrency(scandal.fine)}</div>

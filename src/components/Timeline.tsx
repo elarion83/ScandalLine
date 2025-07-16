@@ -485,6 +485,17 @@ const Timeline: React.FC<TimelineProps> = ({
     const container = containerRef.current;
     if (!container) return;
 
+    // En mode points, convertir le scroll vertical en scroll horizontal
+    if (state.displayMode === 'points') {
+      e.preventDefault();
+      container.scrollLeft += e.deltaY;
+      if (container.scrollLeft > 0 && !hasScrolledHorizontally) {
+        setHasScrolledHorizontally(true);
+      }
+      return;
+    }
+
+    // En mode cartes, comportement normal
     // Si shift + scroll ou scroll horizontal natif
     if (e.deltaX !== 0 || e.shiftKey) {
       container.scrollLeft += e.deltaX || e.deltaY;
@@ -493,7 +504,7 @@ const Timeline: React.FC<TimelineProps> = ({
       }
       e.preventDefault();
     }
-  }, [hasScrolledHorizontally]);
+  }, [hasScrolledHorizontally, state.displayMode]);
 
   // Gérer le scroll tactile et pad
   useEffect(() => {
@@ -693,7 +704,17 @@ const Timeline: React.FC<TimelineProps> = ({
                           title="Timelines contextualisées"
                         >
                           <div className="flex items-center justify-center relative">
-                            <span className="text-white font-bold text-lg tracking-tight drop-shadow-sm">Sk</span>
+                            <img 
+                              src="/logo_letters_white.png" 
+                              alt="Skandal"
+                              className="w-8 h-8 object-contain"
+                              onError={(e) => {
+                                // Fallback vers le texte si l'image ne charge pas
+                                e.currentTarget.style.display = 'none';
+                                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                              }}
+                            />
+                            <span className="text-white font-bold text-lg tracking-tight drop-shadow-sm hidden">Sk</span>
                           </div>
                         </button>
                         
@@ -767,7 +788,7 @@ const Timeline: React.FC<TimelineProps> = ({
               className="relative timeline-container"
               style={{ 
                 width: timelineWidth,
-                minHeight: state.displayMode === 'points' ? 'calc(100vh - 40px - 61px)' : '800px',
+                minHeight: state.displayMode === 'points' ? 'calc(100vh - 80px - 61px)' : '800px',
                 paddingBottom: '100px'
               }}
             >
@@ -886,6 +907,7 @@ const Timeline: React.FC<TimelineProps> = ({
         onClose={() => setShowContextualPanel(false)}
         scandals={scandals}
         onSelectTimeline={handleSelectContextualTimeline}
+        isInContextualTimeline={!!state.contextualFilter}
       />
     </div>
   );
