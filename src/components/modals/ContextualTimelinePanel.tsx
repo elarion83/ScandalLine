@@ -10,7 +10,6 @@ interface ContextualTimelinePanelProps {
   onClose: () => void;
   scandals: Scandal[];
   onSelectTimeline: (type: 'personality' | 'party', value: string, label: string) => void;
-  isInContextualTimeline?: boolean;
 }
 
 interface TimelineOption {
@@ -31,8 +30,7 @@ const ContextualTimelinePanel: React.FC<ContextualTimelinePanelProps> = ({
   isOpen,
   onClose,
   scandals,
-  onSelectTimeline,
-  isInContextualTimeline = false
+  onSelectTimeline
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'personalities' | 'parties'>('all');
@@ -213,10 +211,7 @@ const ContextualTimelinePanel: React.FC<ContextualTimelinePanelProps> = ({
     onClose();
   };
 
-  const handleReturnToGeneralTimeline = () => {
-    // Rediriger vers l'URL de base
-    window.location.href = '/';
-  };
+
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
@@ -258,26 +253,13 @@ const ContextualTimelinePanel: React.FC<ContextualTimelinePanelProps> = ({
             {/* Header */}
             <div className="texture-overlay bg-gradient-to-r from-gray-800 to-gray-900 text-white p-6 border-b border-gray-700">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  {isInContextualTimeline && (
-                    <button
-                      onClick={handleReturnToGeneralTimeline}
-                      className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-500 to-pink-500 hover:from-violet-600 hover:to-pink-600 active:from-violet-700 active:to-pink-700 text-white rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
-                      title="Retour à la timeline générale"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                      </svg>
-                    </button>
-                  )}
-                  <div>
-                    <h2 className="text-lg font-bold text-white">
-                      Timelines contextualisées
-                    </h2>
-                    <p className="text-sm text-gray-300">
-                      Explorez par personnalité ou parti politique
-                    </p>
-                  </div>
+                <div>
+                  <h2 className="text-lg font-bold text-white">
+                    Timelines contextualisées
+                  </h2>
+                  <p className="text-sm text-gray-300">
+                    Explorez par personnalité ou parti politique
+                  </p>
                 </div>
                 <button
                   onClick={onClose}
