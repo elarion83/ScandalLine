@@ -91,9 +91,23 @@ const ContextualHeader: React.FC<ContextualHeaderProps> = ({
 
     // Trouver le dernier scandale où la personne a un poste
     for (const scandal of sortedScandals) {
-      const personIndex = scandal.personalities?.indexOf(personName);
-      if (personIndex !== -1 && scandal.positions && scandal.positions[personIndex]) {
-        return scandal.positions[personIndex];
+      if (scandal.personalities) {
+        // Gérer les deux formats : tableau de chaînes ou tableau d'objets
+        const personIndex = scandal.personalities.findIndex(personData => {
+          const personalityName = typeof personData === 'string' ? personData : personData.personality;
+          return personalityName === personName;
+        });
+        
+        if (personIndex !== -1) {
+          // Si c'est le nouveau format (objets), récupérer la position directement
+          if (typeof scandal.personalities[personIndex] === 'object') {
+            return scandal.personalities[personIndex].position;
+          }
+          // Si c'est l'ancien format (chaînes), utiliser le tableau positions
+          else if (scandal.positions && scandal.positions[personIndex]) {
+            return scandal.positions[personIndex];
+          }
+        }
       }
     }
 

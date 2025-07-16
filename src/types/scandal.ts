@@ -5,7 +5,8 @@ export interface Scandal {
   personalities: Array<{
     personality: string;
     position: string;
-  }>;
+  }> | string[];
+  positions?: string[];
   startDate: string;
   country?: string;
   judgmentDate?: string;
