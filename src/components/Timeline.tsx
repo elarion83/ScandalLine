@@ -485,10 +485,11 @@ const Timeline: React.FC<TimelineProps> = ({
     const container = containerRef.current;
     if (!container) return;
 
-    // En mode points, convertir le scroll vertical en scroll horizontal
+    // En mode points, convertir le scroll vertical en scroll horizontal ET permettre le scroll horizontal
     if (state.displayMode === 'points') {
       e.preventDefault();
-      container.scrollLeft += e.deltaY;
+      // Scroll horizontal direct (deltaX) + conversion du scroll vertical (deltaY)
+      container.scrollLeft += e.deltaX + e.deltaY;
       if (container.scrollLeft > 0 && !hasScrolledHorizontally) {
         setHasScrolledHorizontally(true);
       }

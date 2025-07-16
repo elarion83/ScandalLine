@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import FingerScrollIcon from '../FingerScrollIcon';
 
 interface ScrollHintProps {
   show?: boolean;
@@ -42,15 +43,14 @@ const ScrollHint: React.FC<ScrollHintProps> = ({ show = true, scrollPosition = 0
       }}
     >
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 max-w-sm mx-4 relative overflow-hidden">
-        {/* Icône décorative */}
+        {/* Icône de doigt animée */}
         <motion.div 
-          className="w-12 h-12 rounded-full bg-gradient-to-r from-violet-500 to-pink-500 flex items-center justify-center mx-auto"
+          className="w-36 h-36 rounded-full bg-gradient-to-r from-violet-500 to-pink-500 flex items-center justify-center mx-auto"
         >
-          <motion.div
-            className="text-white text-2xl font-bold"
-          >
-            →
-          </motion.div>
+          <FingerScrollIcon 
+            className="text-white" 
+            size={144}
+          />
         </motion.div>
 
         {/* Titre */}

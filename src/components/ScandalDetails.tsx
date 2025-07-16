@@ -131,6 +131,94 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
           {/* Contenu Scrollable */}
           <div className="overflow-y-auto max-h-[calc(95vh-8rem)] md:max-h-[calc(90vh-12rem)]">
             <div className="p-3 md:p-6 space-y-3 md:space-y-6">
+              
+              {/* Section Personnes impliquées */}
+              <ScandalModalSection 
+                title="Personnes impliquées" 
+                icon={Users}
+                className="bg-white dark:bg-gray-800 p-3 md:p-6 rounded-lg md:rounded-xl border border-gray-100 dark:border-gray-700/50"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                  {scandal.personalities.map((personData, index) => {
+                    // Handle both old format (object) and new format (string)
+                    const person = typeof personData === 'string' ? personData : personData.personality;
+                    const position = typeof personData === 'string' ? null : personData.position;
+                    // Chercher si la personne a des sanctions
+                    const sanction = scandal.sanctions?.find(s => s.person === person);
+                    const personPhoto = getPersonPhoto(person);
+                    
+                    return (
+                      <div key={index} className="flex bg-gray-50 dark:bg-gray-800/50 rounded-lg md:rounded-xl border border-gray-200/50 dark:border-gray-600/50 overflow-hidden group hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-all duration-200">
+                        <div className="flex-1 p-3 md:p-4">
+                          <div className="flex items-center gap-3">
+                            {personPhoto ? (
+                              <img 
+                                src={personPhoto} 
+                                alt={person}
+                                className="w-8 h-8 md:w-10 md:h-10 rounded object-cover"
+                                onError={(e) => {
+                                  e.currentTarget.style.display = 'none';
+                                }}
+                              />
+                            ) : (
+                              <div className="w-8 h-8 md:w-10 md:h-10 rounded bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+                                <Users className="w-4 h-4 md:w-5 md:h-5 text-gray-500 dark:text-gray-400" />
+                              </div>
+                            )}
+                            <div className="flex-1">
+                              <div className="font-medium text-gray-900 dark:text-white">
+                                <button
+                                  onClick={() => handlePersonClick(person)}
+                                  className="flex items-center gap-2 hover:text-purple-600 dark:hover:text-purple-400 transition-all duration-200 cursor-pointer"
+                                  title={`Voir les détails de ${person}`}
+                                >
+                                  <span className="hover:underline">{person}</span>
+                                </button>
+                              </div>
+                              {position && (
+                                <div className="text-sm text-gray-600 dark:text-gray-400">
+                                  {position}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          
+                          {/* Afficher les sanctions si elles existent */}
+                          {sanction && (
+                            <div className="mt-2 pt-2 border-t border-gray-200/50 dark:border-gray-600/50">
+                              <div className="text-sm text-gray-600 dark:text-gray-400">
+                                {sanction.penalty}
+                              </div>
+                              {sanction.fine > 0 && (
+                                <div className="text-sm font-medium text-blue-600 dark:text-blue-400 mt-1">
+                                  Amende : {formatLargeNumber(sanction.fine)} €
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Grande flèche qui prend toute la hauteur */}
+                        <button
+                          onClick={() => handlePersonClick(person)}
+                          className="flex items-center justify-center w-12 md:w-16 bg-purple-500 hover:bg-purple-600 text-white transition-all duration-200 cursor-pointer group"
+                          title={`Voir les détails de ${person}`}
+                        >
+                          <svg 
+                            className="w-6 h-6 md:w-8 md:h-8 group-hover:translate-x-1 transition-all duration-200" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </ScandalModalSection>
+
               {/* Description en premier */}
               <ScandalModalSection 
                 title="Description" 
@@ -140,6 +228,47 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
                 <div className="text-base md:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
                   {scandal.description}
                 </div>
+              </ScandalModalSection>
+
+              {/* Section Institution */}
+              {(scandal.politicalParty || scandal.institution) && (
+                <ScandalModalSection 
+                  title="Institution concernée" 
+                  icon={Building2}
+                  className="bg-white dark:bg-gray-800 p-3 md:p-6 rounded-lg md:rounded-xl border border-gray-100 dark:border-gray-700/50"
+                >
+                  <div className="space-y-4">
+                    {scandal.politicalParty && (
+                      <div className="bg-gray-50 dark:bg-gray-800/50 p-3 md:p-4 rounded-lg md:rounded-xl border border-gray-200/50 dark:border-gray-600/50">
+                        <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                          Parti politique
+                        </div>
+                        <div className="font-medium text-gray-900 dark:text-white">
+                          {scandal.politicalParty}
+                        </div>
+                      </div>
+                    )}
+                    {scandal.institution && (
+                      <div className="bg-gray-50 dark:bg-gray-800/50 p-3 md:p-4 rounded-lg md:rounded-xl border border-gray-200/50 dark:border-gray-600/50">
+                        <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                          Institution
+                        </div>
+                        <div className="font-medium text-gray-900 dark:text-white">
+                          {scandal.institution}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </ScandalModalSection>
+              )}
+
+              {/* Timeline */}
+              <ScandalModalSection 
+                title="Chronologie" 
+                icon={Calendar}
+                className="bg-white dark:bg-gray-800 p-3 md:p-6 pb-0 rounded-lg md:rounded-xl border border-gray-100 dark:border-gray-700/50"
+              >
+                <ScandalTimeline events={timelineEvents} />
               </ScandalModalSection>
 
               {/* Section Faits & Sanctions - Affichée uniquement s'il y a des sanctions */}
@@ -238,134 +367,6 @@ const ScandalDetails: React.FC<ScandalDetailsProps> = ({ scandal, onClose }) => 
                   </div>
                 </ScandalModalSection>
               )}
-
-              {/* Section Personnes impliquées */}
-              <ScandalModalSection 
-                title="Personnes impliquées" 
-                icon={Users}
-                className="bg-white dark:bg-gray-800 p-3 md:p-6 rounded-lg md:rounded-xl border border-gray-100 dark:border-gray-700/50"
-              >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-                  {scandal.personalities.map((personData, index) => {
-                    // Handle both old format (object) and new format (string)
-                    const person = typeof personData === 'string' ? personData : personData.personality;
-                    const position = typeof personData === 'string' ? null : personData.position;
-                    // Chercher si la personne a des sanctions
-                    const sanction = scandal.sanctions?.find(s => s.person === person);
-                    const personPhoto = getPersonPhoto(person);
-                    
-                    return (
-                      <div key={index} className="flex bg-gray-50 dark:bg-gray-800/50 rounded-lg md:rounded-xl border border-gray-200/50 dark:border-gray-600/50 overflow-hidden group hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-all duration-200">
-                        <div className="flex-1 p-3 md:p-4">
-                          <div className="flex items-center gap-3">
-                            {personPhoto ? (
-                              <img 
-                                src={personPhoto} 
-                                alt={person}
-                                className="w-8 h-8 md:w-10 md:h-10 rounded object-cover"
-                                onError={(e) => {
-                                  e.currentTarget.style.display = 'none';
-                                }}
-                              />
-                            ) : (
-                              <div className="w-8 h-8 md:w-10 md:h-10 rounded bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
-                                <Users className="w-4 h-4 md:w-5 md:h-5 text-gray-500 dark:text-gray-400" />
-                              </div>
-                            )}
-                            <div className="flex-1">
-                              <div className="font-medium text-gray-900 dark:text-white">
-                                <button
-                                  onClick={() => handlePersonClick(person)}
-                                  className="flex items-center gap-2 hover:text-purple-600 dark:hover:text-purple-400 transition-all duration-200 cursor-pointer"
-                                  title={`Voir les détails de ${person}`}
-                                >
-                                  <span className="hover:underline">{person}</span>
-                                </button>
-                              </div>
-                              {position && (
-                                <div className="text-sm text-gray-600 dark:text-gray-400">
-                                  {position}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                          
-                          {/* Afficher les sanctions si elles existent */}
-                          {sanction && (
-                            <div className="mt-2 pt-2 border-t border-gray-200/50 dark:border-gray-600/50">
-                              <div className="text-sm text-gray-600 dark:text-gray-400">
-                                {sanction.penalty}
-                              </div>
-                              {sanction.fine > 0 && (
-                                <div className="text-sm font-medium text-blue-600 dark:text-blue-400 mt-1">
-                                  Amende : {formatLargeNumber(sanction.fine)} €
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                        
-                        {/* Grande flèche qui prend toute la hauteur */}
-                        <button
-                          onClick={() => handlePersonClick(person)}
-                          className="flex items-center justify-center w-12 md:w-16 bg-purple-500 hover:bg-purple-600 text-white transition-all duration-200 cursor-pointer group"
-                          title={`Voir les détails de ${person}`}
-                        >
-                          <svg 
-                            className="w-6 h-6 md:w-8 md:h-8 group-hover:translate-x-1 transition-all duration-200" 
-                            fill="none" 
-                            stroke="currentColor" 
-                            viewBox="0 0 24 24"
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-              </ScandalModalSection>
-
-              {/* Section Institution */}
-              {(scandal.politicalParty || scandal.institution) && (
-                <ScandalModalSection 
-                  title="Institution concernée" 
-                  icon={Building2}
-                  className="bg-white dark:bg-gray-800 p-3 md:p-6 rounded-lg md:rounded-xl border border-gray-100 dark:border-gray-700/50"
-                >
-                  <div className="space-y-4">
-                    {scandal.politicalParty && (
-                      <div className="bg-gray-50 dark:bg-gray-800/50 p-3 md:p-4 rounded-lg md:rounded-xl border border-gray-200/50 dark:border-gray-600/50">
-                        <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                          Parti politique
-                        </div>
-                        <div className="font-medium text-gray-900 dark:text-white">
-                          {scandal.politicalParty}
-                        </div>
-                      </div>
-                    )}
-                    {scandal.institution && (
-                      <div className="bg-gray-50 dark:bg-gray-800/50 p-3 md:p-4 rounded-lg md:rounded-xl border border-gray-200/50 dark:border-gray-600/50">
-                        <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                          Institution
-                        </div>
-                        <div className="font-medium text-gray-900 dark:text-white">
-                          {scandal.institution}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </ScandalModalSection>
-              )}
-
-              {/* Timeline */}
-              <ScandalModalSection 
-                title="Chronologie" 
-                icon={Calendar}
-                className="bg-white dark:bg-gray-800 p-3 md:p-6 pb-0 rounded-lg md:rounded-xl border border-gray-100 dark:border-gray-700/50"
-              >
-                <ScandalTimeline events={timelineEvents} />
-              </ScandalModalSection>
 
               {/* Section Tags et Connexions */}
               {((scandal.tags && scandal.tags.length > 0) || (scandal.relatedScandals && scandal.relatedScandals.length > 0)) && (

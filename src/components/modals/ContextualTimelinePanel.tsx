@@ -257,6 +257,17 @@ const ContextualTimelinePanel: React.FC<ContextualTimelinePanelProps> = ({
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-3">
+                {isInContextualTimeline && (
+                  <button
+                    onClick={handleReturnToGeneralTimeline}
+                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-500 to-pink-500 hover:from-violet-600 hover:to-pink-600 active:from-violet-700 active:to-pink-700 text-white rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
+                    title="Retour à la timeline générale"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                  </button>
+                )}
                 <div>
                   <h2 className="text-lg font-bold text-gray-900 dark:text-white">
                     Timelines contextualisées
@@ -266,27 +277,13 @@ const ContextualTimelinePanel: React.FC<ContextualTimelinePanelProps> = ({
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                {isInContextualTimeline && (
-                  <button
-                    onClick={handleReturnToGeneralTimeline}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
-                    title="Retour à la timeline générale"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                    </svg>
-                    <span className="text-sm font-medium">Timeline générale</span>
-                  </button>
-                )}
-                <button
-                  onClick={onClose}
-                  className="w-10 h-10 rounded-full bg-red-500 hover:bg-red-600 active:bg-red-700 text-white flex items-center justify-center transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
-                  title="Fermer les timelines contextualisées"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
+              <button
+                onClick={onClose}
+                className="w-10 h-10 rounded-full bg-red-500 hover:bg-red-600 active:bg-red-700 text-white flex items-center justify-center transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
+                title="Fermer les timelines contextualisées"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
             {/* Search and filters */}
