@@ -174,7 +174,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
         </div>
         <button
           onClick={onClose}
-          className="w-10 h-10 rounded-full bg-red-500 hover:bg-red-600 active:bg-red-700 text-white flex items-center justify-center transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
+          className="w-10 h-10 rounded-full text-white flex items-center justify-center transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
           title="Fermer les filtres"
         >
           <X className="w-5 h-5" />
