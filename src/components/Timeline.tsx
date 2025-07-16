@@ -589,7 +589,7 @@ const Timeline: React.FC<TimelineProps> = ({
 
       <div className="flex flex-1 overflow-hidden relative">
           <div 
-            className={`timeline-controls ${state.showFilters ? 'filters-open' : ''} ${state.showStats ? 'stats-open' : ''} fixed bottom-0 left-1/2 transform -translate-x-1/2 mb-12 md:mb-0`} 
+            className={`timeline-controls ${state.showFilters ? 'filters-open' : ''} ${state.showStats ? 'stats-open' : ''} fixed bottom-0 left-1/2 transform mb-12 md:mb-0`} 
             style={{ zIndex: 50 }}
           >
                 {/* Container principal */}
@@ -790,7 +790,7 @@ const Timeline: React.FC<TimelineProps> = ({
               className="relative timeline-container"
               style={{ 
                 width: timelineWidth,
-                minHeight: '800px',
+                minHeight: state.displayMode === 'points' ? 'calc(100vh - 40px - 61px)' : '800px',
                 paddingBottom: '100px'
               }}
             >

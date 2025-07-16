@@ -252,15 +252,12 @@ const ContextualTimelinePanel: React.FC<ContextualTimelinePanelProps> = ({
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-violet-500 to-pink-500 flex items-center justify-center">
-                  <TrendingUp className="w-5 h-5 text-white" />
-                </div>
                 <div>
                   <h2 className="text-lg font-bold text-gray-900 dark:text-white">
                     Timelines contextualisées
                   </h2>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Explorez les affaires par personnalité ou parti politique
+                    Explorez par personnalité ou parti politique
                   </p>
                 </div>
               </div>
@@ -304,7 +301,6 @@ const ContextualTimelinePanel: React.FC<ContextualTimelinePanelProps> = ({
                     }`}
                   >
                     {getCategoryIcon(category.id)}
-                    {category.label}
                   </button>
                 ))}
               </div>
@@ -408,12 +404,6 @@ const ContextualTimelinePanel: React.FC<ContextualTimelinePanelProps> = ({
                                )}
                              </div>
                            </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs px-2 py-1 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
-                            {option.type === 'personality' ? 'Personnalité' : 'Parti'}
-                          </span>
-                          <div className="w-2 h-2 rounded-full bg-violet-500 group-hover:scale-125 transition-transform" />
                         </div>
                                               </div>
                       </motion.button>

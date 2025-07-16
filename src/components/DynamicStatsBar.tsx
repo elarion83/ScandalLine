@@ -148,7 +148,7 @@ const DynamicStatsBar: React.FC<DynamicStatsBarProps> = ({
   return (
     <>
       {/* Mobile Stats - Position fixe en haut à gauche */}
-      <div className="fixed top-[105px] opacity-80 left-[5px] z-40 md:hidden">
+      <div className="fixed bottom-[105px] opacity-80 left-[5px] z-40 md:hidden">
         <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-3 space-y-2">
           {/* Visible scandals count */}
           {visibleStats.count > 0 && (
