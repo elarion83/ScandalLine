@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Users, Building2, TrendingUp, Star, Search, FileText, DollarSign, Award, Lock } from 'lucide-react';
 import { Scandal } from '../../types/scandal';
-import { shareUtils } from '../../utils/shareUtils';
 import { perso_Photos } from '../../data/perso_photos';
 
 interface ContextualTimelinePanelProps {
@@ -103,8 +102,9 @@ const ContextualTimelinePanel: React.FC<ContextualTimelinePanelProps> = ({
         });
       }
 
-      // Count parties - handle both old and new format
+      // Count parties - handle both old format (parties array) and new format (politicalParty string)
       if (scandal.parties) {
+        // Old format: array of parties
         scandal.parties.forEach(party => {
           const partyName = typeof party === 'string' ? party : party.party;
           if (partyName) {
@@ -117,6 +117,18 @@ const ContextualTimelinePanel: React.FC<ContextualTimelinePanelProps> = ({
             }
           }
         });
+      } else if (scandal.politicalParty) {
+        // New format: single politicalParty string
+        const partyName = scandal.politicalParty;
+        if (partyName) {
+          const existing = parties.get(partyName);
+          if (existing) {
+            existing.count += 1;
+            existing.scandals.push(scandal);
+          } else {
+            parties.set(partyName, { count: 1, scandals: [scandal] });
+          }
+        }
       }
     });
 
@@ -247,7 +259,7 @@ const ContextualTimelinePanel: React.FC<ContextualTimelinePanelProps> = ({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 rounded-t-3xl shadow-2xl z-50 max-h-[80vh] overflow-hidden"
+            className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 z-50 h-screen overflow-hidden"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">

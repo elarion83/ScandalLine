@@ -35,6 +35,7 @@ const ScrollHint: React.FC<ScrollHintProps> = ({ show = true, scrollPosition = 0
       className="scrollhint fixed w-screen flex justify-center items-center pointer-events-none"
       style={{
         top: '50%',
+        zIndex: 1,
         transform: 'translateY(-50%)',
         opacity: opacity,
         transition: 'opacity 0.3s ease-out'

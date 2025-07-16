@@ -356,9 +356,11 @@
 /* Bouton SK central - le bouton principal de l'application */
 .sk-central-button {
   width: 90px;
+  animation: none !important;
   height: 90px;
+  margin-bottom: 20px;
   border-radius: 50% !important;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.2) !important;
   box-shadow: 
     0 8px 32px rgba(139, 92, 246, 0.3),
     0 4px 16px rgba(217, 70, 239, 0.2),

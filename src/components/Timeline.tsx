@@ -589,7 +589,7 @@ const Timeline: React.FC<TimelineProps> = ({
 
       <div className="flex flex-1 overflow-hidden relative">
           <div 
-            className={`timeline-controls ${state.showFilters ? 'filters-open' : ''} ${state.showStats ? 'stats-open' : ''} fixed bottom-0 left-1/2 transform mb-12 md:mb-0`} 
+            className={`timeline-controls ${state.showFilters ? 'filters-open' : ''} ${state.showStats ? 'stats-open' : ''} fixed bottom-0 left-1/2 transform mb-2 md:mb-0`} 
             style={{ zIndex: 50 }}
           >
                 {/* Container principal */}
@@ -694,8 +694,6 @@ const Timeline: React.FC<TimelineProps> = ({
                         >
                           <div className="flex items-center justify-center relative">
                             <span className="text-white font-bold text-lg tracking-tight drop-shadow-sm">Sk</span>
-                            {/* Petit point décoratif pour rendre l'icône plus distinctive */}
-                            <div className="absolute -top-1 -right-1 w-2 h-2 bg-violet-400 rounded-full opacity-80"></div>
                           </div>
                         </button>
                         
@@ -711,28 +709,7 @@ const Timeline: React.FC<TimelineProps> = ({
                           <BarChart3 className={`w-6 h-6 text-white transition-transform ${state.showStats ? 'scale-110' : ''}`} />
                         </button>
                         
-                        {/* Button to switch between cards and points mode by adjusting zoom - masqué sur mobile */}
-                        {!isMobile && (
-                          <button
-                            onClick={() => {
-                              if (state.displayMode === 'points') {
-                                // Switch to cards mode: zoom in to 100% (default zoom level)
-                                dispatch({ type: 'SET_ZOOM', payload: 15 });
-                              } else {
-                                // Switch to points mode: zoom out to 30% of default
-                                dispatch({ type: 'SET_ZOOM', payload: 4.5 });
-                              }
-                            }}
-                            className={`w-10 h-10 ml-1 rounded-full flex items-center justify-center transition-all ${
-                              state.displayMode === 'points'
-                                ? 'bg-green-500/30 ring-2 ring-green-500/50' 
-                                : 'bg-black/10 hover:bg-black/20 active:bg-black/30'
-                            }`}
-                            title={`Passer au mode ${state.displayMode === 'points' ? 'cartes' : 'points'}`}
-                          >
-                            <div className={`w-3 h-3 rounded-full ${state.displayMode === 'points' ? 'bg-green-400' : 'bg-white'}`} />
-                          </button>
-                        )}
+
                     </div>
                 </div>
           </div>
