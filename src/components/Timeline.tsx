@@ -81,8 +81,8 @@ const Timeline: React.FC<TimelineProps> = ({
   // Detect if we're on mobile
   const isMobile = state.viewportWidth < 768; // Standard mobile breakpoint
   
-  // Force mobile behavior: 43% zoom and points mode
-  const mobileZoomLevel = 6.45; // 43% of default zoom (15 * 0.43)
+  // Force mobile behavior: 25% zoom and points mode
+  const mobileZoomLevel = 3.75; // 25% of default zoom (15 * 0.25)
   
   // Auto-switch to points mode when zoomed out significantly (zoom < 40%) or on mobile
   const shouldUsePointsMode = state.zoomLevel < 6 || isMobile; // 40% of default zoom level or mobile
