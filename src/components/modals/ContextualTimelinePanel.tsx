@@ -11,6 +11,11 @@ interface ContextualTimelinePanelProps {
   onClose: () => void;
   scandals: Scandal[];
   onSelectTimeline: (type: 'personality' | 'party', value: string, label: string) => void;
+  activeContextualFilter?: {
+    type: 'personality' | 'party';
+    value: string;
+    label: string;
+  } | null;
 }
 
 interface TimelineOption {
@@ -31,7 +36,8 @@ const ContextualTimelinePanel: React.FC<ContextualTimelinePanelProps> = ({
   isOpen,
   onClose,
   scandals,
-  onSelectTimeline
+  onSelectTimeline,
+  activeContextualFilter
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'personalities' | 'parties'>('all');
@@ -364,9 +370,19 @@ const ContextualTimelinePanel: React.FC<ContextualTimelinePanelProps> = ({
                              </div>
                            )}
                                                      <div>
-                             <h3 className="font-medium text-gray-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
-                               {option.label}
-                             </h3>
+                             <div className="flex items-center gap-2">
+                               <h3 className="font-medium text-gray-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
+                                 {option.label}
+                               </h3>
+                               {/* Badge "Active" si cette option correspond à la timeline actuellement affichée */}
+                               {activeContextualFilter && 
+                                activeContextualFilter.type === option.type && 
+                                activeContextualFilter.value === option.value && (
+                                 <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                                   Active
+                                 </span>
+                               )}
+                             </div>
                              <div className="flex items-center gap-3 mt-1">
                                {/* Affaires */}
                                <div className="flex items-center gap-1">

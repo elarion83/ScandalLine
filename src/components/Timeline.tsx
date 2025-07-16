@@ -932,7 +932,7 @@ const Timeline: React.FC<TimelineProps> = ({
         onClose={() => setShowContextualPanel(false)}
         scandals={scandals}
         onSelectTimeline={handleSelectContextualTimeline}
-        isInContextualTimeline={!!state.contextualFilter}
+        activeContextualFilter={state.contextualFilter}
       />
     </div>
   );
