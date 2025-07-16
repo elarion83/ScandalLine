@@ -408,3 +408,31 @@ export const cleanScandalName = (name: string): string => {
   // Remove content in parentheses (including the parentheses)
   return name.replace(/\s*\([^)]*\)/g, '').trim();
 };
+
+// Fonction pour obtenir le nom de l'icône d'une catégorie
+export const getCategoryIconName = (detailedType: string): string => {
+  const mainCategory = getMainCategory(detailedType);
+  
+  switch (mainCategory) {
+    case 'corruption':
+      return 'Shield';
+    case 'fraude-financiere':
+      return 'DollarSign';
+    case 'manipulation-marche':
+      return 'TrendingUp';
+    case 'tech':
+      return 'Cpu';
+    case 'crise':
+      return 'AlertTriangle';
+    case 'gestion-frauduleuse':
+      return 'Building2';
+    case 'financement-illegal':
+      return 'Vote';
+    case 'crime':
+      return 'Skull';
+    case 'ethique':
+      return 'Scale';
+    default:
+      return 'Shield';
+  }
+};

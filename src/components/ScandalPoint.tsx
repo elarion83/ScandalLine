@@ -1,9 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Scandal } from '../types/scandal';
-import { getMainCategory, cleanScandalName, formatCurrency, getCategoryLabel } from '../utils/scandalUtils';
+import { getMainCategory, cleanScandalName, formatCurrency, getCategoryLabel, getCategoryIconName } from '../utils/scandalUtils';
 import { useTimeline } from '../contexts/TimelineContext';
-import { ExternalLink } from 'lucide-react';
+import { 
+  ExternalLink, 
+  Shield, 
+  DollarSign, 
+  TrendingUp, 
+  Cpu, 
+  AlertTriangle, 
+  Building2, 
+  Vote, 
+  Skull, 
+  Scale 
+} from 'lucide-react';
 
 interface ScandalPointProps {
   scandal: Scandal;
@@ -136,11 +147,38 @@ const ScandalPoint: React.FC<ScandalPointProps> = ({
 
   const currentColor = colorScheme[getState() as keyof typeof colorScheme];
   const pointSize = isSelected ? 'w-8 h-8' : isHovered ? 'w-7 h-7' : 'w-6 h-6';
+  const iconSize = isSelected ? 'w-4 h-4' : isHovered ? 'w-3.5 h-3.5' : 'w-3 h-3';
+
+  // Fonction pour obtenir l'icône basée sur le nom
+  const getIconComponent = (iconName: string) => {
+    switch (iconName) {
+      case 'Shield':
+        return <Shield className={iconSize} />;
+      case 'DollarSign':
+        return <DollarSign className={iconSize} />;
+      case 'TrendingUp':
+        return <TrendingUp className={iconSize} />;
+      case 'Cpu':
+        return <Cpu className={iconSize} />;
+      case 'AlertTriangle':
+        return <AlertTriangle className={iconSize} />;
+      case 'Building2':
+        return <Building2 className={iconSize} />;
+      case 'Vote':
+        return <Vote className={iconSize} />;
+      case 'Skull':
+        return <Skull className={iconSize} />;
+      case 'Scale':
+        return <Scale className={iconSize} />;
+      default:
+        return <Shield className={iconSize} />;
+    }
+  };
 
   return (
     <div className="relative">
       <motion.div
-        className={`absolute rounded-full cursor-pointer transition-all duration-200 ${currentColor} ${pointSize} shadow-lg ${className || ''}`}
+        className={`absolute rounded-full cursor-pointer transition-all duration-200 ${currentColor} ${pointSize} shadow-lg flex items-center justify-center ${className || ''}`}
         style={{
           left: position.x - 10,
           top: position.y,
@@ -157,7 +195,11 @@ const ScandalPoint: React.FC<ScandalPointProps> = ({
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.2 }}
-      />
+      >
+        <div className="text-white">
+          {getIconComponent(getCategoryIconName(scandal.type))}
+        </div>
+      </motion.div>
       
       {/* Desktop Tooltip (hover only) */}
       {isHovered && !isMobile && (
