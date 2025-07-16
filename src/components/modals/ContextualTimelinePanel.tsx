@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Users, Building2, TrendingUp, Star, Search, FileText, DollarSign, Award, Lock } from 'lucide-react';
 import { Scandal } from '../../types/scandal';
 import { perso_Photos } from '../../data/perso_photos';
+import { formatLargeNumber } from '../../utils/scandalUtils';
 
 interface ContextualTimelinePanelProps {
   isOpen: boolean;
@@ -396,7 +397,7 @@ const ContextualTimelinePanel: React.FC<ContextualTimelinePanelProps> = ({
                                  <div className="flex items-center gap-1">
                                    <DollarSign className="w-3 h-3 text-red-500" />
                                    <span className="text-xs text-gray-600 dark:text-gray-400">
-                                     {option.stats.moneyAmount.toLocaleString()}
+                                     {formatLargeNumber(option.stats.moneyAmount)}
                                    </span>
                                  </div>
                                )}
@@ -406,7 +407,7 @@ const ContextualTimelinePanel: React.FC<ContextualTimelinePanelProps> = ({
                                  <div className="flex items-center gap-1">
                                    <Award className="w-3 h-3 text-orange-500" />
                                    <span className="text-xs text-gray-600 dark:text-gray-400">
-                                     {option.stats.fines.toLocaleString()}
+                                     {formatLargeNumber(option.stats.fines)}
                                    </span>
                                  </div>
                                )}
