@@ -95,15 +95,15 @@ const ScandalPoint: React.FC<ScandalPointProps> = ({
         };
       case 'manipulation-marche':
         return {
-          selected: 'bg-orange-500 shadow-lg shadow-orange-200/50',
-          hover: 'bg-orange-400 shadow-md shadow-orange-200/30',
-          default: 'bg-orange-300 dark:bg-orange-600'
+          selected: 'bg-amber-500 shadow-lg shadow-amber-200/50',
+          hover: 'bg-amber-400 shadow-md shadow-amber-200/30',
+          default: 'bg-amber-300 dark:bg-amber-600'
         };
       case 'tech':
         return {
-          selected: 'bg-purple-500 shadow-lg shadow-purple-200/50',
-          hover: 'bg-purple-400 shadow-md shadow-purple-200/30',
-          default: 'bg-purple-300 dark:bg-purple-600'
+          selected: 'bg-cyan-500 shadow-lg shadow-cyan-200/50',
+          hover: 'bg-cyan-400 shadow-md shadow-cyan-200/30',
+          default: 'bg-cyan-300 dark:bg-cyan-600'
         };
       case 'crise':
         return {
@@ -146,8 +146,8 @@ const ScandalPoint: React.FC<ScandalPointProps> = ({
   };
 
   const currentColor = colorScheme[getState() as keyof typeof colorScheme];
-  const pointSize = isSelected ? 'w-8 h-8' : isHovered ? 'w-7 h-7' : 'w-6 h-6';
-  const iconSize = isSelected ? 'w-4 h-4' : isHovered ? 'w-3.5 h-3.5' : 'w-3 h-3';
+  const pointSize = isSelected ? 'w-12 h-12' : isHovered ? 'w-10 h-10' : 'w-8 h-8';
+  const iconSize = isSelected ? 'w-6 h-6' : isHovered ? 'w-5 h-5' : 'w-4 h-4';
 
   // Fonction pour obtenir l'icône basée sur le nom
   const getIconComponent = (iconName: string) => {

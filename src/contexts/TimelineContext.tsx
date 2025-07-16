@@ -30,7 +30,7 @@ export type TimelineAction =
   | { type: 'SET_DISPLAY_MODE'; payload: 'cards' | 'points' };
 
 const initialState: TimelineState = {
-  zoomLevel: 15,
+  zoomLevel: 9, // 60% au lieu de 100% (15 * 0.6 = 9)
   scrollPosition: 0,
   selectedScandalId: null,
   showFilters: false,
