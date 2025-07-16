@@ -164,7 +164,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
       exit={{ x: '-100%' }}
       transition={{ type: 'tween', duration: 0.2 }}
       style={{ zIndex: 50 }}
-      className="w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col h-full absolute top-0 left-0 shadow-2xl"
+      className="w-80 md:w-80 w-full bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col h-full absolute top-0 left-0 shadow-2xl"
     >
       {/* Header */}
       <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-gray-100 dark:bg-gray-800">
@@ -174,9 +174,10 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
         </div>
         <button
           onClick={onClose}
-          className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          className="w-10 h-10 rounded-full bg-red-500 hover:bg-red-600 active:bg-red-700 text-white flex items-center justify-center transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
+          title="Fermer les filtres"
         >
-          <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+          <X className="w-5 h-5" />
         </button>
       </div>
 

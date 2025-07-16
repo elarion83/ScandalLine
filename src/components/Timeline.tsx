@@ -584,6 +584,7 @@ const Timeline: React.FC<TimelineProps> = ({
           }
         }}
         onDragClick={() => setHasUsedDrag(true)}
+        isVisible={!state.showFilters && !state.showStats}
       />
 
       <div className="flex flex-1 overflow-hidden relative">
@@ -681,20 +682,20 @@ const Timeline: React.FC<TimelineProps> = ({
                           )}
                         </button>
                         
-                        {/* Button to open contextual timelines panel - plus gros et entre filtres et stats */}
+                        {/* Button to open contextual timelines panel - le bouton central de l'app */}
                         <button
                           onClick={() => setShowContextualPanel(true)}
-                          className={`w-12 h-12 ml-2 rounded-full flex items-center justify-center transition-all ${
+                          className={`sk-central-button ml-2 flex items-center justify-center ${
                             state.contextualFilter
-                              ? 'bg-violet-500/40 ring-2 ring-violet-500/60 animate-pulse' 
-                              : 'bg-black/10 hover:bg-black/20 active:bg-black/30'
+                              ? 'ring-2 ring-violet-500/60 animate-pulse' 
+                              : ''
                           }`}
                           title="Timelines contextualisées"
                         >
-                          <div className="flex items-center justify-center w-6 h-6 relative">
-                            <span className="text-white font-bold text-sm tracking-tight drop-shadow-sm">Sk</span>
+                          <div className="flex items-center justify-center relative">
+                            <span className="text-white font-bold text-lg tracking-tight drop-shadow-sm">Sk</span>
                             {/* Petit point décoratif pour rendre l'icône plus distinctive */}
-                            <div className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-violet-400 rounded-full opacity-80"></div>
+                            <div className="absolute -top-1 -right-1 w-2 h-2 bg-violet-400 rounded-full opacity-80"></div>
                           </div>
                         </button>
                         

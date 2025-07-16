@@ -17,6 +17,7 @@ interface DynamicStatsBarProps {
   timelineWidth: number;
   onScrollChange?: (newPosition: number) => void;
   onDragClick?: () => void;
+  isVisible?: boolean;
 }
 
 const DynamicStatsBar: React.FC<DynamicStatsBarProps> = ({ 
@@ -29,7 +30,8 @@ const DynamicStatsBar: React.FC<DynamicStatsBarProps> = ({
   viewportWidth,
   timelineWidth,
   onScrollChange,
-  onDragClick
+  onDragClick,
+  isVisible = true
 }) => {
   const isDraggingRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -137,6 +139,11 @@ const DynamicStatsBar: React.FC<DynamicStatsBarProps> = ({
     document.addEventListener('touchmove', handleTouchMove, { passive: false });
     document.addEventListener('touchend', handleTouchEnd);
   };
+
+  // Si le composant n'est pas visible, ne rien afficher
+  if (!isVisible) {
+    return null;
+  }
 
   return (
     <>

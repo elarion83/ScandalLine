@@ -352,3 +352,59 @@
 .timeline-container * {
   transition: left 300ms ease-in-out, transform 300ms ease-in-out;
 }
+
+/* Bouton SK central - le bouton principal de l'application */
+.sk-central-button {
+  width: 90px;
+  height: 90px;
+  border-radius: 50% !important;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 8px 32px rgba(139, 92, 246, 0.3),
+    0 4px 16px rgba(217, 70, 239, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.sk-central-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sk-central-button:hover::before {
+  opacity: 1;
+}
+
+.sk-central-button:active {
+  transform: scale(0.95);
+  box-shadow: 
+    0 4px 16px rgba(139, 92, 246, 0.4),
+    0 2px 8px rgba(217, 70, 239, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Dark mode adjustments */
+.dark .sk-central-button {
+  background: linear-gradient(135deg, 
+    rgba(139, 92, 246, 0.8) 0%,
+    rgba(217, 70, 239, 0.8) 50%,
+    rgba(139, 92, 246, 0.8) 100%
+  );
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 
+    0 8px 32px rgba(139, 92, 246, 0.4),
+    0 4px 16px rgba(217, 70, 239, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
