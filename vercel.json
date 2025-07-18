@@ -2,7 +2,7 @@
   "version": 2,
   "functions": {
     "api/og.ts": {
-      "runtime": "edge"
+      "runtime": "@vercel/edge@1.0.0"
     }
   },
   "routes": [
