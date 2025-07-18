@@ -227,25 +227,25 @@ const createHandler = async () => {
 
           // Texte SK
           ctx.fillStyle = 'white';
-          ctx.font = 'bold 24px Arial';
+          ctx.font = 'bold 24px sans-serif';
           ctx.textAlign = 'center';
           ctx.fillText('SK', 120, 130);
 
           // Titre ScandalLine
-          ctx.font = 'bold 32px Arial';
+          ctx.font = 'bold 32px sans-serif';
           ctx.textAlign = 'left';
           ctx.fillText('ScandalLine', 180, 130);
 
           // Nom de la personnalité au centre
-          ctx.font = 'bold 64px Arial';
+          ctx.font = 'bold 64px sans-serif';
           ctx.textAlign = 'center';
           ctx.fillStyle = 'white';
           ctx.fillText(name, 600, 280);
 
           // Sous-titre
-          ctx.font = '24px Arial';
+          ctx.font = '24px sans-serif';
           ctx.fillStyle = '#e2e8f0';
-          ctx.fillText(type === 'personality' ? 'Personnalité politique' : 'Parti politique', 600, 320);
+          ctx.fillText(type === 'personality' ? 'Personnalite politique' : 'Parti politique', 600, 320);
 
           // Box des statistiques en bas
           ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
@@ -257,12 +257,12 @@ const createHandler = async () => {
           ctx.stroke();
 
           // Statistiques - Scandales (gauche)
-          ctx.font = 'bold 48px Arial';
+          ctx.font = 'bold 48px sans-serif';
           ctx.textAlign = 'center';
           ctx.fillStyle = '#fbbf24';
           ctx.fillText(scandals, 450, 530);
           
-          ctx.font = '18px Arial';
+          ctx.font = '18px sans-serif';
           ctx.fillStyle = '#e2e8f0';
           ctx.fillText('Scandales', 450, 560);
 
@@ -275,13 +275,13 @@ const createHandler = async () => {
           ctx.stroke();
 
           // Statistiques - Montant (droite)
-          ctx.font = 'bold 48px Arial';
+          ctx.font = 'bold 48px sans-serif';
           ctx.fillStyle = '#ef4444';
           ctx.fillText(amount, 750, 530);
           
-          ctx.font = '18px Arial';
+          ctx.font = '18px sans-serif';
           ctx.fillStyle = '#e2e8f0';
-          ctx.fillText('Montant concerné', 750, 560);
+          ctx.fillText('Montant concerne', 750, 560);
 
           // Convertir en JPEG
           const buffer = canvas.toBuffer('image/jpeg', { quality: 0.9 });
