@@ -1,38 +1,25 @@
-export const config = {
-  runtime: 'edge',
-};
-
-export default async function handler(req) {
+export default async function handler(req, res) {
   try {
-    const url = new URL(req.url);
-    const searchParams = url.searchParams;
+    console.log('[OG Simple API] Request received:', req.url);
+    console.log('[OG Simple API] Query:', req.query);
     
     // Toujours retourner du JSON pour debug
-    return new Response(JSON.stringify({
-      message: 'API OG Edge Runtime fonctionne !',
+    return res.status(200).json({
+      message: 'API OG Simple fonctionne !',
       timestamp: new Date().toISOString(),
       url: req.url,
       method: req.method,
-      query: Object.fromEntries(searchParams.entries()),
-      runtime: 'edge'
-    }), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      query: req.query,
+      runtime: 'nodejs'
     });
     
   } catch (error) {
-    return new Response(JSON.stringify({
-      error: 'Erreur dans l\'API OG',
+    console.error('[OG Simple API] Error:', error);
+    return res.status(500).json({
+      error: 'Erreur dans l\'API OG Simple',
       message: error.message,
       stack: error.stack,
       timestamp: new Date().toISOString()
-    }), {
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-      },
     });
   }
 } 

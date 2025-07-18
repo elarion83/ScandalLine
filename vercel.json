@@ -5,7 +5,6 @@
       "src": "server.js",
       "use": "@vercel/node"
     },
-
     {
       "src": "package.json",
       "use": "@vercel/static-build",
@@ -15,19 +14,12 @@
       }
     }
   ],
+  "functions": {
+    "api/*.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
   "routes": [
-    {
-      "src": "/api/test",
-      "dest": "/api/test.js"
-    },
-    {
-      "src": "/api/og-simple",
-      "dest": "/api/og-simple.js"
-    },
-    {
-      "src": "/api/og",
-      "dest": "/api/og.js"
-    },
     {
       "src": "/assets/(.*)",
       "dest": "/dist/assets/$1"
@@ -41,7 +33,7 @@
       "dest": "/dist/index.html"
     },
     {
-      "src": "/(.*)",
+      "src": "/((?!api).*)",
       "dest": "/dist/$1"
     }
   ]
