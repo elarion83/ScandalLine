@@ -3,7 +3,7 @@ import { ZoomIn, ZoomOut, Filter, BarChart3, FileText, Building2, Users, ArrowRi
 import { AnimatePresence, motion } from 'framer-motion';
 import { Scandal } from '../types/scandal';
 import { filterScandals, calculateStats, getCategoryLabel } from '../utils/scandalUtils';
-import { filterTimelineBy } from '../utils/contextualFilters';
+import { filterTimelineBy, createContextualFilter } from '../utils/contextualFilters';
 import { nameToSlug } from '../utils/shareUtils';
 import { 
   calculateTimelineWidth, 
@@ -67,6 +67,15 @@ const Timeline: React.FC<TimelineProps> = ({
     : scandals;
   
   const filteredScandals = filterScandals(contextuallyFilteredScandals, state.filters);
+  
+  // Debug: log the filters when they change
+  React.useEffect(() => {
+    console.log('[DEBUG Timeline] State filters:', {
+      personalities: state.filters.personalities,
+      contextualFilter: state.contextualFilter,
+      filteredCount: filteredScandals.length
+    });
+  }, [state.filters.personalities, state.contextualFilter, filteredScandals.length]);
   const stats = calculateStats(filteredScandals);
 
   // Calculate dynamic date range based on filtered scandals
@@ -313,28 +322,28 @@ const Timeline: React.FC<TimelineProps> = ({
       // Reset du flag avant de changer de contexte
       initialScrollDoneRef.current = false;
       
-      // Create contextual filter
-      const contextualFilter = {
-        type,
-        value,
-        label
-      };
+      // D'abord réinitialiser le contexte (comme PersonalityModal)
+      dispatch({ type: 'SET_CONTEXTUAL_FILTER', payload: null });
       
-      // Set contextual filter
+      // Puis créer et appliquer le nouveau filtre contextuel
+      const contextualFilter = createContextualFilter(type, value, label);
       dispatch({ type: 'SET_CONTEXTUAL_FILTER', payload: contextualFilter });
       
-      // Get filtered scandals
+      // Get filtered scandals avec le nouveau contexte
       const filteredContextScandals = filterTimelineBy(scandals, contextualFilter);
       
       // Calculate new date range based on filtered scandals
       const { start, end } = calculateDynamicDateRange(filteredContextScandals);
       
-      // Update filters with new date range
+      // Reset filters with new date range (pour éviter les intersections de filtres)
       dispatch({ 
         type: 'SET_FILTERS', 
         payload: { 
           ...state.filters,
-          dateRange: { start, end }
+          dateRange: { start, end },
+          types: [],
+          parties: [],
+          personalities: []
         } 
       });
       
