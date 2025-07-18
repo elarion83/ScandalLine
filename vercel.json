@@ -14,7 +14,16 @@
       }
     }
   ],
+  "functions": {
+    "api/og.ts": {
+      "runtime": "edge"
+    }
+  },
   "routes": [
+    {
+      "src": "/api/og",
+      "dest": "/api/og.ts"
+    },
     {
       "src": "/assets/(.*)",
       "dest": "/dist/assets/$1"

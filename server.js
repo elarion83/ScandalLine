@@ -237,12 +237,13 @@ const createHandler = async () => {
           .replace(/<meta property="twitter:title" content=".*?"/, `<meta property="twitter:title" content="${title}"`)
           .replace(/<meta property="twitter:description" content=".*?"/, `<meta property="twitter:description" content="${description}"`);
 
-        // Ajouter l'image si elle existe
-        if (photoUrl) {
-          modifiedHtml = modifiedHtml
-            .replace(/<meta property="og:image" content=".*?"/, `<meta property="og:image" content="${photoUrl}"`)
-            .replace(/<meta property="twitter:image" content=".*?"/, `<meta property="twitter:image" content="${photoUrl}"`);
-        }
+        // Générer l'URL de l'image de partage dynamique
+        const ogImageUrl = `${domain}/api/og?name=${encodeURIComponent(name)}&count=${personalityScandals.length}&amount=${totalAmount}&fines=${totalFines}&prison=${totalPrisonYears}`;
+        
+        // Utiliser l'image dynamique pour les métadonnées
+        modifiedHtml = modifiedHtml
+          .replace(/<meta property="og:image" content=".*?"/, `<meta property="og:image" content="${ogImageUrl}"`)
+          .replace(/<meta property="twitter:image" content=".*?"/, `<meta property="twitter:image" content="${ogImageUrl}"`);
 
         // Injecter les données initiales dans le HTML
         const initialData = {
