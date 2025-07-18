@@ -33,10 +33,12 @@ const findPhotoUrl = (slug, photos) => {
 
 // Fonction pour obtenir le domaine complet
 const getDomain = (req) => {
-  // Utiliser directement l'URL de la requête pour éviter les problèmes d'environnement
-  const protocol = req.headers['x-forwarded-proto'] || 'http';
-  const host = req.headers.host;
-  return `${protocol}://${host}`;
+  // En prod sur Vercel
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  // En local
+  return `http://${req.headers.host}`;
 };
 
 // Fonction pour convertir un slug en nom
@@ -220,10 +222,14 @@ const createHandler = async () => {
         const photoUrl = findPhotoUrl(slug, perso_Photos);
         const domain = getDomain(req);
         
+        // Générer l'URL de l'image OG dynamique
+        const ogImageUrl = `${domain}/api/og?name=${encodeURIComponent(name)}&count=${personalityScandals.length}&amount=${totalAmount}&fines=${totalFines}&prison=${totalPrisonYears}`;
+        
         // Debug de la recherche d'image
         console.log('Recherche image pour:', slug);
         console.log('Premier objet photos:', perso_Photos[0]);
         console.log('URL trouvée:', photoUrl);
+        console.log('OG Image URL:', ogImageUrl);
 
         // Remplacer les métadonnées dans le HTML
         let modifiedHtml = indexHtml
@@ -235,13 +241,16 @@ const createHandler = async () => {
           .replace(/<meta property="twitter:title" content=".*?"/, `<meta property="twitter:title" content="${title}"`)
           .replace(/<meta property="twitter:description" content=".*?"/, `<meta property="twitter:description" content="${description}"`);
 
-        // Générer l'URL de l'image de partage dynamique
-        const ogImageUrl = `${domain}/api/og?name=${encodeURIComponent(name)}&count=${personalityScandals.length}&amount=${totalAmount}&fines=${totalFines}&prison=${totalPrisonYears}`;
-        
-        // Utiliser l'image dynamique pour les métadonnées
+        // Utiliser l'image OG dynamique comme image principale
         modifiedHtml = modifiedHtml
           .replace(/<meta property="og:image" content=".*?"/, `<meta property="og:image" content="${ogImageUrl}"`)
           .replace(/<meta property="twitter:image" content=".*?"/, `<meta property="twitter:image" content="${ogImageUrl}"`);
+        
+        // Fallback sur la photo de profil si l'API OG n'est pas disponible
+        if (photoUrl) {
+          // Ajouter une balise supplémentaire comme fallback
+          modifiedHtml = modifiedHtml.replace('</head>', `<meta property="og:image:alt" content="Photo de ${name}" />\n</head>`);
+        }
 
         // Injecter les données initiales dans le HTML
         const initialData = {

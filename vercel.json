@@ -17,7 +17,7 @@
   "routes": [
     {
       "src": "/api/og",
-      "dest": "/api/og.cjs"
+      "dest": "/api/og.js"
     },
     {
       "src": "/assets/(.*)",
