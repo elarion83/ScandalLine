@@ -1,5 +1,5 @@
 // API route pour générer des images de partage social
-export default async function handler(req: any, res: any) {
+module.exports = async function handler(req, res) {
   try {
     const { searchParams } = new URL(req.url, `http://${req.headers.host}`)
     const name = searchParams.get('name')
@@ -9,7 +9,7 @@ export default async function handler(req: any, res: any) {
     const prisonYears = searchParams.get('prison')
 
     // Formatage des montants
-    const formatAmount = (amount: string) => {
+    const formatAmount = (amount) => {
       const num = parseInt(amount)
       if (num >= 1000000000) return `${(num / 1000000000).toFixed(1)}Md€`
       if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M€`
