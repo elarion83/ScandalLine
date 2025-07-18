@@ -1,19 +1,26 @@
-import { ImageResponse } from '@vercel/og';
-
-export const config = {
-  runtime: 'edge',
-};
-
-export default async function handler(req) {
+// Test simple d'abord pour vérifier la communication
+export default async function handler(req, res) {
   try {
-    const { searchParams } = new URL(req.url);
+    console.log('[OG API] Request received:', req.url);
+    
+    // Test simple en JSON d'abord
+    if (req.query.test === 'true') {
+      return res.status(200).json({
+        message: 'API OG fonctionne !',
+        timestamp: new Date().toISOString(),
+        query: req.query
+      });
+    }
+
+    // Import dynamique pour éviter les erreurs de build
+    const { ImageResponse } = await import('@vercel/og');
     
     // Paramètres avec valeurs par défaut pour éviter les erreurs
-    const name = searchParams.get('name') || 'ScandalLine';
-    const scandalsCount = searchParams.get('count') || '0';
-    const totalAmount = searchParams.get('amount') || '0';
-    const totalFines = searchParams.get('fines') || '0';
-    const totalPrison = searchParams.get('prison') || '0';
+    const name = req.query.name || 'ScandalLine';
+    const scandalsCount = req.query.count || '0';
+    const totalAmount = req.query.amount || '0';
+    const totalFines = req.query.fines || '0';
+    const totalPrison = req.query.prison || '0';
     
     // Fonction helper pour formater les nombres
     const formatLargeNumber = (num) => {
@@ -30,7 +37,7 @@ export default async function handler(req) {
       <text x="60" y="25" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#1f2937">ScandalLine</text>
     </svg>`;
 
-    return new ImageResponse(
+    const imageResponse = new ImageResponse(
       (
         <div
           style={{
@@ -243,6 +250,10 @@ export default async function handler(req) {
         height: 630,
       }
     );
+
+    console.log('[OG API] Image générée avec succès');
+    return imageResponse;
+    
   } catch (error) {
     console.error('Erreur lors de la génération de l\'image OG:', error);
     

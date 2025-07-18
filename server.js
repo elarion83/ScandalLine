@@ -33,11 +33,15 @@ const findPhotoUrl = (slug, photos) => {
 
 // Fonction pour obtenir le domaine complet
 const getDomain = (req) => {
-  // En prod sur Vercel
+  // Prioriser le domaine personnalisé en production
+  if (process.env.VERCEL_ENV === 'production' && req.headers.host) {
+    return `https://${req.headers.host}`;
+  }
+  // En preview ou développement, utiliser VERCEL_URL
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`;
   }
-  // En local
+  // Fallback en local
   return `http://${req.headers.host}`;
 };
 
@@ -222,14 +226,24 @@ const createHandler = async () => {
         const photoUrl = findPhotoUrl(slug, perso_Photos);
         const domain = getDomain(req);
         
-        // Générer l'URL de l'image OG dynamique
-        const ogImageUrl = `${domain}/api/og?name=${encodeURIComponent(name)}&count=${personalityScandals.length}&amount=${totalAmount}&fines=${totalFines}&prison=${totalPrisonYears}`;
+        // Générer l'URL de l'image OG dynamique (avec test d'abord)
+        const ogImageUrl = `${domain}/api/og?test=true&name=${encodeURIComponent(name)}&count=${personalityScandals.length}&amount=${totalAmount}&fines=${totalFines}&prison=${totalPrisonYears}`;
+        
+        // URL de test de l'API
+        const testApiUrl = `${domain}/api/test?from=server`;
         
         // Debug de la recherche d'image
         console.log('Recherche image pour:', slug);
         console.log('Premier objet photos:', perso_Photos[0]);
         console.log('URL trouvée:', photoUrl);
         console.log('OG Image URL:', ogImageUrl);
+        console.log('Test API URL:', testApiUrl);
+        console.log('Domain detection:', { 
+          host: req.headers.host, 
+          vercelUrl: process.env.VERCEL_URL, 
+          vercelEnv: process.env.VERCEL_ENV,
+          finalDomain: domain 
+        });
 
         // Remplacer les métadonnées dans le HTML
         let modifiedHtml = indexHtml
