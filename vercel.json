@@ -6,10 +6,6 @@
       "use": "@vercel/node"
     },
     {
-      "src": "api/og.cjs",
-      "use": "@vercel/node"
-    },
-    {
       "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
