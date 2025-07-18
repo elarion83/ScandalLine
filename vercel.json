@@ -14,6 +14,11 @@
       }
     }
   ],
+  "functions": {
+    "api/og.ts": {
+      "runtime": "@vercel/edge@1.0.0"
+    }
+  },
   "routes": [
     {
       "src": "/api/og",
