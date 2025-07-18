@@ -46,40 +46,23 @@ const getDomain = (req) => {
   return `${protocol}://${host}`;
 };
 
-// Fonction pour obtenir la position actuelle
+// Fonction pour obtenir la position actuelle (identique à PersonalityHint)
 const getCurrentPosition = (scandals, personName) => {
   try {
-    // Chercher dans tous les scandales le dernier poste connu pour cette personne
-    const personalityScandals = scandals.filter(scandal => 
-      scandal.personalities && scandal.personalities.some(p => {
-        const name = typeof p === 'string' ? p : p.personality;
-        return name === personName;
-      })
+    // Trier les scandales par date décroissante
+    const sortedScandals = [...scandals].sort((a, b) => 
+      new Date(b.startDate) - new Date(a.startDate)
     );
 
-    if (personalityScandals.length === 0) return '';
-
-    // Prendre le scandale le plus récent
-    const latestScandal = personalityScandals.sort((a, b) => 
-      new Date(b.startDate) - new Date(a.startDate)
-    )[0];
-
-    // Chercher le poste de cette personne dans ce scandale
-    const personality = latestScandal.personalities.find(p => {
-      const name = typeof p === 'string' ? p : p.personality;
-      return name === personName;
-    });
-
-    if (typeof personality === 'object' && personality.position) {
-      return personality.position;
+    // Trouver le dernier scandale où la personne a un poste
+    for (const scandal of sortedScandals) {
+      const personIndex = scandal.personalities?.indexOf(personName);
+      if (personIndex !== -1 && scandal.positions && scandal.positions[personIndex]) {
+        return scandal.positions[personIndex];
+      }
     }
 
-    // Si pas de poste spécifique, utiliser les positions générales du scandale
-    if (latestScandal.positions && latestScandal.positions.length > 0) {
-      return latestScandal.positions[0];
-    }
-
-    return '';
+    return ''; // Retourner une chaîne vide si aucun poste trouvé
   } catch (error) {
     console.error('Erreur lors de la recherche de position:', error);
     return '';
@@ -166,6 +149,7 @@ const createHandler = async () => {
           const amount = url.searchParams.get('amount') || '0€';
           const type = url.searchParams.get('type') || 'personality';
           const slug = url.searchParams.get('slug') || '';
+          const position = url.searchParams.get('position') || '';
 
           console.log('[DEBUG] Paramètres OG:', { name, scandals, amount, type, slug });
 
@@ -258,10 +242,15 @@ const createHandler = async () => {
           ctx.fillStyle = 'white';
           ctx.fillText(name, 600, 180); // Remonté bien plus haut
 
-          // Sous-titre (remonté aussi)
+          // Sous-titre avec le poste de la personne
+          let subtitle = 'Parti politique';
+          if (type === 'personality') {
+            subtitle = position || 'Personnalite politique';
+          }
+          
           ctx.font = '24px Arial, DejaVu Sans, sans-serif';
           ctx.fillStyle = '#e2e8f0';
-          ctx.fillText(type === 'personality' ? 'Personnalite politique' : 'Parti politique', 600, 320); // Plus haut
+          ctx.fillText(subtitle, 600, 320);
 
           // Box des statistiques en bas
           ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
@@ -278,9 +267,9 @@ const createHandler = async () => {
           ctx.fillStyle = '#fbbf24';
           ctx.fillText(scandals, 450, 500); // Position ajustée
           
-          ctx.font = '16px Arial, DejaVu Sans, sans-serif';
+          ctx.font = '28px Arial, DejaVu Sans, sans-serif';
           ctx.fillStyle = '#e2e8f0';
-          ctx.fillText('Scandales', 450, 570); // Plus d'espace entre nombre et texte
+          ctx.fillText('Scandales', 450, 540); // Plus d'espace entre nombre et texte
 
           // Séparateur vertical
           ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
@@ -295,9 +284,9 @@ const createHandler = async () => {
           ctx.fillStyle = '#ef4444';
           ctx.fillText(amount, 750, 500);
           
-          ctx.font = '16px Arial, DejaVu Sans, sans-serif';
+          ctx.font = '28px Arial, DejaVu Sans, sans-serif';
           ctx.fillStyle = '#e2e8f0';
-          ctx.fillText('Montant concerne', 750, 570);
+          ctx.fillText('Montant concerne', 750, 540);
 
           // Convertir en JPEG
           const buffer = canvas.toBuffer('image/jpeg', { quality: 0.9 });
@@ -459,7 +448,7 @@ const createHandler = async () => {
           .replace(/href="\/assets\//g, 'href="http://localhost:3000/assets/');
 
         // Générer l'URL de l'image OG dynamique
-        const ogImageUrl = `${domain}/api/og?name=${encodeURIComponent(name)}&scandals=${personalityScandals.length}&amount=${encodeURIComponent(formatEuros(totalAmount))}&type=personality&slug=${encodeURIComponent(slug)}`;
+        const ogImageUrl = `${domain}/api/og?name=${encodeURIComponent(name)}&scandals=${personalityScandals.length}&amount=${encodeURIComponent(formatEuros(totalAmount))}&type=personality&slug=${encodeURIComponent(slug)}&position=${encodeURIComponent(currentPosition || '')}`;
         
         // Ajouter l'image OG générée dynamiquement
         modifiedHtml = modifiedHtml
