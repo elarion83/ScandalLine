@@ -152,13 +152,12 @@ const createHandler = async () => {
         try {
           const { createCanvas, loadImage, registerFont } = await import('canvas');
           
-          // Enregistrer une police par défaut robuste
+          // Enregistrer la police Arial locale
           try {
-            // Utiliser la police Arial embarquée
-            registerFont('node_modules/@canvas-fonts/arial/files/arial.ttf', { family: 'Arial' });
-            console.log('[DEBUG] Police Arial embarquée chargée avec succès');
+            registerFont('./public/fonts/arial.ttf', { family: 'Arial' });
+            console.log('[DEBUG] Police Arial locale chargée avec succès');
           } catch (e) {
-            console.log('[DEBUG] Police Arial embarquée non disponible:', e.message);
+            console.log('[DEBUG] Police Arial locale non disponible:', e.message);
           }
           
           // Récupérer les paramètres
