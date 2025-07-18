@@ -33,12 +33,10 @@ const findPhotoUrl = (slug, photos) => {
 
 // Fonction pour obtenir le domaine complet
 const getDomain = (req) => {
-  // En prod sur Vercel
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}`;
-  }
-  // En local
-  return `http://${req.headers.host}`;
+  // Utiliser directement l'URL de la requête pour éviter les problèmes d'environnement
+  const protocol = req.headers['x-forwarded-proto'] || 'http';
+  const host = req.headers.host;
+  return `${protocol}://${host}`;
 };
 
 // Fonction pour convertir un slug en nom

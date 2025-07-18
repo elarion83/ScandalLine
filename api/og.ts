@@ -1,11 +1,7 @@
 import { ImageResponse } from '@vercel/og'
 
-export const config = {
-  runtime: 'edge',
-}
-
-export default async function handler(req: Request) {
-  const { searchParams } = new URL(req.url)
+export default async function handler(req: any, res: any) {
+  const { searchParams } = new URL(req.url, `http://${req.headers.host}`)
   const name = searchParams.get('name')
   const scandalsCount = searchParams.get('count')
   const totalAmount = searchParams.get('amount')
