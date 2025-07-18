@@ -226,18 +226,18 @@ const createHandler = async () => {
         const photoUrl = findPhotoUrl(slug, perso_Photos);
         const domain = getDomain(req);
         
-        // Générer l'URL de l'image OG dynamique (avec test d'abord)
-        const ogImageUrl = `${domain}/api/og?test=true&name=${encodeURIComponent(name)}&count=${personalityScandals.length}&amount=${totalAmount}&fines=${totalFines}&prison=${totalPrisonYears}`;
-        
-        // URL de test de l'API
+        // URLs de test pour debug
         const testApiUrl = `${domain}/api/test?from=server`;
+        const ogSimpleUrl = `${domain}/api/og-simple?name=${encodeURIComponent(name)}&count=${personalityScandals.length}`;
+        const ogImageUrl = `${domain}/api/og?test=true&name=${encodeURIComponent(name)}&count=${personalityScandals.length}&amount=${totalAmount}&fines=${totalFines}&prison=${totalPrisonYears}`;
         
         // Debug de la recherche d'image
         console.log('Recherche image pour:', slug);
         console.log('Premier objet photos:', perso_Photos[0]);
         console.log('URL trouvée:', photoUrl);
-        console.log('OG Image URL:', ogImageUrl);
         console.log('Test API URL:', testApiUrl);
+        console.log('OG Simple URL:', ogSimpleUrl);
+        console.log('OG Image URL:', ogImageUrl);
         console.log('Domain detection:', { 
           host: req.headers.host, 
           vercelUrl: process.env.VERCEL_URL, 

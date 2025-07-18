@@ -1,26 +1,36 @@
-// Test simple d'abord pour vérifier la communication
-export default async function handler(req, res) {
+import { ImageResponse } from '@vercel/og';
+
+export const config = {
+  runtime: 'edge',
+};
+
+export default async function handler(req) {
   try {
+    const url = new URL(req.url);
+    const searchParams = url.searchParams;
+    
     console.log('[OG API] Request received:', req.url);
     
     // Test simple en JSON d'abord
-    if (req.query.test === 'true') {
-      return res.status(200).json({
+    if (searchParams.get('test') === 'true') {
+      return new Response(JSON.stringify({
         message: 'API OG fonctionne !',
         timestamp: new Date().toISOString(),
-        query: req.query
+        query: Object.fromEntries(searchParams.entries())
+      }), {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
     }
-
-    // Import dynamique pour éviter les erreurs de build
-    const { ImageResponse } = await import('@vercel/og');
     
     // Paramètres avec valeurs par défaut pour éviter les erreurs
-    const name = req.query.name || 'ScandalLine';
-    const scandalsCount = req.query.count || '0';
-    const totalAmount = req.query.amount || '0';
-    const totalFines = req.query.fines || '0';
-    const totalPrison = req.query.prison || '0';
+    const name = searchParams.get('name') || 'ScandalLine';
+    const scandalsCount = searchParams.get('count') || '0';
+    const totalAmount = searchParams.get('amount') || '0';
+    const totalFines = searchParams.get('fines') || '0';
+    const totalPrison = searchParams.get('prison') || '0';
     
     // Fonction helper pour formater les nombres
     const formatLargeNumber = (num) => {
@@ -257,8 +267,20 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error('Erreur lors de la génération de l\'image OG:', error);
     
-    // Image de fallback en cas d'erreur
-    return new ImageResponse(
+    // Retourner une erreur JSON en cas de problème
+    return new Response(JSON.stringify({
+      error: 'Erreur lors de la génération de l\'image',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    }), {
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    // Image de fallback en cas d'erreur (commenté pour debug)
+    /*return new ImageResponse(
       (
         <div
           style={{
@@ -297,6 +319,6 @@ export default async function handler(req, res) {
         width: 1200,
         height: 630,
       }
-    );
+    );*/
   }
 } 
