@@ -2,10 +2,6 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/og.js",
-      "use": "@vercel/node"
-    },
-    {
       "src": "server.js",
       "use": "@vercel/node"
     },
@@ -21,7 +17,7 @@
   "routes": [
     {
       "src": "/api/og",
-      "dest": "/api/og.js"
+      "dest": "/server.js"
     },
     {
       "src": "/assets/(.*)",
