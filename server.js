@@ -150,7 +150,16 @@ const createHandler = async () => {
       if (pathname === '/api/og') {
         console.log('[DEBUG] Route API OG');
         try {
-          const { createCanvas, loadImage } = await import('canvas');
+          const { createCanvas, loadImage, registerFont } = await import('canvas');
+          
+          // Enregistrer une police par défaut robuste
+          try {
+            // Utiliser la police Arial embarquée
+            registerFont('node_modules/@canvas-fonts/arial/files/arial.ttf', { family: 'Arial' });
+            console.log('[DEBUG] Police Arial embarquée chargée avec succès');
+          } catch (e) {
+            console.log('[DEBUG] Police Arial embarquée non disponible:', e.message);
+          }
           
           // Récupérer les paramètres
           const name = url.searchParams.get('name') || 'ScandalLine';
@@ -164,6 +173,9 @@ const createHandler = async () => {
           // Créer le canvas
           const canvas = createCanvas(1200, 630);
           const ctx = canvas.getContext('2d');
+          
+          // Forcer l'utilisation d'une police robuste
+          ctx.textBaseline = 'top';
 
           // Récupérer l'URL de la photo de profil
           const photoUrl = slug && type === 'personality' ? findPhotoUrl(slug, perso_Photos) : null;
@@ -227,23 +239,23 @@ const createHandler = async () => {
 
           // Texte SK
           ctx.fillStyle = 'white';
-          ctx.font = 'bold 24px sans-serif';
+          ctx.font = 'bold 24px Arial, DejaVu Sans, sans-serif';
           ctx.textAlign = 'center';
           ctx.fillText('SK', 120, 130);
 
           // Titre ScandalLine
-          ctx.font = 'bold 32px sans-serif';
+          ctx.font = 'bold 32px Arial, DejaVu Sans, sans-serif';
           ctx.textAlign = 'left';
           ctx.fillText('ScandalLine', 180, 130);
 
           // Nom de la personnalité au centre
-          ctx.font = 'bold 64px sans-serif';
+          ctx.font = 'bold 64px Arial, DejaVu Sans, sans-serif';
           ctx.textAlign = 'center';
           ctx.fillStyle = 'white';
           ctx.fillText(name, 600, 280);
 
           // Sous-titre
-          ctx.font = '24px sans-serif';
+          ctx.font = '24px Arial, DejaVu Sans, sans-serif';
           ctx.fillStyle = '#e2e8f0';
           ctx.fillText(type === 'personality' ? 'Personnalite politique' : 'Parti politique', 600, 320);
 
@@ -257,12 +269,12 @@ const createHandler = async () => {
           ctx.stroke();
 
           // Statistiques - Scandales (gauche)
-          ctx.font = 'bold 48px sans-serif';
+          ctx.font = 'bold 48px Arial, DejaVu Sans, sans-serif';
           ctx.textAlign = 'center';
           ctx.fillStyle = '#fbbf24';
           ctx.fillText(scandals, 450, 530);
           
-          ctx.font = '18px sans-serif';
+          ctx.font = '18px Arial, DejaVu Sans, sans-serif';
           ctx.fillStyle = '#e2e8f0';
           ctx.fillText('Scandales', 450, 560);
 
@@ -275,11 +287,11 @@ const createHandler = async () => {
           ctx.stroke();
 
           // Statistiques - Montant (droite)
-          ctx.font = 'bold 48px sans-serif';
+          ctx.font = 'bold 48px Arial, DejaVu Sans, sans-serif';
           ctx.fillStyle = '#ef4444';
           ctx.fillText(amount, 750, 530);
           
-          ctx.font = '18px sans-serif';
+          ctx.font = '18px Arial, DejaVu Sans, sans-serif';
           ctx.fillStyle = '#e2e8f0';
           ctx.fillText('Montant concerne', 750, 560);
 
