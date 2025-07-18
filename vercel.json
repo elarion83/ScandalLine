@@ -5,7 +5,7 @@
       "src": "server.js",
       "use": "@vercel/node",
       "config": {
-        "includeFiles": ["public/fonts/**"]
+        "includeFiles": ["public/fonts/**", "public/logo_letters_white.png"]
       }
     },
     {

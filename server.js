@@ -230,33 +230,38 @@ const createHandler = async () => {
             ctx.fillRect(0, 0, 1200, 630);
           }
 
-          // Logo SK en haut à gauche
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-          ctx.beginPath();
-          ctx.arc(120, 120, 40, 0, 2 * Math.PI);
-          ctx.fill();
+          // Logo SK en haut à gauche (sans déformation)
+          try {
+            const logoImage = await loadImage('./public/logo_letters_white.png');
+            // Préserver les proportions du logo
+            const logoWidth = 100;
+            const logoHeight = 60; // Ajuster selon les proportions réelles
+            ctx.drawImage(logoImage, 50, 50, logoWidth, logoHeight);
+            console.log('[DEBUG] Logo SK chargé avec succès');
+          } catch (e) {
+            console.log('[DEBUG] Logo SK non trouvé, fallback vers texte:', e.message);
+            // Fallback: cercle avec texte SK
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.beginPath();
+            ctx.arc(100, 80, 30, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 20px Arial, DejaVu Sans, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('SK', 100, 87);
+          }
 
-          // Texte SK
-          ctx.fillStyle = 'white';
-          ctx.font = 'bold 24px Arial, DejaVu Sans, sans-serif';
-          ctx.textAlign = 'center';
-          ctx.fillText('SK', 120, 130);
-
-          // Titre ScandalLine
-          ctx.font = 'bold 32px Arial, DejaVu Sans, sans-serif';
-          ctx.textAlign = 'left';
-          ctx.fillText('ScandalLine', 180, 130);
-
-          // Nom de la personnalité au centre
+          // Nom de la personnalité au centre (remonté pour éviter le visage)
           ctx.font = 'bold 64px Arial, DejaVu Sans, sans-serif';
           ctx.textAlign = 'center';
           ctx.fillStyle = 'white';
-          ctx.fillText(name, 600, 280);
+          ctx.fillText(name, 600, 180); // Remonté bien plus haut
 
-          // Sous-titre
+          // Sous-titre (remonté aussi)
           ctx.font = '24px Arial, DejaVu Sans, sans-serif';
           ctx.fillStyle = '#e2e8f0';
-          ctx.fillText(type === 'personality' ? 'Personnalite politique' : 'Parti politique', 600, 320);
+          ctx.fillText(type === 'personality' ? 'Personnalite politique' : 'Parti politique', 600, 320); // Plus haut
 
           // Box des statistiques en bas
           ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
@@ -268,31 +273,31 @@ const createHandler = async () => {
           ctx.stroke();
 
           // Statistiques - Scandales (gauche)
-          ctx.font = 'bold 48px Arial, DejaVu Sans, sans-serif';
+          ctx.font = 'bold 42px Arial, DejaVu Sans, sans-serif'; // Plus petit pour éviter débordement
           ctx.textAlign = 'center';
           ctx.fillStyle = '#fbbf24';
-          ctx.fillText(scandals, 450, 530);
+          ctx.fillText(scandals, 450, 500); // Position ajustée
           
-          ctx.font = '18px Arial, DejaVu Sans, sans-serif';
+          ctx.font = '16px Arial, DejaVu Sans, sans-serif';
           ctx.fillStyle = '#e2e8f0';
-          ctx.fillText('Scandales', 450, 560);
+          ctx.fillText('Scandales', 450, 570); // Plus d'espace entre nombre et texte
 
           // Séparateur vertical
           ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
           ctx.lineWidth = 2;
           ctx.beginPath();
-          ctx.moveTo(600, 500);
+          ctx.moveTo(600, 510);
           ctx.lineTo(600, 580);
           ctx.stroke();
 
           // Statistiques - Montant (droite)
-          ctx.font = 'bold 48px Arial, DejaVu Sans, sans-serif';
+          ctx.font = 'bold 42px Arial, DejaVu Sans, sans-serif';
           ctx.fillStyle = '#ef4444';
-          ctx.fillText(amount, 750, 530);
+          ctx.fillText(amount, 750, 500);
           
-          ctx.font = '18px Arial, DejaVu Sans, sans-serif';
+          ctx.font = '16px Arial, DejaVu Sans, sans-serif';
           ctx.fillStyle = '#e2e8f0';
-          ctx.fillText('Montant concerne', 750, 560);
+          ctx.fillText('Montant concerne', 750, 570);
 
           // Convertir en JPEG
           const buffer = canvas.toBuffer('image/jpeg', { quality: 0.9 });
