@@ -5,6 +5,7 @@ import { Scandal } from '../types/scandal';
 import { filterScandals, calculateStats, getCategoryLabel } from '../utils/scandalUtils';
 import { filterTimelineBy, createContextualFilter } from '../utils/contextualFilters';
 import { nameToSlug } from '../utils/shareUtils';
+import { allScandals } from '../data';
 import { 
   calculateTimelineWidth, 
   calculateScandalPositions, 
@@ -63,8 +64,8 @@ const Timeline: React.FC<TimelineProps> = ({
 
   // Apply contextual filter first, then regular filters
   const contextuallyFilteredScandals = state.contextualFilter 
-    ? filterTimelineBy(scandals, state.contextualFilter)
-    : scandals;
+    ? filterTimelineBy(allScandals, state.contextualFilter)
+    : allScandals;
   
   const filteredScandals = filterScandals(contextuallyFilteredScandals, state.filters);
   
@@ -181,7 +182,7 @@ const Timeline: React.FC<TimelineProps> = ({
     if (containerRef.current) {
       containerRef.current.scrollTop = 0;
     }
-  }, [scandals, state.contextualFilter]); // Déclencher quand les scandales changent ou quand on change de contexte
+  }, [state.contextualFilter]); // Déclencher quand on change de contexte
 
   // Update filters with new date range
   useEffect(() => {
@@ -252,8 +253,8 @@ const Timeline: React.FC<TimelineProps> = ({
       // Set contextual filter
       dispatch({ type: 'SET_CONTEXTUAL_FILTER', payload: filter });
       
-      // Get filtered scandals
-      const filteredContextScandals = filterTimelineBy(scandals, filter);
+      // Get filtered scandals (utiliser allScandals, pas la prop scandals qui peut être déjà filtrée)
+      const filteredContextScandals = filterTimelineBy(allScandals, filter);
       
       // Calculate new date range based on filtered scandals
       const { start, end } = calculateDynamicDateRange(filteredContextScandals);
@@ -329,8 +330,8 @@ const Timeline: React.FC<TimelineProps> = ({
       const contextualFilter = createContextualFilter(type, value, label);
       dispatch({ type: 'SET_CONTEXTUAL_FILTER', payload: contextualFilter });
       
-      // Get filtered scandals avec le nouveau contexte
-      const filteredContextScandals = filterTimelineBy(scandals, contextualFilter);
+      // Get filtered scandals avec le nouveau contexte (utiliser allScandals, pas la prop scandals qui peut être déjà filtrée)
+      const filteredContextScandals = filterTimelineBy(allScandals, contextualFilter);
       
       // Calculate new date range based on filtered scandals
       const { start, end } = calculateDynamicDateRange(filteredContextScandals);
@@ -339,9 +340,8 @@ const Timeline: React.FC<TimelineProps> = ({
       dispatch({ 
         type: 'SET_FILTERS', 
         payload: { 
-          ...state.filters,
-          dateRange: { start, end },
           types: [],
+          dateRange: { start, end },
           parties: [],
           personalities: []
         } 
