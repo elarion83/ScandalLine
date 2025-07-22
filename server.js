@@ -442,10 +442,7 @@ const createHandler = async () => {
           .replace(/<meta property="og:description" content=".*?"/, `<meta property="og:description" content="${description}"`)
           .replace(/<meta property="og:url" content=".*?"/, `<meta property="og:url" content="${domain}/timeline/${slug}"`)
           .replace(/<meta property="twitter:title" content=".*?"/, `<meta property="twitter:title" content="${title}"`)
-          .replace(/<meta property="twitter:description" content=".*?"/, `<meta property="twitter:description" content="${description}"`)
-          // Corriger les chemins des assets pour qu'ils pointent vers le serveur Node.js
-          .replace(/src="\/assets\//g, 'src="http://localhost:3000/assets/')
-          .replace(/href="\/assets\//g, 'href="http://localhost:3000/assets/');
+          .replace(/<meta property="twitter:description" content=".*?"/, `<meta property="twitter:description" content="${description}"`);
 
         // Générer l'URL de l'image OG dynamique
         const ogImageUrl = `${domain}/api/og?name=${encodeURIComponent(name)}&scandals=${personalityScandals.length}&amount=${encodeURIComponent(formatEuros(totalAmount))}&type=personality&slug=${encodeURIComponent(slug)}&position=${encodeURIComponent(currentPosition || '')}`;
